@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<link rel="stylesheet" href="codenames3.css">
+	<!-- 
+
+	 -->
+	<style>
+		html,
+		body  {
+			/*
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0; 
+			*/
+			background-color: lightblue;
+			font-size: 16px;
+		}
+		.green {
+			background-color: green;
+		}
+		.border1 {
+			border: 1px solid;
+		}
+
+		/* responsive table (left area) */
+		.cardspace {
+			/* font-size: x-small; */
+			float: left;
+  			/* padding: 15px; */
+			  padding-right: 10px;
+			width: max(300px, 68%);
+			height: max(200px, 100%); 
+		}
+		/* responsive right area(game log)) */
+		.log_area {
+			float: left;
+  			/* padding: 15px; */
+			width: max(210px, 27%);
+		}
+
+		td.card {
+			/* width: 208px; height: 134px; */
+			/* 
+			aspect-ratio:3;
+			vertical-align: bottom;
+			height: 20%; 
+			*/
+			width: 20%;
+			text-align: center;
+			border: 1px solid;
+		}
+		.card_text {
+			background-color: white;
+			text-transform: uppercase;
+			vertical-align: bottom;
+		}
+
+		/* option 1 for proportional size */
+		.card_text.bottom_a {
+			margin-top: 30%;
+		}
+		/* option 2  for proportional size */
+		.card .v_spacer {
+			width: 0;
+			padding-top: 30%; 
+			/* position: relative; */
+		}
+
+
+		/* option 3 outer-inner */
+		.card .outer {
+			width: 100%;
+			padding-top: 60%; 
+			position: relative;
+		}
+		.card .outer .inner {
+			position: absolute;
+			width: 100%;
+			bottom: 0;
+		}
+
+		/* junk section */ 
+		/*
+		td .card {width: 20%;}
+
+		div.parent {
+			display: flex;
+			height: 100%;
+		}
+		div.child {
+			display: inline-block;
+			align-self: flex-end;
+			width: 100%;
+		}
+		
+		.bottom_aligner2 {
+			display: inline-block;
+			height: 100%;
+			vertical-align: bottom;
+			width: 0px;
+		}
+
+		div.d {
+			background-color: lightgrey;
+			width: 150px;
+			border: 15px solid green;
+			padding: 50px;
+			margin: 20px;
+		}
+		*/
+	</style>
+</head>
+
+<body>
+	<div class="cardspace border1">
+	<img src="https://helpdeskgeek.com/wp-content/pictures/2017/09/add-new-envrionment-variable.png">	
+	<table class="border1" width="100%">
+		<tr>
+			<td width=20% class="card">
+				<div class="bottom_aligner card grey" />
+				<span class="card_text">КРЕПОСТЬ</div>
+					</div>
+			</td>
+			<td>
+				<div class="card" style="color:Tomato;" />
+				<div class="card_text ">КРdddd</div>
+				</div>
+			</td>
+			<td>
+				<div class="card" />
+				<div class="bottom_aligner">КРЕПОСТЬ</div>
+				</div>
+			</td>
+			<td class="card "><span class="card_text">КРЕПОСТЬ</span></td>
+			<td class="card ">
+				<div class="card_text border1" style="display:block; margin: 5px;">КРЕПОСТЬ</div>
+			</td>
+		</tr>
+		<tr>
+			<td>КРЕПОСТЬ</td>
+			<td>КРЕПОСТЬ</td>
+			<td>КРЕПОСТЬ</td>
+			<td>КРЕПОСТЬ</td>
+			<td class="card green">
+				<div class="card_text ">КРЕПОСТЬ</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="card">
+				<div class="v_spacer"></div>    
+						<div class="card_text">
+							SPACER
+						</div>
+			</td>
+			<td>КРЕПОСТЬ</td>
+			<td>КРЕПОСТЬ</td>
+			<td>КРЕПОСТЬ</td>
+			<td>КРЕПОСТЬ</td>
+		</tr>
+		<tr>
+			<td class="card">    
+				<div class="card_text bottom_a">
+					MARGIN_30%
+				</div>
+			</td>
+			<td class="card">    
+				<div class="card_text bottom_a">
+					MARGIN_30%
+				</div>
+			</td>
+			<td class="card">    
+				<div class="card_text bottom_a">
+					MARGIN_30%
+				</div>
+			</td>
+			<td class="card">    
+				<div class="card_text bottom_a">
+					MARGIN_30%
+				</div>
+			</td>
+			<td class="card">    
+				<div class="card_text bottom_a">
+					MARGIN_30%
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="card green">
+				<div class="outer">
+					<div class="inner">
+						<div class="card_text">
+							outr_innr_no_align 
+						</div>
+					</div>
+				</div>
+			</td>
+			<td class="card">
+				<div class="outer">
+					<div class="inner">
+						<div class="card_text" style="position: bottom;">
+							out_inn_botm 
+						</div>
+					</div>
+				</div>
+			</td>
+			<td class="card">
+				<div class="outer">
+					<div class="inner parent">
+						<div class="card_text child">
+							out_in_flex
+						</div>
+					</div>
+				</div>
+			</td>
+			<td>КРЕПОСТЬ</td>
+			<td>КРЕПОСТЬ</td>
+		</tr>
+	</table>
+
+</div>
+	<div class="log_area border1"  />
+	Log:
+	</div>
+	
+	<!-- 	<div class="absolute" role="img" aria-label="gray" tabindex="0" style="left: -108.5px; top: -70px; width: 208.32px; height: 134.4px; transform: translateX(525px) translateY(220px) translateZ(0px);">
+		<div class="jsx-2512964683 card gray shadow-card text-black dark:text-[#d9d9d9]">
+			<div class="jsx-2512964683 card-color-layer gray"/>
+			<div class="jsx-2512964683 cardImage gray"/>
+			<section class="absolute inline-flex justify-center items-center uppercase select-text font-lorimer land:font-futuraBold" style="width: 151.9px; height: 42px; left: 29.295px; bottom: 17.5px;">
+				<div class="transition-opacity inline-block leading-none text-center max-w-full" style="font-size: 30px; white-space: nowrap; word-break: break-all; opacity: 1;">КРЕПОСТЬ</div>
+			</section>
+</div>
+</div> -->
+</body>
+
+</html>
