@@ -2,10 +2,11 @@
 "use strict";
 
 const express = require('express');
-const codenames_DB = require('./db');
-const app = express();
 const path = require('path');
 const bodyParser = require('body-parser');
+const codenames_DB = require('./db');
+
+const app = express();
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -33,6 +34,16 @@ const pool = new Pool({
 });
 */
 
+// Short-circuiting, and saving a parse operation
+function isInt(value) {
+    var x;
+    if (isNaN(value)) {
+      return false;
+    }
+    x = parseFloat(value);
+    return (x | 0) === x;
+  }
+
 // Home route to list all blog posts
 app.get('/', async (req, res) => {
   const { rows } = await codenames_DB.query('SELECT * FROM posts');
@@ -42,14 +53,21 @@ app.get('/', async (req, res) => {
 
 // Route to get a specific post by id
 app.get('/post/:id', async (req, res) => {
-  const { rows } = await codenames_DB.query('SELECT * FROM posts WHERE id = $1', [req.params.id]);
-  if (rows.length === 0) {
-    res.status(404).send('Post not found');
-    //res.status(404).json({ message: 'Post not found' });
-  } else {
-    res.render('post', { post: rows[0] });
-    //res.json(rows[0]);
-  }
+    const int_id= req.params.id;
+    if (isInt(int_id)) {
+    const { rows } = await codenames_DB.query('SELECT * FROM posts WHERE id = $1', [int_id]);
+        if (rows.length === 0) {
+            res.status(404).send('Post not found');
+            //res.status(404).json({ message: 'Post not found' });
+        } else {
+            res.render('post', { post: rows[0] });
+            //res.json(rows[0]);
+        }
+    }  else {
+        // SQL injection attack
+        console.log(`SQL injection attack ${req.params.id}`);
+        res.status(404).send('Post not found');
+    }
 });
 
 // Route to display the form for creating a new post
