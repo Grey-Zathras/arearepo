@@ -1,3 +1,6 @@
+// Whole-script strict mode syntax
+"use strict";
+
 const express = require('express');
 const codenames_DB = require('./db');
 const app = express();
