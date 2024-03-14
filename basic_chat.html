@@ -21,22 +21,34 @@
         document.cookie = name + "=" + (value || "") + expires + "; path=/";
       }
 
+      function addChatLine (text){
+        var item = document.createElement('li');
+        item.textContent = text;
+          //messages.appendChild(item);
+          //window.scrollTo(0, document.body.scrollHeight);
+        messages.insertBefore(item, messages.firstChild);
+        window.scrollTo(0, 0); // Scroll to the top to show the newest message
+      }
+
       window.onload = function() {
         var userName = getCookie("username");
         if (!userName) {
           userName = prompt("Please enter your name:");
           setCookie("username", userName, 7);
+          
         }
         var form = document.getElementById('form');
         var input = document.getElementById('input');
-        var roomInput = document.getElementById('room');
+        var roomInput = document.getElementById('roomElement');
         document.getElementById('userName').value = userName;
 
         // Join a room
         document.getElementById('joinRoom').onclick = function() {
           var room = roomInput.value;
+          
           socket.emit('join room', { room: room, user: userName  });
           socket.emit('chat message', { room: room, msg: "welcome to chat" , user: userName});
+          
         };
 
         form.addEventListener('submit', function(e) {
@@ -49,18 +61,30 @@
         });
 
         socket.on('chat message', function(data) {
-          var item = document.createElement('li');
-          item.textContent = data.user + ": " + data.msg;
+          addChatLine(data.user + ": " + data.msg);
+
+          //var item = document.createElement('li');
+          //item.textContent = data.user + ": " + data.msg;
           //messages.appendChild(item);
           //window.scrollTo(0, document.body.scrollHeight);
-          messages.insertBefore(item, messages.firstChild);
-          window.scrollTo(0, 0); // Scroll to the top to show the newest message
+          //messages.insertBefore(item, messages.firstChild);
+          //window.scrollTo(0, 0); // Scroll to the top to show the newest message
+        });
+
+        socket.on("disconnect", (reason) => {
+          console.log("chat disconnected");
+          addChatLine("chat disconnected");
         });
 
         window.addEventListener('beforeunload', function (e) {
           // You can customize the message, but modern browsers often display their own default message for security reasons.
           var confirmationMessage = 'You have unsaved changes! Are you sure you want to leave?';
-          console.log("asking before unloading");
+          console.log("asking before unloading from room "+room);
+          
+          // You can cancel the prompt if silent processing is needed
+          //window.onbeforeunload = undefined;
+          var room = roomInput.value;
+          socket.emit('chat message', { room: room, msg: "user leaving the room ", user: userName});
 
           // Some browsers may display this message to the user, prompting them to confirm if they want to leave the page.
           (e || window.event).returnValue = confirmationMessage; // Gecko + IE
@@ -69,7 +93,7 @@
         window.addEventListener("visibilitychange", (event) => {
             var room = roomInput.value;
             socket.emit('chat message', { room: room, msg: "visibilitychange event "+document.visibilityState , user: userName});
-          console.log("visibilitychange");   
+          console.log("visibilitychange "+document.visibilityState, "room " + room );   
         });
       };
 
@@ -77,7 +101,7 @@
   </head>
   <body>
     Your name: <input type="text" id="userName" name="userName" disabled><br><br>
-    <input id="room" autocomplete="off" placeholder="Room name"/><button id="joinRoom">Join Room</button><br /><br />
+    <input id="roomElement" autocomplete="off" placeholder="Room name"/><button id="joinRoom">Join Room</button><br /><br />
     <form id="form" action="">
       Your message:
       <input id="input" autocomplete="off" /><button>Send</button>

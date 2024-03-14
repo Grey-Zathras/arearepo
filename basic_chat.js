@@ -11,12 +11,13 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  console.log(socket.id,'a user connected');
 
   // Join a room
   socket.on('join room', (data) => {
     socket.join(data.room);
-    console.log(`User ${data.user} joined room: ${data.room}`);
+    socket.data.username = data.user;
+    console.log(socket.id,` User ${data.user} joined room: ${data.room}`);
     //console.log('rooms:');
     //console.log(socket.rooms);
   });
@@ -24,12 +25,21 @@ io.on('connection', (socket) => {
   // Listen for chat messages and emit to the room
   socket.on('chat message', (data) => {
     io.to(data.room).emit('chat message', { msg: data.msg, user: data.user });
+    console.log(socket.id,'chat message', data.room, data.user, data.msg);
   });
 
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
+  socket.on('disconnect', (reason) => {
+    console.log(socket.id,`user ${socket.data.username} disconnected`, reason);
   });
+  
 });
+
+///*
+io.use((socket, next) => {
+  console.log(socket.id,'io.use');
+    next();
+});
+// */
 
 server.listen(3000, () => {
 console.log('listening on *:3000');
