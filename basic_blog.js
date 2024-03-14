@@ -4,6 +4,9 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const http = require('http');
+const socketIo = require('socket.io');
+
 const codenames_DB = require('./db');
 
 const app = express();
@@ -49,6 +52,7 @@ app.get('/', async (req, res) => {
   const { rows } = await codenames_DB.query('SELECT * FROM posts');
   //res.json(rows);
   res.render('index', { posts: rows });
+  console.log(`${JSON.stringify(rows)} `);
 });
 
 // Route to get a specific post by id
@@ -60,7 +64,7 @@ app.get('/post/:id', async (req, res) => {
             res.status(404).send('Post not found');
             //res.status(404).json({ message: 'Post not found' });
         } else {
-            res.render('post', { post: rows[0] });
+            res.render('room', { post: rows[0] }); //post
             //res.json(rows[0]);
         }
     }  else {
@@ -87,9 +91,39 @@ app.post('/create', async (req, res) => {
   //res.status(201).send(`Post ${title} created`);
   res.status(201).render('create_confirmation', { post:  req.body });
 });
+
+// chat server support
+const server = http.createServer(app);
+const io = socketIo(server);
+
+io.on('connection', (socket) => {
+    console.log('a user connected');
+    
+    // Join a room
+    socket.on('join room', (room) => {
+    socket.join(room);
+    console.log(`User joined room: ${room}`);
+  });
   
+  // Listen for chat messages and emit to the room
+  socket.on('chat message', (data) => {
+    io.to(data.room).emit('chat message', data.msg);
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+  });
+  
+
 // Start the server
+/*
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+*/
+
+server.listen(3000, () => {
+  console.log('listening chat server on *:3000');
+  });
