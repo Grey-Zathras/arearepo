@@ -100,18 +100,21 @@ io.on('connection', (socket) => {
     console.log(socket.id,'a user connected');
     
     // Join a room
-    socket.on('join room', (room) => {
-    socket.join(room);
-    console.log(socket.id,`User joined room: ${room}`);
+    socket.on('join room', (data) => {
+      socket.join(data.room);
+      socket.data.username = data.user;
+      socket.data.username = data.user;
+    console.log(socket.id,` User ${data.user} joined room: ${data.room}`);
   });
   
   // Listen for chat messages and emit to the room
   socket.on('chat message', (data) => {
-    io.to(data.room).emit('chat message', data.msg);
+    io.to(data.room).emit('chat message', { msg: data.msg, user: data.user });
+    console.log(socket.id,'chat message', data.room, data.user, data.msg);
   });
   
-  socket.on('disconnect', () => {
-    console.log(socket.id,'user disconnected');
+  socket.on('disconnect', (reason) => {
+    console.log(socket.id,`user ${socket.data.username} disconnected`, reason);
   });
   });
   

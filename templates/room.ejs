@@ -4,63 +4,258 @@
   <script src="/socket.io/socket.io.js"></script>
   <meta charset="UTF-8">
   <title><%= room.title %></title>
-  <!-- Link to your stylesheet here -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<link rel="stylesheet"  type="text/css" href="/codenames3.css">
+	<!-- 
+
+	 -->
+	<style>
+		html,
+		body  {
+			/*
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0; 
+			*/
+			background-color: lightblue;
+			font-size: 16px;
+		}
+		.green {
+			background-color: green;
+		}
+		.border1 {
+			border: 1px solid red;
+		}
+    .header{
+      width: 100%;
+    }
+    .navigation{
+      float: right;
+    }
+    h1 {
+      float:  left;
+      display:contents;
+    }
+    .chat_header, .chat_msg {
+      border: 1px solid;
+      padding: 10px; 
+    }
+
+		/* responsive table (left area) */
+		.cardspace {
+			/* font-size: x-small; */
+			float: left;
+  		padding: 10px; 
+			  /* padding-right: 10px; */
+			width: max(300px, 68%);
+			height: max(200px, 100%); 
+		}
+		/* responsive right area(game log)) */
+		.log_area {
+			float: left;
+  			/* padding: 15px; */
+			width: max(160px, 27%);
+		}
+
+		td.card {
+			/* width: 208px; height: 134px; */
+			/* 
+			aspect-ratio:3;
+			vertical-align: bottom;
+			height: 20%; 
+			*/
+			width: 20%;
+			text-align: center;
+			border: 1px solid;
+      background-color: rgb(206, 179, 26);
+      padding-bottom: 3%;
+      padding-top: 3%;
+		}
+		.card_text {
+			background-color: white;
+			text-transform: uppercase;
+			/* vertical-align: bottom; */
+      display: inline-block;
+		}
+
+		/* option 1 for proportional size */
+		.card_text.bottom_a {
+			margin-top: 30%;
+		}
+		/* option 2  for proportional size */
+		.card .v_spacer {
+			width: 0;
+			padding-top: 30%; 
+			/* position: relative; */
+		}
+
+
+		/* option 3 outer-inner */
+		.card .outer {
+			width: 100%;
+			padding-top: 60%; 
+			position: relative;
+		}
+		.card .outer .inner {
+			position: absolute;
+			width: 100%;
+			bottom: 0;
+		}
+
+    #messages  {
+      list-style-type: none;
+    }
+    
+		/* junk section */ 
+		/*
+		td .card {width: 20%;}
+
+		div.parent {
+			display: flex;
+			height: 100%;
+		}
+		div.child {
+			display: inline-block;
+			align-self: flex-end;
+			width: 100%;
+		}
+		
+		.bottom_aligner2 {
+			display: inline-block;
+			height: 100%;
+			vertical-align: bottom;
+			width: 0px;
+		}
+
+		div.d {
+			background-color: lightgrey;
+			width: 150px;
+			border: 15px solid green;
+			padding: 50px;
+			margin: 20px;
+		}
+		*/
+	</style>
   <script>
+      function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+      }
+
+      function setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+          var date = new Date();
+          date.setTime(date.getTime() + (days*24*60*60*1000));
+          expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+      }
+
+      function addChatLine (text){
+        var item = document.createElement('li');
+        item.textContent = text;
+          //messages.appendChild(item);
+          //window.scrollTo(0, document.body.scrollHeight);
+        messages.insertBefore(item, messages.firstChild);
+        window.scrollTo(0, 0); // Scroll to the top to show the newest message
+      }
+
     var socket = io();
     window.onload = function() {
+        var userName = getCookie("username");
+        if (!userName) {
+          userName = prompt("Please enter your name:");
+          setCookie("username", userName, 7);
+          
+        }
       var form = document.getElementById('form');
       var input = document.getElementById('input');
       //var roomInput = document.getElementById('room');
+      document.getElementById('userName').value = userName;
 
       // Join a room
       //document.getElementById('joinRoom').onclick = function() {
         //var room = roomInput.value;
         var room = '<%= room.title %>';
-        socket.emit('join room', room);
+        socket.emit('join room', { room: room, user: userName  });
+          socket.emit('chat message', { room: room, msg: "welcome to chat" , user: userName});
       //};
 
       form.addEventListener('submit', function(e) {
         e.preventDefault();
         if (input.value) {
           //var room = roomInput.value;
-          socket.emit('chat message', { room: room, msg: input.value });
-          console.log({ room: room, msg: input.value });
+          socket.emit('chat message', { room: room, msg: input.value, user: userName  });
+          console.log({ room: room, msg: input.value, user: userName  });
           input.value = '';
         }
       });
 
-      socket.on('chat message', function(msg) {
-        var item = document.createElement('li');
-        item.textContent = msg;
-        messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+      socket.on('chat message', function(data) {
+        addChatLine(data.user + ": " + data.msg);
+      });
+      window.addEventListener("visibilitychange", (event) => {
+        console.log("visibilitychange "+document.visibilityState );   
+      });
+      window.addEventListener('beforeunload', function (e) {
+        // Uncomment below to cancel the popup and event
+        //window.onbeforeunload = undefined;
+        //return false; 
+
+        // You can customize the message, but modern browsers often display their own default message for security reasons.
+        var confirmationMessage = 'You have unsaved changes! Are you sure you want to leave?';
+        console.log("unloading");
+        socket.emit('chat message', { room: room, msg: "user leaving the room ", user: userName});
+
+        // Some browsers may display this message to the user, prompting them to confirm if they want to leave the page.
+        (e || window.event).returnValue = confirmationMessage; // Gecko + IE
+        return confirmationMessage; // Webkit, Safari, Chrome etc.
       });
     };
-    window.addEventListener("visibilitychange", (event) => {alert("visibilitychange");
-        console.log("visibilitychange");   
-    });
-    window.addEventListener('beforeunload', function (e) {
-      // You can customize the message, but modern browsers often display their own default message for security reasons.
-      var confirmationMessage = 'You have unsaved changes! Are you sure you want to leave?';
-      console.log("unloading");
-
-      window.onbeforeunload = undefined;
-      return false; // Webkit, Safari, Chrome etc.
-      // Some browsers may display this message to the user, prompting them to confirm if they want to leave the page.
-      //(e || window.event).returnValue = confirmationMessage; // Gecko + IE
-      //return confirmationMessage; // Webkit, Safari, Chrome etc.
-    });
-    
   </script>
 </head>
 <body>
-  <h1><%= room.title %></h1>
+  <div class="header">
+  <h1>Room name: <%= room.title %></h1>
+  <div class="navigation">
+    <a href="/">Back to home</a>
+  </div>
   <p><%= room.content %></p>
-  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>
-  <ul id="messages"></ul>
+  </div>
+  <div>
+
+  <div class="cardspace border1">
+    
+    <table class="border1" width="100%">
+      <% for(var i =0; i<5; i++) { %>
+        <tr>
+        <% for(var j =0; j<5; j++) { %>
+          <td  class="card" id="card[<%= i*j %>]">
+            <div class="card_text">
+							КРЕПОСТЬ
+						</div> 
+            </td>
+        <% } %>
+        </tr>
+      <% } %>
+    </table>
+  
+  </div>
+  <div class="log_area border1"  />
+  <div class="chat_header">
+  Your name: <input type="text" id="userName" name="userName" disabled><br><br>
+  <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
   <form id="form" action="">
     <input id="input" autocomplete="off" /><button>Send</button>
   </form>
-  <a href="/">Back to home</a>
+  </div>
+  <div class="chat_msg">
+    <ul id="messages"></ul>
+  </div>
+</div>
+</div>
 </body>
 </html>
