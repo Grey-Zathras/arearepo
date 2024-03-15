@@ -47,49 +47,49 @@ function isInt(value) {
     return (x | 0) === x;
   }
 
-// Home route to list all blog posts
+// Home route to list all rooms
 app.get('/', async (req, res) => {
   const { rows } = await codenames_DB.query('SELECT * FROM posts');
   //res.json(rows);
-  res.render('index', { posts: rows });
-  console.log(`${JSON.stringify(rows)} `);
+  res.render('index', { rooms: rows });
+  //console.log(`${JSON.stringify(rows)} `);
 });
 
-// Route to get a specific post by id
-app.get('/post/:id', async (req, res) => {
+// Route to get a specific room by id
+app.get('/room/:id', async (req, res) => {
     const int_id= req.params.id;
     if (isInt(int_id)) {
     const { rows } = await codenames_DB.query('SELECT * FROM posts WHERE id = $1', [int_id]);
         if (rows.length === 0) {
-            res.status(404).send('Post not found');
+            res.status(404).send('Room not found');
             //res.status(404).json({ message: 'Post not found' });
         } else {
-            res.render('room', { post: rows[0] }); //post
+            res.render('room', { room: rows[0] }); 
             //res.json(rows[0]);
         }
     }  else {
         // SQL injection attack
         console.log(`SQL injection attack ${req.params.id}`);
-        res.status(404).send('Post not found');
+        res.status(404).send('Room not found');
     }
 });
 
-// Route to display the form for creating a new post
+// Route to display the form for creating a new room
 app.get('/create', (req, res) => {
     res.render('create');
   });
   
-// Route to create a new post
+// Route to create a new room
 app.post('/create', async (req, res) => {
   const { title, content } = req.body;
-  console.log(`creating new record ${req.body}`);
+  console.log(`creating new room  ${title}`); //{req.body}
   const { rows } = await codenames_DB.query(
     'INSERT INTO posts(title, content) VALUES($1, $2) RETURNING *',
     [title, content]
   );
   //res.status(201).json(rows[0]);
   //res.status(201).send(`Post ${title} created`);
-  res.status(201).render('create_confirmation', { post:  req.body });
+  res.status(201).render('create_confirmation', { room:  req.body });
 });
 
 // chat server support
@@ -97,12 +97,12 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 io.on('connection', (socket) => {
-    console.log('a user connected');
+    console.log(socket.id,'a user connected');
     
     // Join a room
     socket.on('join room', (room) => {
     socket.join(room);
-    console.log(`User joined room: ${room}`);
+    console.log(socket.id,`User joined room: ${room}`);
   });
   
   // Listen for chat messages and emit to the room
@@ -111,7 +111,7 @@ io.on('connection', (socket) => {
   });
   
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    console.log(socket.id,'user disconnected');
   });
   });
   

@@ -3,7 +3,7 @@
 <head>
   <script src="/socket.io/socket.io.js"></script>
   <meta charset="UTF-8">
-  <title><%= post.title %></title>
+  <title><%= room.title %></title>
   <!-- Link to your stylesheet here -->
   <script>
     var socket = io();
@@ -15,7 +15,7 @@
       // Join a room
       //document.getElementById('joinRoom').onclick = function() {
         //var room = roomInput.value;
-        var room = <%= post.id %>;
+        var room = '<%= room.title %>';
         socket.emit('join room', room);
       //};
 
@@ -54,9 +54,9 @@
   </script>
 </head>
 <body>
-  <h1><%= post.title %></h1>
-  <p><%= post.content %></p>
-  <input id="room" autocomplete="off" placeholder="Room name <%= post.title %>"/>
+  <h1><%= room.title %></h1>
+  <p><%= room.content %></p>
+  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>
   <ul id="messages"></ul>
   <form id="form" action="">
     <input id="input" autocomplete="off" /><button>Send</button>

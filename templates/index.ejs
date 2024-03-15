@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Blog Home</title>
+  <title>Code Names Board Game</title>
   <!-- Link to your stylesheet here -->
 </head>
 <body>
-  <h1>Welcome to My Blog</h1>
+  <h1>Welcome to the Code Names</h1>
 
   <!-- Link to your stylesheet here -->
   <a href="/create">
-    <button>Create a post</button>
+    <button>Create a Game Room</button>
   </a>
   <ul>
-    <% posts.forEach(function(post) { %>
-      <li><a href="/post/<%= post.id %>"><%= post.title %></a></li>
+    <% rooms.forEach(function(room) { %>
+      <li><a href="/room/<%= room.id %>"><%= room.title %></a></li>
     <% }) %>
   </ul>
 </body>
