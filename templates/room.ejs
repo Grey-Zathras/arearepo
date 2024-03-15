@@ -6,57 +6,90 @@
   <title><%= room.title %></title>
   <!-- Link to your stylesheet here -->
   <script>
+      function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+      }
+
+      function setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+          var date = new Date();
+          date.setTime(date.getTime() + (days*24*60*60*1000));
+          expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+      }
+
+      function addChatLine (text){
+        var item = document.createElement('li');
+        item.textContent = text;
+          //messages.appendChild(item);
+          //window.scrollTo(0, document.body.scrollHeight);
+        messages.insertBefore(item, messages.firstChild);
+        window.scrollTo(0, 0); // Scroll to the top to show the newest message
+      }
+
     var socket = io();
     window.onload = function() {
+        var userName = getCookie("username");
+        if (!userName) {
+          userName = prompt("Please enter your name:");
+          setCookie("username", userName, 7);
+          
+        }
       var form = document.getElementById('form');
       var input = document.getElementById('input');
       //var roomInput = document.getElementById('room');
+      document.getElementById('userName').value = userName;
 
       // Join a room
       //document.getElementById('joinRoom').onclick = function() {
         //var room = roomInput.value;
         var room = '<%= room.title %>';
-        socket.emit('join room', room);
+        socket.emit('join room', { room: room, user: userName  });
+          socket.emit('chat message', { room: room, msg: "welcome to chat" , user: userName});
       //};
 
       form.addEventListener('submit', function(e) {
         e.preventDefault();
         if (input.value) {
           //var room = roomInput.value;
-          socket.emit('chat message', { room: room, msg: input.value });
-          console.log({ room: room, msg: input.value });
+          socket.emit('chat message', { room: room, msg: input.value, user: userName  });
+          console.log({ room: room, msg: input.value, user: userName  });
           input.value = '';
         }
       });
 
-      socket.on('chat message', function(msg) {
-        var item = document.createElement('li');
-        item.textContent = msg;
-        messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+      socket.on('chat message', function(data) {
+        addChatLine(data.user + ": " + data.msg);
+      });
+      window.addEventListener("visibilitychange", (event) => {
+        console.log("visibilitychange "+document.visibilityState );   
+      });
+      window.addEventListener('beforeunload', function (e) {
+        // Uncomment below to cancel the popup and event
+        //window.onbeforeunload = undefined;
+        //return false; 
+
+        // You can customize the message, but modern browsers often display their own default message for security reasons.
+        var confirmationMessage = 'You have unsaved changes! Are you sure you want to leave?';
+        console.log("unloading");
+        socket.emit('chat message', { room: room, msg: "user leaving the room ", user: userName});
+
+        // Some browsers may display this message to the user, prompting them to confirm if they want to leave the page.
+        (e || window.event).returnValue = confirmationMessage; // Gecko + IE
+        return confirmationMessage; // Webkit, Safari, Chrome etc.
       });
     };
-    window.addEventListener("visibilitychange", (event) => {alert("visibilitychange");
-        console.log("visibilitychange");   
-    });
-    window.addEventListener('beforeunload', function (e) {
-      // You can customize the message, but modern browsers often display their own default message for security reasons.
-      var confirmationMessage = 'You have unsaved changes! Are you sure you want to leave?';
-      console.log("unloading");
-
-      window.onbeforeunload = undefined;
-      return false; // Webkit, Safari, Chrome etc.
-      // Some browsers may display this message to the user, prompting them to confirm if they want to leave the page.
-      //(e || window.event).returnValue = confirmationMessage; // Gecko + IE
-      //return confirmationMessage; // Webkit, Safari, Chrome etc.
-    });
-    
   </script>
 </head>
 <body>
   <h1><%= room.title %></h1>
   <p><%= room.content %></p>
-  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>
+  Your name: <input type="text" id="userName" name="userName" disabled><br><br>
+  <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
   <ul id="messages"></ul>
   <form id="form" action="">
     <input id="input" autocomplete="off" /><button>Send</button>
