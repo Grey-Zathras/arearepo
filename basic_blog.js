@@ -7,6 +7,10 @@ const bodyParser = require('body-parser');
 const http = require('http');
 const socketIo = require('socket.io');
 
+//const fsPromises = require('fs/promises')
+const fs = require('fs');
+
+const cardGenerator = require('./card_generator');
 const codenames_DB = require('./db');
 
 const app = express();
@@ -37,6 +41,22 @@ const pool = new Pool({
 });
 */
 
+/*
+const readFileAsync = async () => {
+  try {
+    const contents = await fsPromises.readFile('file.txt', 'utf-8');
+    const arr = contents.split(/\r?\n/);
+    console.log(arr);
+    // [ 'this', 'is', 'an', 'example two two', 'text!' ]
+  } catch (err) {
+    console.error(err);
+  }
+}
+*/
+
+const fullWordList = fs.readFileSync('wordlist.txt', 'utf-8');
+const wordList = fullWordList.split(/\r?\n/);
+
 // Short-circuiting, and saving a parse operation
 function isInt(value) {
     var x;
@@ -49,7 +69,7 @@ function isInt(value) {
 
 // Home route to list all rooms
 app.get('/', async (req, res) => {
-  const { rows } = await codenames_DB.query('SELECT * FROM posts');
+  const { rows } = await codenames_DB.query('SELECT id, title,code, stat  FROM rooms where priv=FALSE');
   //res.json(rows);
   res.render('index', { rooms: rows });
   //console.log(`${JSON.stringify(rows)} `);
@@ -59,7 +79,7 @@ app.get('/', async (req, res) => {
 app.get('/room/:id', async (req, res) => {
     const int_id= req.params.id;
     if (isInt(int_id)) {
-    const { rows } = await codenames_DB.query('SELECT * FROM posts WHERE id = $1', [int_id]);
+    const { rows } = await codenames_DB.query('SELECT * FROM rooms WHERE id = $1', [int_id]);
         if (rows.length === 0) {
             res.status(404).send('Room not found');
             //res.status(404).json({ message: 'Post not found' });
@@ -81,11 +101,21 @@ app.get('/create', (req, res) => {
   
 // Route to create a new room
 app.post('/create', async (req, res) => {
-  const { title, content } = req.body;
+  const { title, code } = req.body;
   console.log(`creating new room  ${title}`); //{req.body}
+/*
+  await new Promise((resolve, reject) => {
+    fs.readFile('wordlist.txt', 'utf8', (err, content) => {
+  })
+})
+*/
+//readFileAsync();
+  var cards = cardGenerator.generateCards25(wordList);
+  var states = cardGenerator.generateSpies();
+
   const { rows } = await codenames_DB.query(
-    'INSERT INTO posts(title, content) VALUES($1, $2) RETURNING *',
-    [title, content]
+    'INSERT INTO rooms(title, code, cards, states ) VALUES($1, $2, $3, $4) RETURNING *',
+    [title, code, cards, states]
   );
   //res.status(201).json(rows[0]);
   //res.status(201).send(`Post ${title} created`);

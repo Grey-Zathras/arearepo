@@ -6,14 +6,15 @@
   <!-- Link to your stylesheet here -->
 </head>
 <body>
-  <h1>Welcome to the Code Names</h1>
+  <h1>Welcome to the Code Names Duet</h1>
 
   <!-- Link to your stylesheet here -->
   <a href="/create">
     <button>Create a Game Room</button>
   </a>
   <ul>
-    <% rooms.forEach(function(room) { %>
+    <% console.log(rooms);
+    rooms.forEach(function(room) { %>
       <li><a href="/room/<%= room.id %>"><%= room.title %></a></li>
     <% }) %>
   </ul>
