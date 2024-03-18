@@ -27,6 +27,12 @@
     .card.killer_opened{
       background-color: rgb(42, 43, 42);
     }
+    .card.spy .card_text{
+      background-color: green;
+    }
+    .card.killer .card_text{
+      background-color: rgb(42, 43, 42);
+    }
 		.border1 {
 			border: 1px solid red;
 		}
@@ -71,7 +77,7 @@
 			width: 20%;
 			text-align: center;
 			border: 1px solid;
-      background-color: rgb(182, 171, 117); //rgb(206, 179, 26);
+      background-color: rgb(182, 171, 117); /* rgb(206, 179, 26); */
       padding-bottom: 3%;
       padding-top: 3%;
 		}
@@ -157,16 +163,39 @@
         document.cookie = name + "=" + (value || "") + expires + "; path=/";
       }
 
-      function addChatLine (text){
+      function addChatLine (text, msgclass=""){
         var item = document.createElement('li');
-        item.textContent = text;
+        if (msgclass==""){
+          item.textContent = text;
+        } else{
+          var item1 = document.createElement('span');
+          item1.className=msgclass;
+          item.appendChild(item1);
+          item1.textContent = text;
+          
+          console.log(item.outerHTML, text);
+
+        }
+        messages.insertBefore(item, messages.firstChild);
           //messages.appendChild(item);
           //window.scrollTo(0, document.body.scrollHeight);
-        messages.insertBefore(item, messages.firstChild);
         window.scrollTo(0, 0); // Scroll to the top to show the newest message
       }
 
+    var player_class_array=['closed', 'spy', 'killer', 'spy_opened','civilian','killer_opened' ];
+    var observer_class_array=[ 'spy_opened','civilian','killer_opened' ];
+    var teams_list=["observer","Red","Blue"];
     var socket = io();
+
+    function refreshTable(states, role){
+        if (role=="player") {
+          for (var i=0;i<25;i++){
+            var card = document.getElementById('card['+i+']');
+            card.className="card "+player_class_array[states[i] ];
+          }
+        }
+    }
+
     window.onload = function() {
         var userName = getCookie("username");
         if (!userName) {
@@ -174,7 +203,8 @@
           setCookie("username", userName, 7);
           
         }
-      var form = document.getElementById('form');
+      var chatForm = document.getElementById('chatForm');
+      var userForm = document.getElementById('userForm');
       var input = document.getElementById('input');
       //var roomInput = document.getElementById('room');
       document.getElementById('userName').value = userName;
@@ -183,11 +213,11 @@
       //document.getElementById('joinRoom').onclick = function() {
         //var room = roomInput.value;
         var room = '<%= room.title %>';
-        socket.emit('join room', { room: room, user: userName  });
+        socket.emit('join room', { room: room, user: userName, room_id: <%= room.id %>  });
           socket.emit('chat message', { room: room, msg: "welcome to chat" , user: userName});
       //};
 
-      form.addEventListener('submit', function(e) {
+      chatForm.addEventListener('submit', function(e) {
         e.preventDefault();
         if (input.value) {
           //var room = roomInput.value;
@@ -197,8 +227,29 @@
         }
       });
 
+      userForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log(userTeam.value);
+        if (userTeam.value) {
+          var team = userTeam.value;
+          socket.emit('team change', { room: room, team: team, user: userName  });
+          //console.log('team change event', { room: room, team: team, user: userName  });
+          //input.value = '';
+        }
+      });
+
       socket.on('chat message', function(data) {
         addChatLine(data.user + ": " + data.msg);
+      });
+      socket.on('error message', function(data) {
+        console.dir(data);
+        addChatLine(data,"errormsg");
+      });
+      socket.on('team scheme', function(data) {
+        console.dir(data);
+        //addChatLine(data,"errormsg");
+        refreshTable(data.states,"player")
+        addChatLine("welcome to the "+teams_list[data.team]+" team" ,"errormsg");
       });
       window.addEventListener("visibilitychange", (event) => {
         console.log("visibilitychange "+document.visibilityState );   
@@ -238,8 +289,9 @@
         <% for(var j =0; j<5; j++) { 
           const ind=(i*5) + (j);
           const state_class_array = ['closed', 'spy', 'killer', 'spy_opened','civilian','killer_opened' ]; 
+          //state_class_array[room.states[0][ind]] 
           %>
-          <td  class="card <%= state_class_array[room.states[0][ind]] %>" id="card[<%= ind %>]">
+          <td  class="card " id="card[<%= ind %>]">
             <div class="card_text">
 							<%= room.cards[ind] %>
 						</div> 
@@ -252,10 +304,19 @@
   </div>
   <div class="log_area"  />
   <div class="chat_header">
-  Your name: <input type="text" id="userName" name="userName" disabled><br><br>
   <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
-  <form id="form" action="">
-    <input id="input" autocomplete="off" /><button>Send</button>
+  <form id="userForm" action="">
+    Your name: <input type="text" id="userName" name="userName" disabled /><br>
+    Your team: <select  id="userTeam" name="userTeam">
+      <option value="0">Observer, no team</option>
+      <option value="1" style="color: red;">Red team</option>
+      <option value="2" style="color: blue;">Blue team</option>
+      </select>
+      <button>Join</button>
+      <br><br>
+    </form>
+    <form id="chatForm" action="">
+        <input id="input" autocomplete="off" /><button>Send</button>
   </form>
   </div>
   <div class="chat_msg">

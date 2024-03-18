@@ -6,6 +6,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const http = require('http');
 const socketIo = require('socket.io');
+//const session = require('express-session');
 
 //const fsPromises = require('fs/promises')
 const fs = require('fs');
@@ -17,6 +18,14 @@ const app = express();
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+/*
+app.use(session({
+  secret: 'Wonka-Willi',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 60000000 } // session timeout of 60 seconds
+}));
+*/
 
 // Set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -78,13 +87,18 @@ app.get('/', async (req, res) => {
 // Route to get a specific room by id
 app.get('/room/:id', async (req, res) => {
     const int_id= req.params.id;
+    //const { userTeam } = req._parsedUrl.query;
+    //console.log("User team is", userTeam );
     if (isInt(int_id)) {
     const { rows } = await codenames_DB.query('SELECT * FROM rooms WHERE id = $1', [int_id]);
         if (rows.length === 0) {
             res.status(404).send('Room not found');
             //res.status(404).json({ message: 'Post not found' });
         } else {
-            res.render('room', { room: rows[0] }); 
+            res.render('room', { room: rows[0] });
+            //req.session.username = username;
+            //req.session.room_id = int_id; 
+            //console.log(socket.id,` User ${socket.data.user} entering room: ${socket.data.room}`);
             //res.json(rows[0]);
         }
     }  else {
@@ -103,16 +117,9 @@ app.get('/create', (req, res) => {
 app.post('/create', async (req, res) => {
   const { title, code } = req.body;
   console.log(`creating new room  ${title}`); //{req.body}
-/*
-  await new Promise((resolve, reject) => {
-    fs.readFile('wordlist.txt', 'utf8', (err, content) => {
-  })
-})
-*/
-//readFileAsync();
   var cards = cardGenerator.generateCards25(wordList);
   var states = cardGenerator.generateSpies();
-
+  
   const { rows } = await codenames_DB.query(
     'INSERT INTO rooms(title, code, cards, states ) VALUES($1, $2, $3, $4) RETURNING *',
     [title, code, cards, states]
@@ -130,13 +137,47 @@ io.on('connection', (socket) => {
     console.log(socket.id,'a user connected');
     
     // Join a room
-    socket.on('join room', (data) => {
+  socket.on('join room', (data) => {
       socket.join(data.room);
       socket.data.username = data.user;
-      socket.data.username = data.user;
+      socket.data.room_id = data.room_id;
     console.log(socket.id,` User ${data.user} joined room: ${data.room}`);
   });
-  
+
+  socket.on('team change', async  (data) => {
+    //socket.join(data.room+"/"+data.team);
+    socket.data.team = data.team;
+    //socket.emit('chat message', { msg: 'Your new team in room '+socket.data.room_id+' is '+data.team }); // + room.title?
+    const int_id = socket.data.room_id;
+    // /*
+    // read database stats
+    if (isInt(int_id)) {
+      if (data.team >0) {
+          //const { rows } = await codenames_DB.query('SELECT states[$2] FROM rooms WHERE id = $1', [int_id],[data.team]);
+          const { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [data.team]);
+          if (rows.length === 0) {
+            socket.emit('error message',  `Room ${int_id} not found`);
+            //res.status(404).send('Room not found');
+          } else {
+            if (Array.isArray(rows[0].states)  ) {
+              //console.dir(rows[0].states);
+              socket.emit('team scheme',  { room_id: int_id,team:data.team, states: rows[0].states[data.team]});
+            //res.render('room', { room: rows[0] });
+            } else {
+              socket.emit('error message',  `Room ${int_id} - game data not found, pls generate the table`);
+            }
+          }
+        }
+      }  else {
+          // SQL injection attack
+          console.log(`SQL injection attack ${socket.data.room_id}`);
+          socket.emit('error message',  `Room ${int_id} not found`);
+        }
+    // */
+    console.log(socket.id,` User ${data.user} changed team to ${data.team} in room: ${data.room}`);
+
+  });
+
   // Listen for chat messages and emit to the room
   socket.on('chat message', (data) => {
     io.to(data.room).emit('chat message', { msg: data.msg, user: data.user });
