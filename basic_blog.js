@@ -146,8 +146,13 @@ io.on('connection', (socket) => {
   socket.on('join room', (data) => {
     var res= addUser({id: socket.id,username: data.user,room: data.room_id}); 
     if (res.error) {
-      console.log(res.error);
-      socket.emit('error message',  "Cannot join the room: "+res.error);
+      
+      if (res.error=="Username is in use!") {
+        // socket.emit('team scheme',  { room_id: int_id,team:data.team, states: rows[0].states[data.team-1]});
+      } else {
+        console.log(res.error);
+        socket.emit('error message',  "Cannot join the room: "+res.error);
+      }
     } else {
       socket.join(data.room);
       socket.data.username = data.user;
@@ -173,7 +178,7 @@ io.on('connection', (socket) => {
     // read database stats
     if (isInt(int_id)) {
       if (data.team >0) {
-          data.team--;
+          //data.team--;
           //const { rows } = await codenames_DB.query('SELECT states[$2] FROM rooms WHERE id = $1', [int_id],[data.team]);
           const { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [int_id]);
           if (rows.length === 0) {
@@ -187,7 +192,7 @@ io.on('connection', (socket) => {
                 room: int_id,
                 users: getUsersInRoom(int_id)
               });
-              socket.emit('team scheme',  { room_id: int_id,team:data.team, states: rows[0].states[data.team]});
+              socket.emit('team scheme',  { room_id: int_id,team:data.team, states: rows[0].states[data.team-1]});
         
             //res.render('room', { room: rows[0] });
             } else {

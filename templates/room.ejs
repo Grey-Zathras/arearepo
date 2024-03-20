@@ -21,6 +21,25 @@
 			background-color: lightblue;
 			font-size: 16px;
 		}
+
+    .div-table {
+      display: table;         
+      width: auto;         
+      background-color: #eee;         
+      border: 1px solid #666666;         
+      border-spacing: 5px; /* cellspacing:poor IE support for  this */
+    }
+    .div-table-row {
+      display: table-row;
+      width: auto;
+      clear: both;
+    }
+    .div-table-col {
+      float: left; /* fix for  buggy browsers */
+      display: table-column;         
+      width: 80px;         
+      background-color: #ccc;  
+    }
     .card.spy_opened{
 			background-color: green;
 		}
@@ -182,12 +201,29 @@
         window.scrollTo(0, 0); // Scroll to the top to show the newest message
       }
 
-    var player_class_array=['closed', 'spy', 'killer', 'spy_opened','civilian','killer_opened' ];
-    var observer_class_array=[ 'spy_opened','civilian','killer_opened' ];
-    var teams_list=["observer","Red","Blue"];
-    var socket = io();
+      var activeClass=["inactive","active"];
+      var memberTagID = ["Observers","Red_team", "Blue_team"];
+      var player_class_array=['closed', 'spy', 'killer', 'spy_opened','civilian','killer_opened' ];
+      var observer_class_array=[ 'spy_opened','civilian','killer_opened' ];
+      var teams_list=["observer","Red","Blue"]; //for chat
+      
+      var socket = io();
 
-    function refreshTable(states, role){
+      function ResetMembers(){
+        for(var i =0; i<3; i++)
+          document.getElementById(memberTagID[i]).innerHTML="";
+      }
+      function AddMemberLine ({username, team, active}) {
+          var item = document.createElement('li');
+          var item1 = document.createElement('span');
+          //item1.className=activeClass[active];
+          item.appendChild(item1);
+          item1.textContent = username;
+          item1.className=activeClass[active];
+          document.getElementById(memberTagID[team]).appendChild(item);
+      }
+ 
+      function refreshTable(states, role){
         if (role=="player") {
           for (var i=0;i<25;i++){
             var card = document.getElementById('card['+i+']');
@@ -252,8 +288,12 @@
         addChatLine("welcome to the "+teams_list[data.team]+" team" ,"errormsg");
       });
       socket.on('roomData', function(data) {
-        console.dir(data);
-        data.forEach((element) => console.dir(element));
+        console.log('roomData',data);
+        ResetMembers();
+        data.users.forEach((element) => {
+          console.dir(element);
+          AddMemberLine (element);
+        }); 
       });
       
       window.addEventListener("visibilitychange", (event) => {

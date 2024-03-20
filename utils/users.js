@@ -20,10 +20,16 @@ const addUser = ({ id, username, room }) => {
 
   // Validate username
   if (existingUser) {
-  /*     return {
+    var user = getUser(id);
+       return {
+        user:user,
       error: "Username is in use!"
-    }; */
-    return getUser(id);
+    }; 
+    
+    /*
+    const user = getUser(id);
+    return { user };
+    */
   }
 
   // Store user { id, username, room , team 0|1|2 , active 0|1};
