@@ -144,20 +144,23 @@ io.on('connection', (socket) => {
   
     // Join a room
   socket.on('join room', (data) => {
+    var res= addUser({id: socket.id,username: data.user,room: data.room_id}); 
+    if (res.error) {
+      console.log(res.error);
+      socket.emit('error message',  "Cannot join the room: "+res.error);
+    } else {
       socket.join(data.room);
       socket.data.username = data.user;
       socket.data.room_id = data.room_id;
       
-      addUser(socket.id,data.user,data.room_id); 
+      //addUser(socket.id,data.user,data.room_id); 
       
       io.to(data.room).emit('roomData', {
         room: data.room_id,
         users: getUsersInRoom(data.room_id)
       });
-
-
-    console.log(socket.id,` User ${data.user} joined room: ${data.room}`);
-    
+      console.log(socket.id,` User ${data.user} joined room: ${data.room}`);
+    } 
   });
 
   socket.on('team change', async  (data) => {

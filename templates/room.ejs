@@ -251,6 +251,11 @@
         refreshTable(data.states,"player")
         addChatLine("welcome to the "+teams_list[data.team]+" team" ,"errormsg");
       });
+      socket.on('roomData', function(data) {
+        console.dir(data);
+        data.forEach((element) => console.dir(element));
+      });
+      
       window.addEventListener("visibilitychange", (event) => {
         console.log("visibilitychange "+document.visibilityState );   
       });
@@ -304,6 +309,26 @@
   </div>
   <div class="log_area"  />
   <div class="chat_header">
+    <div class="members div-table" >
+      <div class="div-table-row" >
+        <div class="div-table-col Observers">
+          Observers
+          <div id="Observers">
+      
+          </div>
+        </div>
+        <div class="div-table-col Red_team" >
+          Red Team
+          <div id="Red_team">
+          </div>
+        </div>
+        <div class="div-table-col Blue_team">
+          Blue Team
+          <div id="Blue_team">
+          </div>
+        </div>
+      </div>
+    </div>
   <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
   <form id="userForm" action="">
     Your name: <input type="text" id="userName" name="userName" disabled /><br>
