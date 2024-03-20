@@ -1,6 +1,10 @@
 // Whole-script strict mode syntax
 "use strict";
 
+//var allUsers= nem Map();
+var allUsers= {};
+var allRooms ={};
+
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -11,7 +15,8 @@ const socketIo = require('socket.io');
 //const fsPromises = require('fs/promises')
 const fs = require('fs');
 
-const cardGenerator = require('./card_generator');
+const cardGenerator = require('./utils/card_generator');
+const { addUser, removeUser, getUser, getUsersInRoom,updateUser } = require("./utils/users");
 const codenames_DB = require('./db');
 
 const app = express();
@@ -136,12 +141,23 @@ const io = socketIo(server);
 io.on('connection', (socket) => {
     console.log(socket.id,'a user connected');
     
+  
     // Join a room
   socket.on('join room', (data) => {
       socket.join(data.room);
       socket.data.username = data.user;
       socket.data.room_id = data.room_id;
+      
+      addUser(socket.id,data.user,data.room_id); 
+      
+      io.to(data.room).emit('roomData', {
+        room: data.room_id,
+        users: getUsersInRoom(data.room_id)
+      });
+
+
     console.log(socket.id,` User ${data.user} joined room: ${data.room}`);
+    
   });
 
   socket.on('team change', async  (data) => {
@@ -149,19 +165,27 @@ io.on('connection', (socket) => {
     socket.data.team = data.team;
     //socket.emit('chat message', { msg: 'Your new team in room '+socket.data.room_id+' is '+data.team }); // + room.title?
     const int_id = socket.data.room_id;
+    //   room <-> data.room <-> rooms[room_id] ?
     // /*
     // read database stats
     if (isInt(int_id)) {
       if (data.team >0) {
+          data.team--;
           //const { rows } = await codenames_DB.query('SELECT states[$2] FROM rooms WHERE id = $1', [int_id],[data.team]);
-          const { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [data.team]);
+          const { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [int_id]);
           if (rows.length === 0) {
             socket.emit('error message',  `Room ${int_id} not found`);
             //res.status(404).send('Room not found');
           } else {
             if (Array.isArray(rows[0].states)  ) {
               //console.dir(rows[0].states);
+              updateUser ( { id:socket.id, active:1,team: data.team});
+              io.to(data.room).emit('roomData', {
+                room: int_id,
+                users: getUsersInRoom(int_id)
+              });
               socket.emit('team scheme',  { room_id: int_id,team:data.team, states: rows[0].states[data.team]});
+        
             //res.render('room', { room: rows[0] });
             } else {
               socket.emit('error message',  `Room ${int_id} - game data not found, pls generate the table`);
@@ -185,9 +209,23 @@ io.on('connection', (socket) => {
   });
   
   socket.on('disconnect', (reason) => {
-    console.log(socket.id,`user ${socket.data.username} disconnected`, reason);
+    const user = getUser(socket.id);
+    if (user === undefined){
+      console.log(socket.id,`unknown user  disconnected`, reason);
+    } else  {
+      updateUser ( { id:socket.id, active:0 });
+      /*
+      room = ... user.room
+      io.to(room).emit('roomData', {
+        room: user.room,
+        users: getUsersInRoom(user.room)
+      });
+      */
+
+      console.log(socket.id,`user ${user.username} disconnected`, reason);
+    }
   });
-  });
+});
   
 
 // Start the server
