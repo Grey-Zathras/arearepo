@@ -234,11 +234,21 @@
 
     window.onload = function() {
         var userName = getCookie("username");
+        var userID = getCookie("userid");
         if (!userName) {
           userName = prompt("Please enter your name:");
           setCookie("username", userName, 7);
-          
-        }
+          userID = 0;
+          //userID = socket.id;
+          //setCookie("userid", userID, 7);
+        }   else {
+          if (!userID) {
+            userID = 0;
+            //userID = socket.id;
+            //setCookie("userid", userID, 7);
+          }
+        } 
+
       var chatForm = document.getElementById('chatForm');
       var userForm = document.getElementById('userForm');
       var input = document.getElementById('input');
@@ -249,8 +259,8 @@
       //document.getElementById('joinRoom').onclick = function() {
         //var room = roomInput.value;
         var room = '<%= room.title %>';
-        socket.emit('join room', { room: room, user: userName, room_id: <%= room.id %>  });
-          socket.emit('chat message', { room: room, msg: "welcome to chat" , user: userName});
+        socket.emit('join room', { room: room, user: userName, room_id: <%= room.id %>, user_id: userID  });
+        socket.emit('chat message', { room: room, msg: "welcome to chat" , user: userName});
       //};
 
       chatForm.addEventListener('submit', function(e) {
@@ -278,14 +288,19 @@
         addChatLine(data.user + ": " + data.msg);
       });
       socket.on('error message', function(data) {
-        console.dir(data);
+        console.log('error message data', data);
         addChatLine(data,"errormsg");
       });
       socket.on('team scheme', function(data) {
-        console.dir(data);
+        console.log('team scheme data',data);
         //addChatLine(data,"errormsg");
         refreshTable(data.states,"player")
         addChatLine("welcome to the "+teams_list[data.team]+" team" ,"errormsg");
+      });
+      socket.on('userID', function(data) {
+        console.log('userID data',data,"socket.id",socket.id );
+        userID = socket.id;
+        setCookie("userid", userID, 7);
       });
       socket.on('roomData', function(data) {
         console.log('roomData',data);

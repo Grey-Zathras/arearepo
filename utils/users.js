@@ -20,16 +20,17 @@ const addUser = ({ id, username, room }) => {
 
   // Validate username
   if (existingUser) {
-    var user = getUser(id);
-       return {
-        user:user,
-      error: "Username is in use!"
-    }; 
-    
-    /*
     const user = getUser(id);
-    return { user };
-    */
+    if (user === undefined ) {
+       return {
+        error: "Username is in use!"
+        }
+    } else  {
+      return { 
+        user,
+        msg: "reconnect" 
+      };
+    }
   }
 
   // Store user { id, username, room , team 0|1|2 , active 0|1};

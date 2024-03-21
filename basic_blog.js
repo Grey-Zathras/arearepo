@@ -141,21 +141,62 @@ const io = socketIo(server);
 io.on('connection', (socket) => {
     console.log(socket.id,'a user connected');
     
+    async function joinTeam(team_id, data) { // data.room
+      socket.data.team = team_id;
+      const room_id = socket.data.room_id;
+      //   room <-> data.room <-> room=rooms[room_id] ?
+      const room_name = data.room;// rooms.title ??
+      // read database stats
+      if (isInt(room_id)) {
+        if (team_id >0) {
+            const { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [room_id]);
+            if (rows.length === 0) {
+              socket.emit('error message',  `Room ${room_id} not found`);
+              //res.status(404).send('Room not found');
+            } else {
+              if (Array.isArray(rows[0].states)  ) {
+                //console.dir(rows[0].states);
+                updateUser ( { id:socket.data.user_id, active:1,team: team_id});
+                io.to(room_name).emit('roomData', {
+                  room: room_id,
+                  users: getUsersInRoom(room_id)
+                });
+                socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states[team_id-1]});
+              } else {
+                socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
+              }
+            }
+          }
+        }  else {
+            // SQL injection attack
+            console.log(`SQL injection attack ${socket.data.room_id}`);
+            socket.emit('error message',  `Room ${room_id} not found`);
+        }
+        console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${room_name}`);
+
+    }
   
     // Join a room
-  socket.on('join room', (data) => {
-    var res= addUser({id: socket.id,username: data.user,room: data.room_id}); 
+  socket.on('join room', async (data) => {
+    
+    if (data.user_id == 0) {
+      data.user_id = socket.id;
+      socket.emit('userID',  "User ID assigned: "+data.user_id);
+    }
+    var res= addUser({id: data.user_id,username: data.user,room: data.room_id}); 
     if (res.error) {
-      
+      /*
       if (res.error=="Username is in use!") {
         // socket.emit('team scheme',  { room_id: int_id,team:data.team, states: rows[0].states[data.team-1]});
       } else {
+      */
         console.log(res.error);
         socket.emit('error message',  "Cannot join the room: "+res.error);
-      }
+      // }
     } else {
       socket.join(data.room);
       socket.data.username = data.user;
+      socket.data.user_id = data.user_id;
       socket.data.room_id = data.room_id;
       
       //addUser(socket.id,data.user,data.room_id); 
@@ -164,17 +205,26 @@ io.on('connection', (socket) => {
         room: data.room_id,
         users: getUsersInRoom(data.room_id)
       });
-      console.log(socket.id,` User ${data.user} joined room: ${data.room}`);
+      if (res.msg && res.user.team){
+        joinTeam(res.user.team, data);
+        console.log(socket.id,` User ${data.user}/${data.user_id} reconnected to room: ${data.room} and team ${res.user.team}`);
+        //console.log(socket.id,` res.user `, res.user);
+      } else {
+        console.log(socket.id,` User ${data.user} joined room: ${data.room}`);
+      }
     } 
   });
 
   socket.on('team change', async  (data) => {
+    
+    joinTeam(data.team, data);
+
+    /*
     //socket.join(data.room+"/"+data.team);
     socket.data.team = data.team;
     //socket.emit('chat message', { msg: 'Your new team in room '+socket.data.room_id+' is '+data.team }); // + room.title?
     const int_id = socket.data.room_id;
     //   room <-> data.room <-> rooms[room_id] ?
-    // /*
     // read database stats
     if (isInt(int_id)) {
       if (data.team >0) {
@@ -205,8 +255,8 @@ io.on('connection', (socket) => {
           console.log(`SQL injection attack ${socket.data.room_id}`);
           socket.emit('error message',  `Room ${int_id} not found`);
         }
-    // */
     console.log(socket.id,` User ${data.user} changed team to ${data.team} in room: ${data.room}`);
+    // */
 
   });
 
@@ -219,7 +269,8 @@ io.on('connection', (socket) => {
   socket.on('disconnect', (reason) => {
     const user = getUser(socket.id);
     if (user === undefined){
-      console.log(socket.id,`unknown user  disconnected`, reason);
+      console.log("socket",socket.data);
+      console.log(socket.id,`unknown user ${socket.data.user_id} disconnected`, reason);
     } else  {
       updateUser ( { id:socket.id, active:0 });
       /*
@@ -246,4 +297,4 @@ app.listen(PORT, () => {
 
 server.listen(3000, () => {
   console.log('listening chat server on *:3000');
-  });
+});
