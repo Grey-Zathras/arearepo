@@ -24,7 +24,7 @@
 
     .div-table {
       display: table;         
-      width: auto;         
+      width: 100%;         
       background-color: #eee;         
       border: 1px solid #666666;         
       border-spacing: 5px; /* cellspacing:poor IE support for  this */
@@ -37,7 +37,7 @@
     .div-table-col {
       float: left; /* fix for  buggy browsers */
       display: table-column;         
-      width: 80px;         
+      width: 30%;         
       background-color: #ccc;  
     }
     .card.spy_opened{
@@ -386,7 +386,6 @@
     </div>
   <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
   <form id="userForm" action="">
-    Your name: <input type="text" id="userName" name="userName" disabled /><br>
     Your team: <select  id="userTeam" name="userTeam">
       <option value="0">Observer, no team</option>
       <option value="1" style="color: red;">Red team</option>
@@ -394,6 +393,7 @@
       </select>
       <button>Join</button>
       <br><br>
+      Your name: <input type="text" id="userName" name="userName" disabled /><br>
     </form>
     <form id="chatForm" action="">
         <input id="input" autocomplete="off" /><button>Send</button>
