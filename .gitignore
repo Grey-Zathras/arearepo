@@ -131,3 +131,4 @@ dist
 
 # my config files
 db.js
+package-lock.json
