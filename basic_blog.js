@@ -2,8 +2,8 @@
 "use strict";
 
 //var allUsers= nem Map();
-var allUsers= {};
-var allRooms ={};
+//var allUsers= {};
+//var allRooms ={};
 
 const express = require('express');
 const path = require('path');
@@ -17,6 +17,7 @@ const fs = require('fs');
 
 const cardGenerator = require('./utils/card_generator');
 const { addUser, removeUser, getUser, getUsersInRoom,updateUser } = require("./utils/users");
+const { addRoom, removeRoom, getRoom, updateRoom } = require("./utils/rooms");
 const codenames_DB = require('./db');
 
 const app = express();
@@ -145,7 +146,7 @@ io.on('connection', (socket) => {
       socket.data.team = team_id;
       const room_id = socket.data.room_id;
       //   room <-> data.room <-> room=rooms[room_id] ?
-      const room_name = data.room;// rooms.title ??
+      const room_name = getRoom(socket.data.room_id).room_name;// data.room;// rooms.title ??
       // read database stats
       if (isInt(room_id)) {
         if (team_id >0) {
@@ -183,8 +184,11 @@ io.on('connection', (socket) => {
       data.user_id = socket.id;
       socket.emit('userID',  "User ID assigned: "+data.user_id);
     }
-    var res= addUser({id: data.user_id,username: data.user,room: data.room_id}); 
-    if (res.error) {
+    const res= addUser({id: data.user_id,username: data.user,room: data.room_id}); 
+    const res1 = addRoom({id: data.room_id, room_name: data.room, host: data.user_id}); 
+    const the_room = res1.room; 
+    //console.log("Add Room - the_room object", the_room);
+    if (res.error || res1.error) {
       /*
       if (res.error=="Username is in use!") {
         // socket.emit('team scheme',  { room_id: int_id,team:data.team, states: rows[0].states[data.team-1]});
@@ -197,20 +201,20 @@ io.on('connection', (socket) => {
       socket.join(data.room);
       socket.data.username = data.user;
       socket.data.user_id = data.user_id;
-      socket.data.room_id = data.room_id;
+      socket.data.room_id = the_room.id;
       
       //addUser(socket.id,data.user,data.room_id); 
       
-      io.to(data.room).emit('roomData', {
-        room: data.room_id,
-        users: getUsersInRoom(data.room_id)
+      io.to(the_room.room_name).emit('roomData', {
+        room: the_room.id,
+        users: getUsersInRoom(the_room.id)
       });
       if (res.msg && res.user.team){
         joinTeam(res.user.team, data);
-        console.log(socket.id,` User ${data.user}/${data.user_id} reconnected to room: ${data.room} and team ${res.user.team}`);
+        console.log(socket.id,` User ${data.user}/${data.user_id} reconnected to room: ${the_room.room_name} and team ${res.user.team}`);
         //console.log(socket.id,` res.user `, res.user);
       } else {
-        console.log(socket.id,` User ${data.user} joined room: ${data.room}`);
+        console.log(socket.id,` User ${data.user} joined room: ${the_room.room_name}`);
       }
     } 
   });
