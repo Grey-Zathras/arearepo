@@ -142,40 +142,63 @@ const io = socketIo(server);
 io.on('connection', (socket) => {
     console.log(socket.id,'a user connected');
     
+    function roomData({room}) {
+      const room_id= room.id;
+      //const host_id = room.host;
+      //console.log("roomData, room:",room);
+      const host = getUser(room.host)
+      //console.log("roomData, host:",host);
+      
+      const hostname = getUser(room.host).username; 
+      const room_name = room.room_name;
+      
+      let room2= Object.assign({}, room); 
+      delete room2.host;
+      //console.log("roomData, room-2:",room);
+      
+      io.to(room_name).emit('roomData', {
+        room: room2,
+        host: hostname,
+        users: getUsersInRoom(room_id)
+      });
+
+    }
     async function joinTeam(team_id, data) { // data.room
-      socket.data.team = team_id;
-      const room_id = socket.data.room_id;
-      //   room <-> data.room <-> room=rooms[room_id] ?
-      const room_name = getRoom(socket.data.room_id).room_name;// data.room;// rooms.title ??
-      // read database stats
-      if (isInt(room_id)) {
-        if (team_id >0) {
-            const { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [room_id]);
-            if (rows.length === 0) {
-              socket.emit('error message',  `Room ${room_id} not found`);
-              //res.status(404).send('Room not found');
-            } else {
-              if (Array.isArray(rows[0].states)  ) {
-                //console.dir(rows[0].states);
-                updateUser ( { id:socket.data.user_id, active:1,team: team_id});
-                const the_room=getRoom(room_id);
-                io.to(room_name).emit('roomData', {
-                  room: the_room,
-                  host: getUser(the_room.host),
-                  users: getUsersInRoom(room_id)
-                });
-                socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states[team_id-1]});
+      try {
+        socket.data.team = team_id;
+        const room_id = socket.data.room_id;
+        //   room <-> data.room <-> room=rooms[room_id] ?
+        //const room_name = getRoom(socket.data.room_id).room_name;// data.room;// rooms.title ??
+        // read database stats
+        if (isInt(room_id)) {
+          if (team_id >0) {
+              const { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [room_id]);
+              if (rows.length === 0) {
+                socket.emit('error message',  `Room ${room_id} not found`);
+                //res.status(404).send('Room not found');
               } else {
-                socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
+                if (Array.isArray(rows[0].states)  ) {
+                  //console.dir(rows[0].states);
+                  updateUser ( { id:socket.data.user_id, active:1,team: team_id});
+                  const the_room=getRoom(room_id);
+                  roomData({room: the_room });
+                  socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states[team_id-1]});
+                } else {
+                  socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
+                }
               }
             }
+          }  else {
+              // SQL injection attack
+              console.log(`SQL injection attack ${socket.data.room_id}`);
+              socket.emit('error message',  `Room ${room_id} not found`);
           }
-        }  else {
-            // SQL injection attack
-            console.log(`SQL injection attack ${socket.data.room_id}`);
-            socket.emit('error message',  `Room ${room_id} not found`);
-        }
-        console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${room_name}`);
+          console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${room_name}`);
+  
+      } catch (err){
+        console.log(socket.id,` Join Team: User ${socket.data} has got unknown error`,err);
+        socket.emit('error message',  `unknown error ${err}`);
+      }
 
     }
   
@@ -207,11 +230,7 @@ io.on('connection', (socket) => {
       
       //addUser(socket.id,data.user,data.room_id); 
       
-      io.to(the_room.room_name).emit('roomData', {
-        room: the_room,
-        host: getUser(the_room.host),
-        users: getUsersInRoom(the_room.id)
-      });
+      roomData({room: the_room });
       if (res.msg && res.user.team){
         joinTeam(res.user.team, data);
         console.log(socket.id,` User ${data.user}/${data.user_id} reconnected to room: ${the_room.room_name} and team ${res.user.team}`);
@@ -227,9 +246,12 @@ io.on('connection', (socket) => {
   });
 
   socket.on('leave room', async  (data) => {
-    const userleft=removeUser(socket.data.user_id);
+    //if (socket.data) 
+      const userleft=removeUser(socket.data.user_id);
+    //else
+      //const userleft=removeUser(socket.data.user_id);
     console.log('leave room - userleft:',userleft);
-    if (!userleft  ) { //|| !userleft.room
+    try { //|| !userleft.room
       const the_room=getRoom(userleft.room);
       io.to(the_room.room_name).emit('chat message', { msg: "user left the room", user: userleft.username });
       if (the_room.host == userleft.id) {
@@ -239,16 +261,18 @@ io.on('connection', (socket) => {
         if (!users.length) {
           console.log("last active user left the room - room will be destroyed");
           io.to(the_room.room_name).emit('chat message', { msg: "last active user left the room - room will be destroyed", user: userleft.username });
+          removeRoom(the_room.id);
         } else {
           const new_host = users[0];
           console.log("reassigning host to the 'host':",new_host.username );
           updateRoom({id:the_room.id, host:new_host.id });
-          io.to(the_room.room_name).emit('roomData', { room: the_room, host: new_host,  users: getUsersInRoom(the_room.id)  });
+          roomData({room: the_room });
           io.to(the_room.room_name).emit('chat message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
         }
     }
-  } else {
-    console.log("no room to leave for 'userleft'",userleft, "socket.data.user_id",socket.data.user_id, "data",data);
+  } 
+  catch (err) {
+    console.log("no room found to leave for 'userleft'",userleft, "socket.data",socket.data, "data",data,err);
   }
 });
 
@@ -261,10 +285,23 @@ io.on('connection', (socket) => {
   socket.on('disconnect', (reason) => {
     const user = getUser(socket.id);
     if (user === undefined){
-      console.log("socket",socket.data);
+      console.log("socket_data",socket.data);
       console.log(socket.id,`unknown user ${socket.data.user_id} disconnected`, reason);
     } else  {
-      updateUser ( { id:socket.id, active:0 });
+      try {
+        if ( !socket.data.room ) {
+          throw "no room in socket";
+        }
+          const the_room = socket.data.room;
+          updateUser ( { id:socket.id, active:0 });
+          roomData({room: the_room });
+          io.to(the_room.room_name).emit('chat message', { msg: `I am disconnected, ${reason}`, user: socket.data.username });
+        } catch (err) {
+        console.log(socket.id,`disconnect error: User ${socket.data} `,err);
+        //socket.emit('error message',  `unknown error ${err}`);
+      }
+  
+
       /*
       room = ... user.room
       io.to(room).emit('roomData', {

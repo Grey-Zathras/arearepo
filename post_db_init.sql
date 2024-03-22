@@ -17,10 +17,11 @@ CREATE TABLE posts (
 -- Optional: Insert a sample post into the table
 INSERT INTO posts (title, content) VALUES ('Sample Post', 'This is a sample blog post.');
 
+-- to do: code should be unique
 CREATE TABLE rooms (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    code VARCHAR(255) NOT NULL,
+    code VARCHAR(255) NOT NULL, 
     priv boolean DEFAULT 0,
     stat integer DEFAULT 0,
     cards VARCHAR(30) [25],

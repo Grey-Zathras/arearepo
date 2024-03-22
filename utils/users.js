@@ -50,7 +50,7 @@ const removeUser = id => {
 const updateUser = ( {id,  active, team } ) => {
     const index = users.findIndex(user => user.id === id);
     if (index == -1){
-        return {
+        throw {
             error: "User not found!"
           };
     }
@@ -65,7 +65,9 @@ const getUser = id => {
 
 const getUsersInRoom = room => {
   //room = room.trim().toLowerCase();
-  return users.filter(user => user.room === room);
+  let uu=new Array(users.filter(user => user.room === room));
+  uu.forEach(user => {delete user.id  });
+  return uu;
 };
 
 module.exports = {

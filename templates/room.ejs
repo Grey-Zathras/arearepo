@@ -319,7 +319,7 @@
       });
       socket.on('roomData', function(data) {
         console.log('roomData',data);
-        document.getElementById('host').innerText = data.host.username;
+        document.getElementById('host').innerText = data.host;
 
         ResetMembers();
         data.users.forEach((element) => {
