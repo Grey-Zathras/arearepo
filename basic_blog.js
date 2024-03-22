@@ -158,8 +158,10 @@ io.on('connection', (socket) => {
               if (Array.isArray(rows[0].states)  ) {
                 //console.dir(rows[0].states);
                 updateUser ( { id:socket.data.user_id, active:1,team: team_id});
+                const the_room=getRoom(room_id);
                 io.to(room_name).emit('roomData', {
-                  room: room_id,
+                  room: the_room,
+                  host: getUser(the_room.host),
                   users: getUsersInRoom(room_id)
                 });
                 socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states[team_id-1]});
@@ -206,7 +208,8 @@ io.on('connection', (socket) => {
       //addUser(socket.id,data.user,data.room_id); 
       
       io.to(the_room.room_name).emit('roomData', {
-        room: the_room.id,
+        room: the_room,
+        host: getUser(the_room.host),
         users: getUsersInRoom(the_room.id)
       });
       if (res.msg && res.user.team){
@@ -220,49 +223,34 @@ io.on('connection', (socket) => {
   });
 
   socket.on('team change', async  (data) => {
-    
     joinTeam(data.team, data);
-
-    /*
-    //socket.join(data.room+"/"+data.team);
-    socket.data.team = data.team;
-    //socket.emit('chat message', { msg: 'Your new team in room '+socket.data.room_id+' is '+data.team }); // + room.title?
-    const int_id = socket.data.room_id;
-    //   room <-> data.room <-> rooms[room_id] ?
-    // read database stats
-    if (isInt(int_id)) {
-      if (data.team >0) {
-          //data.team--;
-          //const { rows } = await codenames_DB.query('SELECT states[$2] FROM rooms WHERE id = $1', [int_id],[data.team]);
-          const { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [int_id]);
-          if (rows.length === 0) {
-            socket.emit('error message',  `Room ${int_id} not found`);
-            //res.status(404).send('Room not found');
-          } else {
-            if (Array.isArray(rows[0].states)  ) {
-              //console.dir(rows[0].states);
-              updateUser ( { id:socket.id, active:1,team: data.team});
-              io.to(data.room).emit('roomData', {
-                room: int_id,
-                users: getUsersInRoom(int_id)
-              });
-              socket.emit('team scheme',  { room_id: int_id,team:data.team, states: rows[0].states[data.team-1]});
-        
-            //res.render('room', { room: rows[0] });
-            } else {
-              socket.emit('error message',  `Room ${int_id} - game data not found, pls generate the table`);
-            }
-          }
-        }
-      }  else {
-          // SQL injection attack
-          console.log(`SQL injection attack ${socket.data.room_id}`);
-          socket.emit('error message',  `Room ${int_id} not found`);
-        }
-    console.log(socket.id,` User ${data.user} changed team to ${data.team} in room: ${data.room}`);
-    // */
-
   });
+
+  socket.on('leave room', async  (data) => {
+    const userleft=removeUser(socket.data.user_id);
+    console.log('leave room - userleft:',userleft);
+    if (!userleft  ) { //|| !userleft.room
+      const the_room=getRoom(userleft.room);
+      io.to(the_room.room_name).emit('chat message', { msg: "user left the room", user: userleft.username });
+      if (the_room.host == userleft.id) {
+        const users= getUsersInRoom(the_room.id).filter(user => user.active == 1);
+        const res1=users.length;
+        console.log('getUsersInRoom:',users,res1);
+        if (!users.length) {
+          console.log("last active user left the room - room will be destroyed");
+          io.to(the_room.room_name).emit('chat message', { msg: "last active user left the room - room will be destroyed", user: userleft.username });
+        } else {
+          const new_host = users[0];
+          console.log("reassigning host to the 'host':",new_host.username );
+          updateRoom({id:the_room.id, host:new_host.id });
+          io.to(the_room.room_name).emit('roomData', { room: the_room, host: new_host,  users: getUsersInRoom(the_room.id)  });
+          io.to(the_room.room_name).emit('chat message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
+        }
+    }
+  } else {
+    console.log("no room to leave for 'userleft'",userleft, "socket.data.user_id",socket.data.user_id, "data",data);
+  }
+});
 
   // Listen for chat messages and emit to the room
   socket.on('chat message', (data) => {

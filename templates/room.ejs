@@ -21,7 +21,9 @@
 			background-color: lightblue;
 			font-size: 16px;
 		}
-
+    .inactive{
+      text-decoration: overline;
+    }
     .div-table {
       display: table;         
       width: 100%;         
@@ -48,6 +50,10 @@
     }
     .members li{
       list-style-type: none;
+    }
+    .members{
+     font-size: smaller;
+     font-style: oblique;
     }
     .card.spy_opened{
 			background-color: green;
@@ -313,16 +319,19 @@
       });
       socket.on('roomData', function(data) {
         console.log('roomData',data);
+        document.getElementById('host').innerText = data.host.username;
+
         ResetMembers();
         data.users.forEach((element) => {
           console.dir(element);
           AddMemberLine (element);
         }); 
       });
-      
+      /*
       window.addEventListener("visibilitychange", (event) => {
         console.log("visibilitychange "+document.visibilityState );   
       });
+      */
       window.addEventListener('beforeunload', function (e) {
         // Uncomment below to cancel the popup and event
         //window.onbeforeunload = undefined;
@@ -330,12 +339,14 @@
 
         // You can customize the message, but modern browsers often display their own default message for security reasons.
         var confirmationMessage = 'You have unsaved changes! Are you sure you want to leave?';
-        console.log("unloading");
-        socket.emit('chat message', { room: room, msg: "user leaving the room ", user: userName});
+        socket.emit('chat message', {  msg: "user leaving the room "+room+" - window event1", user: userName});
 
         // Some browsers may display this message to the user, prompting them to confirm if they want to leave the page.
         (e || window.event).returnValue = confirmationMessage; // Gecko + IE
         return confirmationMessage; // Webkit, Safari, Chrome etc.
+      });
+      window.addEventListener('unload', function (e) {
+        socket.emit('leave room', { room: room, msg: "user left the room", user: userName});
       });
     };
   </script>
@@ -371,24 +382,26 @@
     </table>
   
   </div>
-  <div class="log_area"  />
+  <div class="log_area" >
   <div class="chat_header">
-    <div class="members div-table" >
+    <div class="host">
+      Room host:  <span id="host"></span>
+    </div>
+      <div class="div-table" >
       <div class="div-table-row" >
         <div class="div-table-col Observers">
           Observers
-          <div id="Observers">
-      
+          <div class="members" id="Observers">
           </div>
         </div>
         <div class="div-table-col Red_team" >
           Red Team
-          <div id="Red_team">
+          <div class="members" id="Red_team">
           </div>
         </div>
         <div class="div-table-col Blue_team">
           Blue Team
-          <div id="Blue_team">
+          <div class="members" id="Blue_team">
           </div>
         </div>
       </div>
