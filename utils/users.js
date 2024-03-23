@@ -65,9 +65,14 @@ const getUser = id => {
 
 const getUsersInRoom = room => {
   //room = room.trim().toLowerCase();
-  let uu=new Array(users.filter(user => user.room === room));
-  uu.forEach(user => {delete user.id  });
-  return uu;
+  let uu1=users.filter(user => user.room === room);
+  let uu2=[];
+  uu1.forEach(user => {
+    let user2= Object.assign({}, user); 
+    delete user2.id;
+    uu2.push(user2);  
+  });
+  return uu2;
 };
 
 module.exports = {
