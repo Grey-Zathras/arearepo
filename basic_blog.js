@@ -246,10 +246,16 @@ io.on('connection', (socket) => {
   });
 
   socket.on('leave room', async  (data) => {
-    //if (socket.data) 
-      const userleft=removeUser(socket.data.user_id);
-    //else
-      //const userleft=removeUser(socket.data.user_id);
+    var userleft;
+    if (data.userid) {
+      userleft=removeUser(data.userid);
+    } else if (socket.data.user_id){
+       userleft=removeUser(socket.data.user_id);
+   } 
+   if (typeof userleft === "undefined" ) {
+     userleft="undefined";
+   }
+    
     console.log('leave room - userleft:',userleft);
     try { //|| !userleft.room
       let the_room=getRoom(userleft.room);
@@ -267,7 +273,7 @@ io.on('connection', (socket) => {
           console.log("reassigning host to the 'host':",new_host.username );
           updateRoom({id:the_room.id, host:new_host.id });
           //let the_room=getRoom(the_room.id);
-          roomData({room: the_room });
+          roomData({room: the_room , host:new_host.username});
           io.to(the_room.room_name).emit('chat message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
         }
     }

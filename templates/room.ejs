@@ -339,14 +339,14 @@
 
         // You can customize the message, but modern browsers often display their own default message for security reasons.
         var confirmationMessage = 'You have unsaved changes! Are you sure you want to leave?';
-        socket.emit('chat message', {  msg: "user leaving the room "+room+" - window event1", user: userName});
+        socket.emit('chat message', {  msg: "user leaving the room "+room+" - window event1", user: userName, userid:getCookie("userid")});
 
         // Some browsers may display this message to the user, prompting them to confirm if they want to leave the page.
         (e || window.event).returnValue = confirmationMessage; // Gecko + IE
         return confirmationMessage; // Webkit, Safari, Chrome etc.
       });
       window.addEventListener('unload', function (e) {
-        socket.emit('leave room', { room: room, msg: "user left the room", user: userName});
+        socket.emit('leave room', { room: room, msg: "user left the room", user: userName, });
       });
     };
   </script>
