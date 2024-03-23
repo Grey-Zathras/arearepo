@@ -63,16 +63,20 @@ const getUser = id => {
   return users.find(user => user.id === id);
 };
 
-const getUsersInRoom = room => {
+const getUsersInRoom = (room, keepID) => {
   //room = room.trim().toLowerCase();
   let uu1=users.filter(user => user.room === room);
-  let uu2=[];
-  uu1.forEach(user => {
-    let user2= Object.assign({}, user); 
-    delete user2.id;
-    uu2.push(user2);  
-  });
-  return uu2;
+  if (keepID)
+    return uu1;
+  else {
+    let uu2=[];
+    uu1.forEach(user => {
+      let user2= Object.assign({}, user); 
+      delete user2.id;
+      uu2.push(user2);  
+    });
+    return uu2;
+  }
 };
 
 module.exports = {

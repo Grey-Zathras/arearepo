@@ -41,7 +41,7 @@ const removeRoom = id => {
   }
 };
 
-const updateRoom = ( {id,  game_status, active_team, step } ) => {
+const updateRoom = ( {id,  game_status, active_team, step, host } ) => {
     const index = rooms.findIndex(room => room.id === id);
     if (index == -1){
         return {
@@ -50,6 +50,9 @@ const updateRoom = ( {id,  game_status, active_team, step } ) => {
     }
     if (typeof game_status !== "undefined")
         rooms[index].game_status = game_status;
+    if (host !== undefined)
+      rooms[index].host = host;
+    
     if (active_team !== undefined)
       rooms[index].active_team = active_team;
       if (step !== undefined)

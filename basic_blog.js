@@ -252,10 +252,10 @@ io.on('connection', (socket) => {
       //const userleft=removeUser(socket.data.user_id);
     console.log('leave room - userleft:',userleft);
     try { //|| !userleft.room
-      const the_room=getRoom(userleft.room);
+      let the_room=getRoom(userleft.room);
       io.to(the_room.room_name).emit('chat message', { msg: "user left the room", user: userleft.username });
       if (the_room.host == userleft.id) {
-        const users= getUsersInRoom(the_room.id).filter(user => user.active == 1);
+        const users= getUsersInRoom(the_room.id, 1).filter(user => user.active == 1);
         const res1=users.length;
         console.log('getUsersInRoom:',users,res1);
         if (!users.length) {
@@ -266,6 +266,7 @@ io.on('connection', (socket) => {
           const new_host = users[0];
           console.log("reassigning host to the 'host':",new_host.username );
           updateRoom({id:the_room.id, host:new_host.id });
+          //let the_room=getRoom(the_room.id);
           roomData({room: the_room });
           io.to(the_room.room_name).emit('chat message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
         }
@@ -279,7 +280,7 @@ io.on('connection', (socket) => {
   // Listen for chat messages and emit to the room
   socket.on('chat message', (data) => {
     io.to(data.room).emit('chat message', { msg: data.msg, user: data.user });
-    console.log(socket.id,'chat message', data.room, data.user, data.msg);
+    console.log(socket.id,'chat message', socket.data, data.user, data.msg);
   });
   
   socket.on('disconnect', (reason) => {
