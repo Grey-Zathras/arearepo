@@ -244,6 +244,26 @@ io.on('connection', (socket) => {
   socket.on('team change', async  (data) => {
     joinTeam(data.team, data);
   });
+  socket.on('start game', async  (data) => {
+    let the_room=getRoom(socket.data.room_id);
+    the_room.game_status=1;
+    the_room.step=0;
+    the_room.active_team=1;
+
+    roomData({room: the_room });
+    /*
+    io.to(room_name).emit('game update', {
+      room: room2,
+      host: hostname,
+      users: getUsersInRoom(room_id)
+    });
+    */
+
+    
+    the_room=getRoom(socket.data.room_id);
+    //const { rows } = await codenames_DB.query('UPDATE rooms SET stat=$2 WHERE id = $1', [room_id],[0]);  
+    console.log("start game", "socket.data",socket.data, "data",data,the_room);
+  });
 
   socket.on('leave room', async  (data) => {
     var userleft;

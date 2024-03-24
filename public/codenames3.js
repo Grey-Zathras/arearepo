@@ -84,6 +84,7 @@ window.onload = function() {
   var chatForm = document.getElementById('chatForm');
   var userForm = document.getElementById('userForm');
   var input = document.getElementById('input');
+  
   //var roomInput = document.getElementById('room');
   document.getElementById('userName').value = userName;
 
@@ -98,7 +99,7 @@ window.onload = function() {
     e.preventDefault();
     if (input.value) {
       //var room = roomInput.value;
-      socket.emit('chat message', { room: room, msg: input.value, user: userName  });
+      socket.emit('chat message', { room: room, msg: input.value, user: userName , user_id: userID });
       console.log({ room: room, msg: input.value, user: userName  });
       input.value = '';
     }
@@ -109,11 +110,19 @@ window.onload = function() {
     console.log(userTeam.value);
     if (userTeam.value) {
       var team = userTeam.value;
-      socket.emit('team change', { room: room, team: team, user: userName  });
+      socket.emit('team change', { room: room, team: team, user: userName , user_id: userID });
       //console.log('team change event', { room: room, team: team, user: userName  });
       //input.value = '';
     }
   });
+  //  document.getElementById('startButton').addEventListener('click', function(e) {
+
+  startButton.addEventListener('click', function(e) {
+    
+    socket.emit('start game', { room: room, user: userName , user_id: userID });
+    startButton.disabled = true;
+
+    });
 
   socket.on('chat message', function(data) {
     addChatLine(data.user + ": " + data.msg);
@@ -135,8 +144,14 @@ window.onload = function() {
   });
   socket.on('roomData', function(data) {
     console.log('roomData',data);
+    // check for host and start button
     document.getElementById('host').innerText = data.host;
-
+    if (data.host==userName && !data.room.game_status){
+        startButton.disabled=false;
+    } else {
+        startButton.disabled=true;
+    }
+    // refresh Teams and Player status
     ResetMembers();
     data.users.forEach((element) => {
       console.dir(element);
