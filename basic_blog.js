@@ -102,9 +102,6 @@ app.get('/room/:id', async (req, res) => {
             //res.status(404).json({ message: 'Post not found' });
         } else {
             res.render('room', { room: rows[0] });
-            //req.session.username = username;
-            //req.session.room_id = int_id; 
-            //console.log(socket.id,` User ${socket.data.user} entering room: ${socket.data.room}`);
             //res.json(rows[0]);
         }
     }  else {
@@ -131,7 +128,6 @@ app.post('/create', async (req, res) => {
     [title, code, cards, states]
   );
   //res.status(201).json(rows[0]);
-  //res.status(201).send(`Post ${title} created`);
   res.status(201).render('create_confirmation', { room:  req.body });
 });
 
@@ -144,25 +140,18 @@ io.on('connection', (socket) => {
     
     function roomData({room}) {
       const room_id= room.id;
-      //const host_id = room.host;
-      //console.log("roomData, room:",room);
       const host = getUser(room.host)
-      //console.log("roomData, host:",host);
-      
       const hostname = getUser(room.host).username; 
       const room_name = room.room_name;
-      
       let room2= Object.assign({}, room); 
       delete room2.host;
-      //console.log("roomData, room-2:",room);
-      
       io.to(room_name).emit('roomData', {
         room: room2,
         host: hostname,
         users: getUsersInRoom(room_id)
       });
-
     }
+
     async function joinTeam(team_id, data) { // data.room
       try {
         socket.data.team = team_id;
@@ -194,7 +183,7 @@ io.on('connection', (socket) => {
               console.log(`SQL injection attack ${socket.data.room_id}`);
               socket.emit('error message',  `Room ${room_id} not found`);
           }
-          console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${room_name}`);
+          console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
   
       } catch (err){
         console.log(socket.id,` Join Team: User ${socket.data} has got unknown error`,err);
