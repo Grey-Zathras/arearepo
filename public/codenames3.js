@@ -23,7 +23,7 @@ function getCookie(name) {
       item1.className=msgclass;
       item.appendChild(item1);
       item1.textContent = text;
-      console.log(item.outerHTML, text);
+      //console.log(item.outerHTML, text);
     }
     chat_messages.insertBefore(item, chat_messages.firstChild);
       //messages.appendChild(item);
@@ -40,7 +40,7 @@ function addSysMsgLine (text, msgclass=""){
       item1.className=msgclass;
       item.appendChild(item1);
       item1.textContent = text;
-      console.log(item.outerHTML, text);
+      //console.log(item.outerHTML, text);
     }
     system_messages.insertBefore(item, system_messages.firstChild);
       //messages.appendChild(item);

@@ -315,7 +315,7 @@ io.on('connection', (socket) => {
           const the_room = socket.data.room;
           updateUser ( { id:socket.id, active:0 });
           roomData({room: the_room });
-          io.to(the_room.room_name).emit('chat message', { msg: `I am disconnected, ${reason}`, user: socket.data.username });
+          io.to(the_room.room_name).emit('system message', { msg: `I am disconnected, ${reason}`, user: socket.data.username });
         } catch (err) {
         console.log(socket.id,`disconnect error: User ${socket.data} `,err);
         //socket.emit('error message',  `unknown error ${err}`);
