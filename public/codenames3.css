@@ -137,6 +137,14 @@ display: inline-block;
 #system_messages, #chat_messages  {
     list-style-type: none;
     padding-left: 5px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+#game_progress {
+    display: none;
+}
+.game_head{
+    text-align: center;
 }
 
 .user_chat {

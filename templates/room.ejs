@@ -25,13 +25,21 @@
   <div>
 
   <div class="cardspace border1">
-    
+    <div class="game_head">
+      <span id="gamestat">Game Not Started</span> &nbsp;&nbsp;&nbsp;
+       <span class="game_progress" id="game_progress">
+         Active team <span id="activeteam"></span>  &nbsp;&nbsp;&nbsp;
+         Step <span id="activestep"></span>  &nbsp;&nbsp;&nbsp;
+         Turn <span id="turn">0</span>  &nbsp;&nbsp;&nbsp;
+     </span>
+       </div>
+  
     <table class="border1" width="100%">
       <% for(var i =0; i<5; i++) { %>
         <tr>
         <% for(var j =0; j<5; j++) { 
           const ind=(i*5) + (j);
-          const state_class_array = ['closed', 'spy', 'killer', 'spy_opened','civilian','killer_opened' ]; 
+          //const state_class_array = ['closed', 'spy', 'killer', 'spy_opened','civilian','killer_opened' ]; 
           //state_class_array[room.states[0][ind]] 
           %>
           <td  class="card " id="card[<%= ind %>]">
@@ -77,7 +85,9 @@
       <option value="2" style="color: blue;">Blue team</option>
       </select>
       <button>Join</button>
-      <br><br>
+      <br>
+      Challendge: <input type="text" id="challenge" name="challenge" disabled /> %nbsp;%nbsp; Attempts:%nbsp;<input type="text" id="clicks" name="clicks" maxlength="2" size="2" disabled />
+      <br>
     </form>
     System Log:<br/>
   <div class="chat_msg">
