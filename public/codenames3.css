@@ -43,10 +43,23 @@ list-style-type: none;
 font-size: smaller;
 font-style: oblique;
 }
-.card.spy_opened{
+.card.spy_opened , .card.spy_opened1 , .card.spy_opened2{
     background-color: green;
 }
-.card.killer_opened{
+/* both civilians */
+.card.civilian.civilian1 , .card.civilian.civilian2, .card.civilian1.civilian2 {
+    background-color: maroon;
+}
+/*  civilian1 */
+.card.civilian.closed1 , .card.civilian1.closed2{
+    background-color: blueviolet;
+}
+/*  civilian2 */
+.card.civilian.closed2 , .card.closed1.civilian2{
+    background-color: salmon;
+}
+
+.card.killer_opened , .card.killer_opened1 , .card.killer_opened2{
 background-color: rgb(42, 43, 42);
 }
 .card.spy .card_text{

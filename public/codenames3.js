@@ -1,4 +1,5 @@
 var ok_to_leave=0;
+var card_event=0;
 
 function getCookie(name) {
     var value = "; " + document.cookie;
@@ -72,12 +73,23 @@ function addSysMsgLine (text, msgclass=""){
       document.getElementById(memberTagID[team]).appendChild(item);
   }
 
-  function refreshTable(states, role){
-    if (role=="player") {
+  function refreshTable(states, role,team){
+    if (typeof states === "undefined") {
+        for (var i=0;i<25;i++){
+            var card = document.getElementById('card['+i+']');
+            card.className="card ";
+          }
+    } else if (role=="player") {
       for (var i=0;i<25;i++){
         var card = document.getElementById('card['+i+']');
-        card.className="card "+player_class_array[states[i] ];
+        card.className=card.className +" " + player_class_array[states[i] ];
       }
+    } else {
+        for (var i=0;i<25;i++){
+            var card = document.getElementById('card['+i+']');
+            card.className=card.className + " " +player_class_array[states[i] ]+team;
+          }
+    
     }
 }
 
@@ -160,9 +172,15 @@ window.onload = function() {
   });
   socket.on('team scheme', function(data) {
     console.log('team scheme data',data);
-    //addChatLine(data,"errormsg");
-    refreshTable(data.states,"player")
-    addChatLine("welcome to the "+teams_list[data.team]+" team" ,"sysmsg");
+    refreshTable();
+    if (data.team >0 ) {
+        refreshTable(data.states[data.team-1],"player");
+        refreshTable(data.states[2-data.team],"team",(3-data.team));
+        addChatLine("welcome to the "+teams_list[data.team]+" team" ,"sysmsg");
+    } else {
+        refreshTable(data.states[data.team-1],"team",(data.team));
+        refreshTable(data.states[2-data.team],"team",(3-data.team));
+    }
   });
   socket.on('userID', function(data) {
     console.log('userID data',data,"socket.id",socket.id );

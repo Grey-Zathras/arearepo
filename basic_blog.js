@@ -161,7 +161,7 @@ io.on('connection', (socket) => {
         // read database stats
         if (isInt(room_id)) {
           if (team_id >0) {
-              const { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [room_id]);
+              var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [room_id]);
               if (rows.length === 0) {
                 socket.emit('error message',  `Room ${room_id} not found`);
                 //res.status(404).send('Room not found');
@@ -171,7 +171,15 @@ io.on('connection', (socket) => {
                   updateUser ( { id:socket.data.user_id, active:1,team: team_id});
                   const the_room=getRoom(room_id);
                   roomData({room: the_room });
-                  socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states[team_id-1]});
+                  // socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states[team_id-1]});
+                  const forbidden=[1,2];
+                  rows[0].states[2-team_id].forEach((state,index) => {
+                    // cleanup spies
+                    if (forbidden.includes(state) ){
+                      rows[0].states[2-team_id][index]=0;
+                    }
+                  });
+                  socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states});
                   io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id }); // system message
                   console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
                 } else {
