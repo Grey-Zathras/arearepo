@@ -183,6 +183,7 @@ io.on('connection', (socket) => {
                   const the_room=getRoom(room_id);
                   roomData({room: the_room });
                   socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states[team_id-1]});
+                  io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id }); // system message
                 } else {
                   socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
                 }
@@ -244,6 +245,7 @@ io.on('connection', (socket) => {
   socket.on('team change', async  (data) => {
     joinTeam(data.team, data);
   });
+
   socket.on('start game', async  (data) => {
     let the_room=getRoom(socket.data.room_id);
     the_room.game_status=1;
@@ -258,7 +260,8 @@ io.on('connection', (socket) => {
       users: getUsersInRoom(room_id)
     });
     */
-
+    io.to(the_room.room_name).emit('system message', { msg: "Let's start the game!", user: data.user }); // system message
+    
     
     the_room=getRoom(socket.data.room_id);
     //const { rows } = await codenames_DB.query('UPDATE rooms SET stat=$2 WHERE id = $1', [room_id],[0]);  

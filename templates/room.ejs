@@ -78,15 +78,22 @@
       </select>
       <button>Join</button>
       <br><br>
-      Your name: <input type="text" id="userName" name="userName" disabled /><br>
     </form>
-    <form id="chatForm" action="">
+    System Log:<br/>
+  <div class="chat_msg">
+    <ul id="system_messages"></ul>
+  </div>
+  </div>
+    <div class="user_chat">
+      Your name: <input type="text" id="userName" name="userName" disabled /><br>
+      User Chat:<br/>
+  <div class="chat_msg">
+  <form id="chatForm" action="">
         <input id="input" autocomplete="off" /><button>Send</button>
   </form>
+    <ul id="chat_messages"></ul>
   </div>
-  <div class="chat_msg">
-    <ul id="messages"></ul>
-  </div>
+    </div>
 </div>
 </div>
 </body>

@@ -27,8 +27,8 @@ const addRoom = ({ id, room_name, host /*, room_socket_id, room_code */}) => {
     }
   }
 
-  // Store room { id, room_name, host , game_status 0|1|2 , active_team 1|2, step};
-  const room = { id, room_name, host ,game_status :0, active_team:1, step:0, challendge:"", clicks:[0,0,0]};
+  // Store room { id, room_name, host , game_status 0|1|2 , active_team 1|2, turn, step 0|1, challendge, clicks[3]  };
+  const room = { id, room_name, host ,game_status :0, active_team:1, step:0, turn:0, challendge:"", clicks:[0,0,0]};
   rooms.push(room);
   return { room };
 };
@@ -41,7 +41,7 @@ const removeRoom = id => {
   }
 };
 
-const updateRoom = ( {id,  game_status, active_team, step, host, challendge, clicks } ) => {
+const updateRoom = ( {id,  game_status, active_team, turn, step, host, challendge, clicks } ) => {
     const index = rooms.findIndex(room => room.id === id);
     if (index == -1){
         return {
@@ -63,8 +63,10 @@ const updateRoom = ( {id,  game_status, active_team, step, host, challendge, cli
     
     if (active_team !== undefined)
       rooms[index].active_team = active_team;
-      if (step !== undefined)
+    if (step !== undefined)
       rooms[index].step = step;
+    if (turn !== undefined)
+      rooms[index].turn = turn;
   };
   
 const getRoom = id => {

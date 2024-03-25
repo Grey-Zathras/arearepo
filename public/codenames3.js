@@ -23,14 +23,29 @@ function getCookie(name) {
       item1.className=msgclass;
       item.appendChild(item1);
       item1.textContent = text;
-      
       console.log(item.outerHTML, text);
-
     }
-    messages.insertBefore(item, messages.firstChild);
+    chat_messages.insertBefore(item, chat_messages.firstChild);
       //messages.appendChild(item);
       //window.scrollTo(0, document.body.scrollHeight);
-    window.scrollTo(0, 0); // Scroll to the top to show the newest message
+    //window.scrollTo(0, 0); // Scroll to the top to show the newest message
+  }
+
+function addSysMsgLine (text, msgclass=""){
+    var item = document.createElement('li');
+    if (msgclass==""){
+      item.textContent = text;
+    } else{
+      var item1 = document.createElement('span');
+      item1.className=msgclass;
+      item.appendChild(item1);
+      item1.textContent = text;
+      console.log(item.outerHTML, text);
+    }
+    system_messages.insertBefore(item, system_messages.firstChild);
+      //messages.appendChild(item);
+      //window.scrollTo(0, document.body.scrollHeight);
+    //window.scrollTo(0, 0); // Scroll to the top to show the newest message
   }
 
   var activeClass=["inactive","active"];
@@ -125,17 +140,22 @@ window.onload = function() {
     });
 
   socket.on('chat message', function(data) {
+    console.log('chat message data', data);
     addChatLine(data.user + ": " + data.msg);
+  });
+  socket.on('system message', function(data) {
+    console.log('system message data', data);
+    addSysMsgLine(data.user + ": " + data.msg,"sysmsg");
   });
   socket.on('error message', function(data) {
     console.log('error message data', data);
-    addChatLine(data,"errormsg");
+    addSysMsgLine(data,"errormsg");
   });
   socket.on('team scheme', function(data) {
     console.log('team scheme data',data);
     //addChatLine(data,"errormsg");
     refreshTable(data.states,"player")
-    addChatLine("welcome to the "+teams_list[data.team]+" team" ,"errormsg");
+    addChatLine("welcome to the "+teams_list[data.team]+" team" ,"sysmsg");
   });
   socket.on('userID', function(data) {
     console.log('userID data',data,"socket.id",socket.id );
