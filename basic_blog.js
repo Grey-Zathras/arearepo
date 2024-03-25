@@ -250,7 +250,7 @@ io.on('connection', (socket) => {
       users: getUsersInRoom(room_id)
     });
     */
-    io.to(the_room.room_name).emit('system message', { msg: "Let's start the game!", user: data.user }); // system message
+    io.to(the_room.room_name).emit('system message', { msg: "Let's start the game!", user: data.user, msg_type:0 }); // system message
     
     
     the_room=getRoom(socket.data.room_id);
@@ -305,8 +305,8 @@ io.on('connection', (socket) => {
   socket.on('disconnect', (reason) => {
     const user = getUser(socket.id);
     if (user === undefined){
-      console.log("socket_data",socket.data);
-      console.log(socket.id,`unknown user ${socket.data.user_id} disconnected`, reason);
+      console.log("disconnect - socket_data",socket.data);
+      console.log(socket.id,`disconnect - unknown user ${socket.data.user_id} disconnected`, reason);
     } else  {
       try {
         if ( !socket.data.room ) {

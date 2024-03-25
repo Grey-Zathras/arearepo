@@ -1,3 +1,5 @@
+var ok_to_leave=0;
+
 function getCookie(name) {
     var value = "; " + document.cookie;
     var parts = value.split("; " + name + "=");
@@ -136,7 +138,6 @@ window.onload = function() {
     
     socket.emit('start game', { room: room, user: userName , user_id: userID });
     startButton.disabled = true;
-
     });
 
   socket.on('chat message', function(data) {
@@ -146,6 +147,12 @@ window.onload = function() {
   socket.on('system message', function(data) {
     console.log('system message data', data);
     addSysMsgLine(data.user + ": " + data.msg,"sysmsg");
+    switch (data.msg_type) {
+        case 0: {
+            game_progress.style.display = "contents";
+            gamestat.innerText = "Game Started"; 
+        }
+    }
   });
   socket.on('error message', function(data) {
     console.log('error message data', data);
@@ -188,6 +195,12 @@ window.onload = function() {
     //window.onbeforeunload = undefined;
     //return false; 
 
+    ok_to_leave=1;
+    let timeout = setTimeout(function() {
+        // user stayed, do stuff here
+      ok_to_leave=0;
+    }, 1000);
+
     // You can customize the message, but modern browsers often display their own default message for security reasons.
     var confirmationMessage = 'You have unsaved changes! Are you sure you want to leave?';
     socket.emit('chat message', {  msg: "user leaving the room "+room+" - window event1", user: userName, userid:getCookie("userid")});
@@ -197,6 +210,7 @@ window.onload = function() {
     return confirmationMessage; // Webkit, Safari, Chrome etc.
   });
   window.addEventListener('unload', function (e) {
-    socket.emit('leave room', { room: room, msg: "user left the room", user: userName, });
+    //if (ok_to_leave)
+       socket.emit('leave room', { room: room, msg: "user left the room", user: userName, });
   });
 };
