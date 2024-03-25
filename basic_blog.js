@@ -173,8 +173,10 @@ io.on('connection', (socket) => {
                   roomData({room: the_room });
                   socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states[team_id-1]});
                   io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id }); // system message
+                  console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
                 } else {
                   socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
+                  console.log(socket.id,` Join Team: User ${socket.data} - Room ${room_id} - game data not found`,err);
                 }
               }
             }
@@ -183,7 +185,6 @@ io.on('connection', (socket) => {
               console.log(`SQL injection attack ${socket.data.room_id}`);
               socket.emit('error message',  `Room ${room_id} not found`);
           }
-          console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
   
       } catch (err){
         console.log(socket.id,` Join Team: User ${socket.data} has got unknown error`,err);
