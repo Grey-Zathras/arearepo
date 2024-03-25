@@ -134,8 +134,14 @@ display: inline-block;
     bottom: 0;
 }
 
-#messages  {
-list-style-type: none;
+#system_messages, #chat_messages  {
+    list-style-type: none;
+    padding-left: 5px;
+}
+
+.user_chat {
+    border: 1px solid;
+    padding: 10px;
 }
 
 html {
