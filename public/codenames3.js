@@ -139,16 +139,27 @@ window.onload = function() {
 
   userForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    console.log(userTeam.value);
-    if (userTeam.value) {
-      var team = userTeam.value;
-      socket.emit('team change', { room: room, team: team, user: userName , user_id: userID });
-      chooseTeamBlock.style.display = "none";
-      userTeam.disabled=true;
-
-      //console.log('team change event', { room: room, team: team, user: userName  });
-      //input.value = '';
+    //console.log(userTeam.value);
+    var game_status=0;
+    if (typeof game_obj.room.game_status !== "undefined") {
+        game_status = game_obj.room.game_status ;
     }
+    if (game_status > 0) { // game started, send Challendge button pressed
+        console.log ("send challendge: ", challenge.value, "",clicks.value);
+        challenge.value="";
+        clicks.value="";
+    } else { // game not started, join team button pressed
+        if (userTeam.value) {
+            var team = userTeam.value;
+            socket.emit('team change', { room: room, team: team, user: userName , user_id: userID });
+            chooseTeamBlock.style.display = "none";
+            userTeam.disabled=true;
+      
+            //console.log('team change event', { room: room, team: team, user: userName  });
+            //input.value = '';
+          }
+    }
+
   });
   //  document.getElementById('startButton').addEventListener('click', function(e) {
 
