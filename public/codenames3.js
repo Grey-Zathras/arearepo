@@ -1,5 +1,7 @@
 var ok_to_leave=0;
-var card_event=0;
+var card_event=0; // event dumb object 
+var my_team=0; // current team 0|1|2
+var game_obj = {}; // game status
 
 function getCookie(name) {
     var value = "; " + document.cookie;
@@ -179,6 +181,7 @@ window.onload = function() {
   });
   socket.on('team scheme', function(data) {
     console.log('team scheme data',data);
+    my_team=data.team;
     refreshTable();
     if (data.team >0 ) {
         refreshTable(data.states[data.team-1],"player");
@@ -197,6 +200,7 @@ window.onload = function() {
   socket.on('roomData', function(data) { // general refresh page / status event
     console.log('roomData',data);
     // check for host and start button
+    game_obj=data;
     document.getElementById('host').innerText = data.host;
     if (data.host==userName && !data.room.game_status){
         startButton.disabled=false;
@@ -216,8 +220,17 @@ window.onload = function() {
       activeteam.innerText =  data.room.active_team;
       activestep.innerText =  step_verbs[data.room.step];
       turn.innerText =  data.room.turn;
-      if (data.room.active_team>0) { // game started, show the Challenge block fo the Team member
+      if (my_team>0) { // game started, show the Challenge block to the Team member
         challendgeBlock.style.display = "contents";
+        if (data.room.active_team==my_team && !data.room.step) { // challedge phase
+            challendgeBlock.disabled=false;
+            challenge.disabled=false;
+            clicks.disabled=false;
+        } else {
+            challendgeBlock.disabled=true;
+            challenge.disabled=true;
+            clicks.disabled=true;
+        }
       }
     }
     
