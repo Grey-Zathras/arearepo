@@ -51,11 +51,12 @@ function addSysMsgLine (text, msgclass=""){
     //window.scrollTo(0, 0); // Scroll to the top to show the newest message
   }
 
-  var activeClass=["inactive","active"];
-  var memberTagID = ["Observers","Red_team", "Blue_team"];
-  var player_class_array=['closed', 'spy', 'killer', 'spy_opened','civilian','killer_opened' ];
-  var observer_class_array=[ 'spy_opened','civilian','killer_opened' ];
-  var teams_list=["observer","Red","Blue"]; //for chat
+  const activeClass=["inactive","active"]; // member chat status
+  const memberTagID = ["Observers","Red_team", "Blue_team"]; // team membership 
+  const player_class_array=['closed', 'spy', 'killer', 'spy_opened','civilian','killer_opened' ]; // cards on the table
+  //var observer_class_array=[ 'spy_opened','civilian','killer_opened' ]; // cards on the table
+  const teams_list=["observer","Red","Blue"]; //team membership text for chat
+  const step_verbs=["Challendge", "Response"]; // game status terms
   
   var socket = io();
 
@@ -140,6 +141,9 @@ window.onload = function() {
     if (userTeam.value) {
       var team = userTeam.value;
       socket.emit('team change', { room: room, team: team, user: userName , user_id: userID });
+      chooseTeamBlock.style.display = "none";
+      userTeam.disabled=true;
+
       //console.log('team change event', { room: room, team: team, user: userName  });
       //input.value = '';
     }
@@ -160,9 +164,12 @@ window.onload = function() {
     console.log('system message data', data);
     addSysMsgLine(data.user + ": " + data.msg,"sysmsg");
     switch (data.msg_type) {
-        case 0: {
-            game_progress.style.display = "contents";
-            gamestat.innerText = "Game Started"; 
+        case 0: { // start the game
+            //game_progress.style.display = "contents";
+            //gamestat.innerText = "Game Started"; 
+            //startButton.style.display = "none";
+            //chooseTeamBlock.style.display = "none";
+            //challendgeBlock.style.display = "contents";
         }
     }
   });
@@ -187,7 +194,7 @@ window.onload = function() {
     userID = socket.id;
     setCookie("userid", userID, 7);
   });
-  socket.on('roomData', function(data) {
+  socket.on('roomData', function(data) { // general refresh page / status event
     console.log('roomData',data);
     // check for host and start button
     document.getElementById('host').innerText = data.host;
@@ -202,6 +209,19 @@ window.onload = function() {
       console.dir(element);
       AddMemberLine (element);
     }); 
+    if (data.room.game_status>0) { //game started, cannot join the Team
+      chooseTeamBlock.style.display = "none";
+      game_progress.style.display = "contents";
+      gamestat.innerText = "Game Started"; 
+      activeteam.innerText =  data.room.active_team;
+      activestep.innerText =  step_verbs[data.room.step];
+      turn.innerText =  data.room.turn;
+      if (data.room.active_team>0) { // game started, show the Challenge block fo the Team member
+        challendgeBlock.style.display = "contents";
+      }
+    }
+    
+    //
   });
   /*
   window.addEventListener("visibilitychange", (event) => {
