@@ -116,11 +116,15 @@ background-color: rgb(182, 171, 117); /* rgb(206, 179, 26); */
 padding-bottom: 3%;
 padding-top: 3%;
 }
+td.my_card_choice {
+    background-color: rgb(226, 101, 29); 
+}
 .card_text {
     background-color: white;
     text-transform: uppercase;
     /* vertical-align: bottom; */
-display: inline-block;
+    display: inline-block;
+    pointer-events: none; /* Important!! - not to intract, not to click */
 }
 
 /* option 1 for proportional size */

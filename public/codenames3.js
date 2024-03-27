@@ -1,7 +1,7 @@
 var ok_to_leave=0;
-var card_event=0; // event dumb object 
+var card_event=""; // event dumb object 
 var my_team=0; // current team 0|1|2
-var game_obj = {}; // game status
+var game_obj = {}; // game status / room object
 
 function getCookie(name) {
     var value = "; " + document.cookie;
@@ -52,13 +52,26 @@ function addSysMsgLine (text, msgclass=""){
       //window.scrollTo(0, document.body.scrollHeight);
     //window.scrollTo(0, 0); // Scroll to the top to show the newest message
   }
+  function clickTheCard(e) {
+    let rx= /\[(\d+)\]/
+    var card_id = e.target.id.match(rx)[1];
+    console.log("clickTheCard", e.target.id, "id:",card_id);
+    removeClassFromAllElements("my_card_choice");
+    e.target.className=e.target.className +" " + "my_card_choice"; 
+    //socket.emit('card_choice', { room: room, user: userName , user_id: userID, card_id: card_id});
+  
+  }
+  const removeClassFromAllElements = (className) => {
+    const allElements = document.querySelectorAll('*')
+    allElements.forEach(el => el.classList.remove(className))
+  }
 
   const activeClass=["inactive","active"]; // member chat status
   const memberTagID = ["Observers","Red_team", "Blue_team"]; // team membership 
   const player_class_array=['closed', 'spy', 'killer', 'spy_opened','civilian','killer_opened' ]; // cards on the table
   //var observer_class_array=[ 'spy_opened','civilian','killer_opened' ]; // cards on the table
   const teams_list=["observer","Red","Blue"]; //team membership text for chat
-  const step_verbs=["Challendge", "Response"]; // game status terms
+  const step_verbs=["Challenge", "Response"]; // game status terms
   
   var socket = io();
 
@@ -144,9 +157,9 @@ window.onload = function() {
     if (typeof game_obj.room.game_status !== "undefined") {
         game_status = game_obj.room.game_status ;
     }
-    if (game_status > 0) { // game started, send Challendge button pressed
-        console.log ("send challendge: ", challenge.value, "",clicks.value);
-        socket.emit('challendge', { room: room, team: my_team, user: userName , user_id: userID, challenge:challenge.value, clicks: clicks.value });
+    if (game_status > 0) { // game started, send Challenge button pressed
+        console.log ("send challenge: ", challenge.value, "",clicks.value);
+        socket.emit('challenge', { room: room, team: my_team, user: userName , user_id: userID, challenge:challenge.value, clicks: clicks.value });
         challenge.value="";
         clicks.value="";
     } else { // game not started, join team button pressed
@@ -180,13 +193,22 @@ window.onload = function() {
     switch (data.msg_type) {
         case 1: { // joining the team
             msg+=" "+memberTagID[data.team];
+            break;
         }
         case 2: { // start the game
             //game_progress.style.display = "contents";
             //gamestat.innerText = "Game Started"; 
             //startButton.style.display = "none";
             //chooseTeamBlock.style.display = "none";
-            //challendgeBlock.style.display = "contents";
+            //challengeBlock.style.display = "contents";
+            break;
+        }
+        case 3: { // challenge -> card choice
+            msg+=" "+data.challenge+ ", clicks " + data.clicks;
+            challenged_text.innerText=data.challenge;
+            card_event=clickTheCard;
+            //totalclicks.innerText=data.totalclicks;
+            break;
         }
     }
     addSysMsgLine(data.user + ": " + msg,"sysmsg");
@@ -233,17 +255,18 @@ window.onload = function() {
       chooseTeamBlock.style.display = "none";
       game_progress.style.display = "contents";
       gamestat.innerText = "Game Started"; 
-      activeteam.innerText =  data.room.active_team;
+      activeteam.innerText =  memberTagID[data.room.active_team];
       activestep.innerText =  step_verbs[data.room.step];
       turn.innerText =  data.room.turn;
       if (my_team>0) { // game started, show the Challenge block to the Team member
-        challendgeBlock.style.display = "contents";
+        challengeBlock.style.display = "contents";
+        totalclicks.innerText=data.room.clicks[my_team];
         if (data.room.active_team==my_team && !data.room.step) { // challedge phase
-            challendgeBlock.disabled=false;
+            challengeBlock.disabled=false;
             challenge.disabled=false;
             clicks.disabled=false;
         } else {
-            challendgeBlock.disabled=true;
+            challengeBlock.disabled=true;
             challenge.disabled=true;
             clicks.disabled=true;
         }
@@ -280,4 +303,17 @@ window.onload = function() {
     //if (ok_to_leave)
        socket.emit('leave room', { room: room, msg: "user left the room", user: userName, });
   });
+
+  // card click event listener
+  document.querySelectorAll('.card').forEach(item => {
+    item.addEventListener('click', event => {
+      //handle click
+      //clickTheCard(event);
+      is_clickable=event.target.classList.contains("closed"+(3-my_team));
+      console.log("card_click_outer, is_clickable", is_clickable, "classList",event.target.classList);
+      if (card_event && is_clickable) {
+        card_event(event);
+      }
+    })
+  })
 };

@@ -20,7 +20,7 @@
   <div class="navigation">
     <a href="/">Back to home</a>
   </div>
-  <p><%= room.content %></p>
+  <p><%= room.content %> </p>
   </div>
   <div>
 
@@ -28,9 +28,11 @@
     <div class="game_head">
       <span id="gamestat">Game Not Started</span> &nbsp;&nbsp;&nbsp;
        <span class="game_progress" id="game_progress">
-         Active team: <span id="activeteam"></span>  &nbsp;&nbsp;&nbsp;
+        Turn: <span id="turn">0</span>  &nbsp;&nbsp;&nbsp;
+        Active team: <span id="activeteam"></span>  &nbsp;&nbsp;&nbsp;
          Step: <span id="activestep"></span>  &nbsp;&nbsp;&nbsp;
-         Turn: <span id="turn">0</span>  &nbsp;&nbsp;&nbsp;
+         Clicks: <span id="totalclicks"></span>  &nbsp;&nbsp;&nbsp;
+         Current challendge:<span id="challenged_text"></span> &nbsp;&nbsp;&nbsp;
      </span>
        </div>
   
@@ -87,9 +89,9 @@
         </select>
         <button>Join</button>
       </div>
-      <div id="challendgeBlock" style="display:none;">
+      <div id="challengeBlock" style="display:none;">
         <br>
-        Challendge: <input type="text" id="challenge" name="challenge" disabled /> &nbsp;&nbsp; Attempts:&nbsp;<input type="text" id="clicks" name="clicks" maxlength="2" size="2" disabled /><button>Send</button>
+        Challenge: <input type="text" id="challenge" name="challenge" disabled /> &nbsp;&nbsp; Attempts:&nbsp;<input type="text" id="clicks" name="clicks" maxlength="2" size="2" disabled /><button>Send</button>
       </div>
       <br /><br />
     </form>
