@@ -146,6 +146,7 @@ window.onload = function() {
     }
     if (game_status > 0) { // game started, send Challendge button pressed
         console.log ("send challendge: ", challenge.value, "",clicks.value);
+        socket.emit('challendge', { room: room, team: my_team, user: userName , user_id: userID, challenge:challenge.value, clicks: clicks.value });
         challenge.value="";
         clicks.value="";
     } else { // game not started, join team button pressed
@@ -166,7 +167,7 @@ window.onload = function() {
   startButton.addEventListener('click', function(e) {
     
     socket.emit('start game', { room: room, user: userName , user_id: userID });
-    startButton.disabled = true;
+    //startButton.disabled = true;
     });
 
   socket.on('chat message', function(data) {
@@ -175,9 +176,12 @@ window.onload = function() {
   });
   socket.on('system message', function(data) {
     console.log('system message data', data);
-    addSysMsgLine(data.user + ": " + data.msg,"sysmsg");
+    var msg=data.msg;
     switch (data.msg_type) {
-        case 0: { // start the game
+        case 1: { // joining the team
+            msg+=" "+teams_list[data.team];
+        }
+        case 2: { // start the game
             //game_progress.style.display = "contents";
             //gamestat.innerText = "Game Started"; 
             //startButton.style.display = "none";
@@ -185,6 +189,7 @@ window.onload = function() {
             //challendgeBlock.style.display = "contents";
         }
     }
+    addSysMsgLine(data.user + ": " + data.msg,"sysmsg");
   });
   socket.on('error message', function(data) {
     console.log('error message data', data);

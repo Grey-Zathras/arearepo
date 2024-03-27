@@ -4,6 +4,8 @@
 //var allUsers= nem Map();
 //var allUsers= {};
 //var allRooms ={};
+const teams_list=["observer","Red","Blue"]; //team membership text for chat
+const step_verbs=["Challendge", "Response"]; // game status terms
 
 const express = require('express');
 const path = require('path');
@@ -180,7 +182,7 @@ io.on('connection', (socket) => {
                     }
                   });
                   socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states});
-                  io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id }); // system message
+                  io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id , msg_type:1}); // system message
                   console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
                 } else {
                   socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
@@ -245,27 +247,106 @@ io.on('connection', (socket) => {
   });
 
   socket.on('start game', async  (data) => {
-    let the_room=getRoom(socket.data.room_id);
-    the_room.game_status=1;
-    the_room.step=0;
-    the_room.active_team=1;
+    var errmsg="";
+    try {
+      console.log("start game request", "socket.data",socket.data, "data",data);
+      if (typeof socket.data.user_id === "undefined"){
+        errmsg="socket data is corrupted. pls reconnect";
+        socket.emit('error message',  errmsg);
+        throw (errmsg);
+      }  
+      const user = getUser(socket.data.user_id);
+      if ( user === undefined){
+        errmsg="user id not found in the users list";
+        socket.emit('error message',  errmsg);
+        throw (errmsg);
+      }  
+      let the_room=getRoom(socket.data.room_id);
+      if (the_room.game_status) {
+        errmsg="wrong request - game is already started";
+        socket.emit('error message',  errmsg);
+        throw (errmsg);
+      }
+      // check if both teams have players
+      let users = getUsersInRoom(the_room.id, 0);
+      
+      if (! (users.filter(user => user.team == 1) && users.filter(user => user.team == 2)) ) {
+        errmsg="one of the teams are empty";
+        socket.emit('error message',  errmsg);
+        throw (errmsg);
+      }
 
-    roomData({room: the_room });
-    /*
-    io.to(room_name).emit('game update', {
-      room: room2,
-      host: hostname,
-      users: getUsersInRoom(room_id)
-    });
-    */
-    io.to(the_room.room_name).emit('system message', { msg: "Let's start the game!", user: data.user, msg_type:0 }); // system message
-    
-    
-    the_room=getRoom(socket.data.room_id);
-    //const { rows } = await codenames_DB.query('UPDATE rooms SET stat=$2 WHERE id = $1', [room_id],[0]);  
-    console.log("start game", "socket.data",socket.data, "data",data,the_room);
+      //let the_room=getRoom(socket.data.room_id);
+      the_room.game_status=1;
+      the_room.step=0;
+      the_room.active_team=1;
+  
+      roomData({room: the_room });
+      /*
+      io.to(room_name).emit('game update', {
+        room: room2,
+        host: hostname,
+        users: getUsersInRoom(room_id)
+      });
+      */
+      io.to(the_room.room_name).emit('system message', { msg: "Let's start the game!", user: data.user, msg_type:2 }); // system message start game
+      //the_room=getRoom(socket.data.room_id);
+      //const { rows } = await codenames_DB.query('UPDATE rooms SET stat=$2 WHERE id = $1', [room_id],[0]);  
+      console.log("start game success, room:",the_room);
+    } catch (err) {
+      console.log(socket.id,`start game  request error: User ${socket.data}, request: ${data} `,err);
+      //socket.emit('error message',  `unknown error ${err}`);
+    }
   });
 
+  socket.on('challendge', async  (data) => {
+    var errmsg="";
+    try {
+      console.log("challendge request", "socket.data",socket.data, "data",data);
+      if (typeof socket.data.user_id === "undefined"){
+        errmsg="socket data is corrupted. pls reconnect";
+        socket.emit('error message',  errmsg);
+        throw (errmsg);
+      }  
+      const user = getUser(socket.data.user_id);
+      if ( user === undefined){
+        errmsg="user id not found in the users list";
+        socket.emit('error message',  errmsg);
+        throw (errmsg);
+      }  
+      if (!user.team) {
+        errmsg="user is obsever, not allowed to play";
+        socket.emit('error message',  errmsg);
+        throw (errmsg);
+      }
+      let the_room=getRoom(socket.data.room_id);
+      if (the_room.step) {
+        errmsg="wrong step - current step is Response:" + the_room.step;
+        socket.emit('error message',  errmsg);
+        throw (errmsg);
+      }
+      if (the_room.active_team!= user.team) {
+        errmsg="wrong team - the other team should play this step";
+        socket.emit('error message',  errmsg);
+        throw (errmsg);
+      }  
+      if (data.challenge="" || !data.clicks) {
+        errmsg="Challend or clicks data is missing";
+        socket.emit('error message',  errmsg);
+        throw (errmsg);
+      }
+      the_room.step=1;
+      the_room.active_team=3-the_room.active_team;
+      the_room.clicks[the_room.active_team]+=data.clicks;
+      the_room.challendge = data.challenge;
+      io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challendge:`, user: data.user,challendge: data.challenge, clicks: data.clicks, msg_type:3 }); // system message challendge
+    } catch (err) {
+      console.log(socket.id,`challendge request error:`,err);
+      //socket.emit('error message',  `unknown error ${err}`);
+    }
+
+  });
+  
   socket.on('leave room', async  (data) => {
     var userleft;
     if (data.userid) {
