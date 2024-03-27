@@ -164,7 +164,16 @@ display: inline-block;
     border: 1px solid;
     padding: 10px;
 }
-
+.errormsg {
+    color:red;
+    font-size: smaller;
+    font-style: oblique;
+}
+.sysmsg{
+    color:grey;
+    font-size: smaller;
+    font-style: oblique;
+}
 html {
     line-height: 1.5;
     -webkit-text-size-adjust: 100%;
