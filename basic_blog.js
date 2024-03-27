@@ -331,7 +331,7 @@ io.on('connection', (socket) => {
         throw (errmsg);
       }  
       if (data.challenge="" || !data.clicks) {
-        errmsg="Challend or clicks data is missing";
+        errmsg="Challendge or clicks data is missing";
         socket.emit('error message',  errmsg);
         throw (errmsg);
       }
@@ -387,7 +387,7 @@ io.on('connection', (socket) => {
 
   // Listen for chat messages and emit to the room
   socket.on('chat message', (data) => {
-    io.to(data.room).emit('chat message', { msg: data.msg, user: data.user });
+    io.to(data.room).emit('chat message', { msg: data.msg, user: data.user, msgclass: data.msgclass });
     console.log(socket.id,'chat message', socket.data, data.user, data.msg);
   });
   
