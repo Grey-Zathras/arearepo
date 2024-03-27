@@ -361,14 +361,14 @@ io.on('connection', (socket) => {
     console.log('leave room - userleft:',userleft);
     try { //|| !userleft.room
       let the_room=getRoom(userleft.room);
-      io.to(the_room.room_name).emit('chat message', { msg: "user left the room", user: userleft.username });
+      io.to(the_room.room_name).emit('chat message', { msg: "user left the room", user: userleft.username, msgclass:"sysmsg" });
       if (the_room.host == userleft.id) {
         const users= getUsersInRoom(the_room.id, 1).filter(user => user.active == 1);
         const res1=users.length;
         console.log('getUsersInRoom:',users,res1);
         if (!users.length) {
           console.log("last active user left the room - room will be destroyed");
-          io.to(the_room.room_name).emit('chat message', { msg: "last active user left the room - room will be destroyed", user: userleft.username });
+          io.to(the_room.room_name).emit('system message', { msg: "last active user left the room - room will be destroyed", user: userleft.username });
           removeRoom(the_room.id);
         } else {
           const new_host = users[0];
@@ -376,7 +376,7 @@ io.on('connection', (socket) => {
           updateRoom({id:the_room.id, host:new_host.id });
           //let the_room=getRoom(the_room.id);
           roomData({room: the_room , host:new_host.username});
-          io.to(the_room.room_name).emit('chat message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
+          io.to(the_room.room_name).emit('system message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
         }
     }
   } 

@@ -172,14 +172,14 @@ window.onload = function() {
 
   socket.on('chat message', function(data) {
     console.log('chat message data', data);
-    addChatLine(data.user + ": " + data.msg);
+    addChatLine(data.user + ": " + data.msg,data.msgclass);
   });
   socket.on('system message', function(data) {
     console.log('system message data', data);
     var msg=data.msg;
     switch (data.msg_type) {
         case 1: { // joining the team
-            msg+=" "+teams_list[data.team];
+            msg+=" "+memberTagID[data.team];
         }
         case 2: { // start the game
             //game_progress.style.display = "contents";
@@ -189,7 +189,7 @@ window.onload = function() {
             //challendgeBlock.style.display = "contents";
         }
     }
-    addSysMsgLine(data.user + ": " + data.msg,"sysmsg");
+    addSysMsgLine(data.user + ": " + msg,"sysmsg");
   });
   socket.on('error message', function(data) {
     console.log('error message data', data);
