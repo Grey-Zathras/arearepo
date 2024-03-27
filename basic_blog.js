@@ -330,16 +330,27 @@ io.on('connection', (socket) => {
         socket.emit('error message',  errmsg);
         throw (errmsg);
       }  
-      if (data.challenge="" || !data.clicks) {
+      if (data.challenge=="" || data.clicks=="") {
         errmsg="Challendge or clicks data is missing";
+        socket.emit('error message',  errmsg);
+        throw (errmsg);
+      }
+      var clicks=parseInt(data.clicks);
+      if (!clicks) {
+        errmsg="clicks should be numeric";
+        socket.emit('error message',  errmsg);
+        throw (errmsg);
+      }
+      if (clicks>9) {
+        errmsg="no more than 9 clicks!";
         socket.emit('error message',  errmsg);
         throw (errmsg);
       }
       the_room.step=1;
       the_room.active_team=3-the_room.active_team;
-      the_room.clicks[the_room.active_team]+=data.clicks;
+      the_room.clicks[the_room.active_team]+=clicks;
       the_room.challendge = data.challenge;
-      io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challendge:`, user: data.user,challendge: data.challenge, clicks: data.clicks, msg_type:3 }); // system message challendge
+      io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challendge:`, user: data.user,challendge: data.challenge, clicks: clicks, msg_type:3 }); // system message challendge
     } catch (err) {
       console.log(socket.id,`challendge request error:`,err);
       //socket.emit('error message',  `unknown error ${err}`);
