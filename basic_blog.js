@@ -5,7 +5,7 @@
 //var allUsers= {};
 //var allRooms ={};
 const teams_list=["observer","Red","Blue"]; //team membership text for chat
-const step_verbs=["Challendge", "Response"]; // game status terms
+const step_verbs=["Challenge", "Response"]; // game status terms
 
 const express = require('express');
 const path = require('path');
@@ -158,8 +158,6 @@ io.on('connection', (socket) => {
       try {
         socket.data.team = team_id;
         const room_id = socket.data.room_id;
-        //   room <-> data.room <-> room=rooms[room_id] ?
-        //const room_name = getRoom(socket.data.room_id).room_name;// data.room;// rooms.title ??
         // read database stats
         if (isInt(room_id)) {
           if (team_id >0) {
@@ -270,7 +268,7 @@ io.on('connection', (socket) => {
       // check if both teams have players
       let users = getUsersInRoom(the_room.id, 0);
       
-      if (! (users.filter(user => user.team == 1) && users.filter(user => user.team == 2)) ) {
+      if (! (users.filter(user => user.team == 1).length && users.filter(user => user.team == 2).length) ) {
         errmsg="one of the teams are empty";
         socket.emit('error message',  errmsg);
         throw (errmsg);
@@ -299,10 +297,10 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('challendge', async  (data) => {
+  socket.on('challenge', async  (data) => {
     var errmsg="";
     try {
-      console.log("challendge request", "socket.data",socket.data, "data",data);
+      console.log("challenge request", "socket.data",socket.data, "data",data);
       if (typeof socket.data.user_id === "undefined"){
         errmsg="socket data is corrupted. pls reconnect";
         socket.emit('error message',  errmsg);
@@ -331,7 +329,7 @@ io.on('connection', (socket) => {
         throw (errmsg);
       }  
       if (data.challenge=="" || data.clicks=="") {
-        errmsg="Challendge or clicks data is missing";
+        errmsg="Challenge or clicks data is missing";
         socket.emit('error message',  errmsg);
         throw (errmsg);
       }
@@ -349,10 +347,11 @@ io.on('connection', (socket) => {
       the_room.step=1;
       the_room.active_team=3-the_room.active_team;
       the_room.clicks[the_room.active_team]+=clicks;
-      the_room.challendge = data.challenge;
-      io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challendge:`, user: data.user,challendge: data.challenge, clicks: clicks, msg_type:3 }); // system message challendge
+      the_room.challenge = data.challenge;
+      io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challenge:`, user: data.user,challenge: data.challenge, clicks: clicks, msg_type:3 }); // system message challenge
+      roomData({room: the_room });
     } catch (err) {
-      console.log(socket.id,`challendge request error:`,err);
+      console.log(socket.id,`challenge request error:`,err);
       //socket.emit('error message',  `unknown error ${err}`);
     }
 
