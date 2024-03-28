@@ -258,18 +258,26 @@ window.onload = function() {
       activeteam.innerText =  memberTagID[data.room.active_team];
       activestep.innerText =  step_verbs[data.room.step];
       turn.innerText =  data.room.turn;
-      if (my_team>0) { // game started, show the Challenge block to the Team member
+      if (my_team>0) { // game started, show the Challenge block to the Team member or enable click event to the cards
         challengeBlock.style.display = "contents";
         totalclicks.innerText=data.room.clicks[my_team];
         if (data.room.active_team==my_team && !data.room.step) { // challedge phase
             challengeBlock.disabled=false;
             challenge.disabled=false;
             clicks.disabled=false;
-        } else {
+        } else { // not my team  - or Response phase / card choice
             challengeBlock.disabled=true;
             challenge.disabled=true;
             clicks.disabled=true;
         }
+        if (data.room.active_team!=my_team || !data.room.step){ // not my team  - or challendge phase
+            card_event=""; 
+        }         
+      } else { // Observer role
+        card_event=""; 
+        challengeBlock.disabled=true;
+        challenge.disabled=true;
+        clicks.disabled=true;
       }
     }
     
