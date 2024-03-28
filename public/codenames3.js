@@ -9,7 +9,7 @@ function getCookie(name) {
     if (parts.length == 2) return parts.pop().split(";").shift();
   }
 
-  function setCookie(name, value, days) {
+function setCookie(name, value, days) {
     var expires = "";
     if (days) {
       var date = new Date();
@@ -17,9 +17,9 @@ function getCookie(name) {
       expires = "; expires=" + date.toUTCString();
     }
     document.cookie = name + "=" + (value || "") + expires + "; path=/";
-  }
+}
 
-  function addChatLine (text, msgclass=""){
+function addChatLine (text, msgclass=""){
     var item = document.createElement('li');
     if (msgclass==""){
       item.textContent = text;
@@ -34,7 +34,7 @@ function getCookie(name) {
       //messages.appendChild(item);
       //window.scrollTo(0, document.body.scrollHeight);
     //window.scrollTo(0, 0); // Scroll to the top to show the newest message
-  }
+}
 
 function addSysMsgLine (text, msgclass=""){
     var item = document.createElement('li');
@@ -51,20 +51,23 @@ function addSysMsgLine (text, msgclass=""){
       //messages.appendChild(item);
       //window.scrollTo(0, document.body.scrollHeight);
     //window.scrollTo(0, 0); // Scroll to the top to show the newest message
-  }
-  function clickTheCard(e) {
+}
+
+function clickTheCard(e) {
     let rx= /\[(\d+)\]/ ;
     var card_id = e.target.id.match(rx)[1];
     console.log("clickTheCard", e.target.id, "id:",card_id);
     removeClassFromAllElements("my_card_choice");
     e.target.className=e.target.className +" " + "my_card_choice"; 
-    socket.emit('card_choice', { room: room, user: userName , user_id: userID, card_id: card_id});
+    //socket.emit('card_choice', { room: room, user: userName , user_id: userID, card_id: card_id});
+    socket.emit('card_choice', {  card_id: card_id});
   
-  }
-  const removeClassFromAllElements = (className) => {
+}
+
+const removeClassFromAllElements = (className) => {
     const allElements = document.querySelectorAll('*')
     allElements.forEach(el => el.classList.remove(className))
-  }
+}
 
   const activeClass=["inactive","active"]; // member chat status
   const memberTagID = ["Observers","Red_team", "Blue_team"]; // team membership 
@@ -248,7 +251,7 @@ window.onload = function() {
     // refresh Teams and Player status
     ResetMembers();
     data.users.forEach((element) => {
-      console.dir(element);
+      //console.log(element);
       AddMemberLine (element);
     }); 
     if (data.room.game_status>0) { //game started, cannot join the Team
@@ -262,11 +265,13 @@ window.onload = function() {
         challengeBlock.style.display = "contents";
         totalclicks.innerText=data.room.clicks[my_team];
         if (data.room.active_team==my_team && !data.room.step) { // challedge phase
-            challengeBlock.disabled=false;
+            //challengeBlock.disabled=false;
+            challengeBlock.querySelector("button").disabled=false;
             challenge.disabled=false;
             clicks.disabled=false;
         } else { // not my team  - or Response phase / card choice
-            challengeBlock.disabled=true;
+            //challengeBlock.disabled=true;
+            challengeBlock.querySelector("button").disabled=true;
             challenge.disabled=true;
             clicks.disabled=true;
         }

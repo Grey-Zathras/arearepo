@@ -54,7 +54,7 @@ exports.getRoomWithTeamsReady = function (socket) {
 }
 
 exports.checkUserHasTeam = function (user) {
-  console.log("checkUserHasTeam user",user);  
+  //console.log("checkUserHasTeam user",user);  
   if (!user.team) {
         const errmsg="user is obsever, not allowed to play";
         //socket.emit('error message',  errmsg);
@@ -70,11 +70,7 @@ exports.getRoomInChallengeStep = function (socket,user) {
       //socket.emit('error message',  errmsg);
       throw (errmsg);
     }
-    if (the_room.active_team!= user.team) {
-      const errmsg="wrong team - the other team should play this step";
-      //socket.emit('error message',  errmsg);
-      throw (errmsg);
-    }  
+    exports.checkUserTeamIsActive (the_room,user);
     return the_room;
 }
 
@@ -85,8 +81,8 @@ exports.getChallengeClicks = function (data) {
         throw (errmsg);
       }
       var clicks=parseInt(data.clicks);
-      if (!clicks) {
-        const errmsg="clicks should be numeric";
+      if (!clicks || clicks < 0 ) {
+        const errmsg="clicks should be integer and > 0";
         //socket.emit('error message',  errmsg);
         throw (errmsg);
       }
@@ -95,6 +91,7 @@ exports.getChallengeClicks = function (data) {
         //socket.emit('error message',  errmsg);
         throw (errmsg);
       }
+    return clicks;
 }
 
 exports.resetRoomCardsResponsesMap = function (the_room){
@@ -105,4 +102,24 @@ exports.resetRoomCardsResponsesMap = function (the_room){
     users.forEach(user1 => {
       the_room.card_response_map.set(user1.username,""); // don't share the user id with all the room
     });
+}
+
+exports.getRoomInResponseStep = function (socket,user) {
+    let the_room=getRoom(socket.data.room_id);
+
+    if (the_room.step != 1) {
+      const errmsg="wrong step - current step is Challenge:" + the_room.step;
+      //socket.emit('error message',  errmsg);
+      throw (errmsg);
+    }
+    exports.checkUserTeamIsActive (the_room,user);
+    return the_room;
+}
+
+exports.checkUserTeamIsActive = function (the_room,user) {
+    if (the_room.active_team!= user.team) {
+        const errmsg="wrong team - the other team should play this step";
+        //socket.emit('error message',  errmsg);
+        throw (errmsg);
+      }  
 }

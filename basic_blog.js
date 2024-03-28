@@ -296,6 +296,40 @@ io.on('connection', (socket) => {
       //socket.emit('error message',  `unknown error ${err}`);
     }
   });
+
+  socket.on('card_choice', async  (data) => { // emit the challenge so  players of other team will agree with the cards
+    try {
+      console.log("card_choice", "socket.data",socket.data, "data",data);
+      gameLogic.checkSocketDataUserIDReady(socket);
+      const user = gameLogic.getUserFromSocket(socket);
+      gameLogic.checkUserHasTeam(user);
+      let the_room=gameLogic.getRoomInResponseStep(socket,user);
+      
+      the_room.card_response_map.set(user.username,data.card_id); 
+      let consent=1;
+      for (const [key, value] of the_room.card_response_map) {
+        consent=consent && (value==data.card_id) ;
+        console.log(`card_response_map ${key} = ${value}`);
+      }
+      console.log("card_choice consent", consent);
+      /*
+      the_room.step=1;
+      the_room.active_team=3-the_room.active_team;
+      the_room.clicks[the_room.active_team]+=clicks;
+      the_room.challenge = data.challenge;
+      //preparation for the cards selection by all the team members
+      gameLogic.resetRoomCardsResponsesMap(the_room);
+
+      io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challenge:`, user: data.user,challenge: data.challenge, clicks: clicks, msg_type:3 }); // system message challenge
+      gameLogic.roomData({room: the_room });
+      */
+
+    } catch (err) {
+      console.log(socket.id,`card_choice error:`,err);
+      socket.emit('error message',  err);
+      //socket.emit('error message',  `unknown error ${err}`);
+    }
+  });
   
   socket.on('leave room', async  (data) => {
     var userleft;
@@ -373,15 +407,6 @@ io.on('connection', (socket) => {
     }
   });
 });
-  
-
-// Start the server
-/*
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-*/
 
 server.listen(3000, () => {
   console.log('listening chat server on *:3000');
