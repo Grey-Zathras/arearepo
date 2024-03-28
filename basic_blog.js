@@ -297,7 +297,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('challenge', async  (data) => {
+  socket.on('challenge', async  (data) => { // emit the challendge so other team players will bargain for the cards
     var errmsg="";
     try {
       console.log("challenge request", "socket.data",socket.data, "data",data);
@@ -348,6 +348,15 @@ io.on('connection', (socket) => {
       the_room.active_team=3-the_room.active_team;
       the_room.clicks[the_room.active_team]+=clicks;
       the_room.challenge = data.challenge;
+      
+      //preparation for the cards selection by all the team members
+      delete the_room.card_response_map;
+      the_room.card_response_map=new Map();
+      const users= getUsersInRoom(the_room.id, 1).filter(user => user.team == the_room.active_team);
+      users.forEach(user1 => {
+        the_room.card_response_map.set(user1.username,""); // don't share the user id with all the room
+      });
+
       io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challenge:`, user: data.user,challenge: data.challenge, clicks: clicks, msg_type:3 }); // system message challenge
       roomData({room: the_room });
     } catch (err) {

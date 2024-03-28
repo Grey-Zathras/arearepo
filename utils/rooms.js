@@ -27,8 +27,8 @@ const addRoom = ({ id, room_name, host /*, room_socket_id, room_code */}) => {
     }
   }
 
-  // Store room { id, room_name, host , game_status 0|1|2 , active_team 1|2, turn, step 0|1, challendge, clicks[3]  };
-  const room = { id, room_name, host ,game_status :0, active_team:1, step:0, turn:0, challendge:"", clicks:[0,0,0]};
+  // Store room { id, room_name, host , game_status 0|1|2 , active_team 1|2, turn, step 0|1, challendge, clicks[3], card_response_map  };
+  const room = { id, room_name, host ,game_status :0, active_team:1, step:0, turn:0, challendge:"", clicks:[0,0,0], card_response_map:{}};
   rooms.push(room);
   return { room };
 };

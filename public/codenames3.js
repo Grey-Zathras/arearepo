@@ -53,12 +53,12 @@ function addSysMsgLine (text, msgclass=""){
     //window.scrollTo(0, 0); // Scroll to the top to show the newest message
   }
   function clickTheCard(e) {
-    let rx= /\[(\d+)\]/
+    let rx= /\[(\d+)\]/ ;
     var card_id = e.target.id.match(rx)[1];
     console.log("clickTheCard", e.target.id, "id:",card_id);
     removeClassFromAllElements("my_card_choice");
     e.target.className=e.target.className +" " + "my_card_choice"; 
-    //socket.emit('card_choice', { room: room, user: userName , user_id: userID, card_id: card_id});
+    socket.emit('card_choice', { room: room, user: userName , user_id: userID, card_id: card_id});
   
   }
   const removeClassFromAllElements = (className) => {
