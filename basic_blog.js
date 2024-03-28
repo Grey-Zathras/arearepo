@@ -17,12 +17,14 @@ const socketIo = require('socket.io');
 //const fsPromises = require('fs/promises')
 const fs = require('fs');
 
+const { app, server, io } = require("./utils/glbl_objcts.js");
+const gameLogic = require('./utils/game_logic');
 const cardGenerator = require('./utils/card_generator');
 const { addUser, removeUser, getUser, getUsersInRoom,updateUser } = require("./utils/users");
 const { addRoom, removeRoom, getRoom, updateRoom } = require("./utils/rooms");
 const codenames_DB = require('./db');
 
-const app = express();
+//const app = express();
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -134,12 +136,12 @@ app.post('/create', async (req, res) => {
 });
 
 // chat server support
-const server = http.createServer(app);
-const io = socketIo(server);
+//const server = http.createServer(app);
+//const io = socketIo(server);
 
 io.on('connection', (socket) => {
     console.log(socket.id,'a user connected');
-    
+/*    
     function roomData({room}) {
       const room_id= room.id;
       const host = getUser(room.host)
@@ -153,7 +155,7 @@ io.on('connection', (socket) => {
         users: getUsersInRoom(room_id)
       });
     }
-
+*/
     async function joinTeam(team_id, data) { // data.room
       try {
         socket.data.team = team_id;
@@ -170,7 +172,7 @@ io.on('connection', (socket) => {
                   //console.dir(rows[0].states);
                   updateUser ( { id:socket.data.user_id, active:1,team: team_id});
                   const the_room=getRoom(room_id);
-                  roomData({room: the_room });
+                  gameLogic.roomData({room: the_room });
                   // socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states[team_id-1]});
                   const forbidden=[1,2];
                   rows[0].states[2-team_id].forEach((state,index) => {
@@ -184,7 +186,7 @@ io.on('connection', (socket) => {
                   console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
                 } else {
                   socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
-                  console.log(socket.id,` Join Team: User ${socket.data} - Room ${room_id} - game data not found`,err);
+                  console.log(socket.id,` Join Team: User ${socket.data} - Room ${room_id} - game data not found`);
                 }
               }
             }
@@ -229,7 +231,7 @@ io.on('connection', (socket) => {
       
       //addUser(socket.id,data.user,data.room_id); 
       
-      roomData({room: the_room });
+      gameLogic.roomData({room: the_room });
       if (res.msg && res.user.team){
         joinTeam(res.user.team, data);
         console.log(socket.id,` User ${data.user}/${data.user_id} reconnected to room: ${the_room.room_name} and team ${res.user.team}`);
@@ -279,7 +281,7 @@ io.on('connection', (socket) => {
       the_room.step=0;
       the_room.active_team=1;
   
-      roomData({room: the_room });
+      gameLogic.roomData({room: the_room });
       /*
       io.to(room_name).emit('game update', {
         room: room2,
@@ -358,7 +360,7 @@ io.on('connection', (socket) => {
       });
 
       io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challenge:`, user: data.user,challenge: data.challenge, clicks: clicks, msg_type:3 }); // system message challenge
-      roomData({room: the_room });
+      gameLogic.roomData({room: the_room });
     } catch (err) {
       console.log(socket.id,`challenge request error:`,err);
       //socket.emit('error message',  `unknown error ${err}`);
@@ -394,7 +396,7 @@ io.on('connection', (socket) => {
           console.log("reassigning host to the 'host':",new_host.username );
           updateRoom({id:the_room.id, host:new_host.id });
           //let the_room=getRoom(the_room.id);
-          roomData({room: the_room , host:new_host.username});
+          gameLogic.roomData({room: the_room , host:new_host.username});
           io.to(the_room.room_name).emit('system message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
         }
     }
@@ -422,7 +424,7 @@ io.on('connection', (socket) => {
         }
           const the_room = socket.data.room;
           updateUser ( { id:socket.id, active:0 });
-          roomData({room: the_room });
+          gameLogic.roomData({room: the_room });
           io.to(the_room.room_name).emit('system message', { msg: `I am disconnected, ${reason}`, user: socket.data.username });
         } catch (err) {
         console.log(socket.id,`disconnect error: User ${socket.data} `,err);
