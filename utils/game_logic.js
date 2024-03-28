@@ -97,4 +97,12 @@ exports.getChallengeClicks = function (data) {
       }
 }
 
-
+exports.resetRoomCardsResponsesMap = function (the_room){
+    //preparation for the cards selection by all the team members
+    delete the_room.card_response_map;
+    the_room.card_response_map=new Map();
+    const users= getUsersInRoom(the_room.id, 1).filter(user => user.team == the_room.active_team);
+    users.forEach(user1 => {
+      the_room.card_response_map.set(user1.username,""); // don't share the user id with all the room
+    });
+}

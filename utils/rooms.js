@@ -27,8 +27,8 @@ const addRoom = ({ id, room_name, host /*, room_socket_id, room_code */}) => {
     }
   }
 
-  // Store room { id, room_name, host , game_status 0|1|2 , active_team 1|2, turn, step 0|1, challendge, clicks[3], card_response_map  };
-  const room = { id, room_name, host ,game_status :0, active_team:1, step:0, turn:0, challendge:"", clicks:[0,0,0], card_response_map:{}};
+  // Store room { id, room_name, host , game_status 0|1|2 , active_team 1|2, turn, step 0|1, challenge, clicks[3], card_response_map  };
+  const room = { id, room_name, host ,game_status :0, active_team:1, step:0, turn:0, challenge:"", clicks:[0,0,0], card_response_map:{}};
   rooms.push(room);
   return { room };
 };
@@ -41,7 +41,7 @@ const removeRoom = id => {
   }
 };
 
-const updateRoom = ( {id,  game_status, active_team, turn, step, host, challendge, clicks } ) => {
+const updateRoom = ( {id,  game_status, active_team, turn, step, host, challenge, clicks } ) => {
     const index = rooms.findIndex(room => room.id === id);
     if (index == -1){
         return {
@@ -52,8 +52,8 @@ const updateRoom = ( {id,  game_status, active_team, turn, step, host, challendg
         rooms[index].game_status = game_status;
     if (host !== undefined)
       rooms[index].host = host;
-      if (challendge !== undefined)
-      rooms[index].challendge = challendge;
+      if (challenge !== undefined)
+      rooms[index].challenge = challenge;
       if (clicks !== undefined){
         clicks.forEach((click, team_index) => {
           rooms[index].clicks[team_index] = click;

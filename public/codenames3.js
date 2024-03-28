@@ -270,7 +270,7 @@ window.onload = function() {
             challenge.disabled=true;
             clicks.disabled=true;
         }
-        if (data.room.active_team!=my_team || !data.room.step){ // not my team  - or challendge phase
+        if (data.room.active_team!=my_team || !data.room.step){ // not my team  - or challenge phase
             card_event=""; 
         }         
       } else { // Observer role
