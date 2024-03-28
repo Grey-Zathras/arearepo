@@ -247,105 +247,40 @@ io.on('connection', (socket) => {
   });
 
   socket.on('start game', async  (data) => {
-    var errmsg="";
+    //var errmsg="";
     try {
       console.log("start game request", "socket.data",socket.data, "data",data);
-      if (typeof socket.data.user_id === "undefined"){
-        errmsg="socket data is corrupted. pls reconnect";
-        socket.emit('error message',  errmsg);
-        throw (errmsg);
-      }  
-      const user = getUser(socket.data.user_id);
-      if ( user === undefined){
-        errmsg="user id not found in the users list";
-        socket.emit('error message',  errmsg);
-        throw (errmsg);
-      }  
-      let the_room=getRoom(socket.data.room_id);
-      if (the_room.game_status) {
-        errmsg="wrong request - game is already started";
-        socket.emit('error message',  errmsg);
-        throw (errmsg);
-      }
-      // check if both teams have players
-      let users = getUsersInRoom(the_room.id, 0);
-      
-      if (! (users.filter(user => user.team == 1).length && users.filter(user => user.team == 2).length) ) {
-        errmsg="one of the teams are empty";
-        socket.emit('error message',  errmsg);
-        throw (errmsg);
-      }
 
-      //let the_room=getRoom(socket.data.room_id);
+      gameLogic.checkSocketDataUserIDReady(socket);
+      const user = gameLogic.getUserFromSocket(socket);
+      let the_room=gameLogic.getRoomWithTeamsReady(socket);
+
       the_room.game_status=1;
       the_room.step=0;
       the_room.active_team=1;
   
       gameLogic.roomData({room: the_room });
-      /*
-      io.to(room_name).emit('game update', {
-        room: room2,
-        host: hostname,
-        users: getUsersInRoom(room_id)
-      });
-      */
+
       io.to(the_room.room_name).emit('system message', { msg: "Let's start the game!", user: data.user, msg_type:2 }); // system message start game
-      //the_room=getRoom(socket.data.room_id);
       //const { rows } = await codenames_DB.query('UPDATE rooms SET stat=$2 WHERE id = $1', [room_id],[0]);  
       console.log("start game success, room:",the_room);
     } catch (err) {
       console.log(socket.id,`start game  request error: User ${socket.data}, request: ${data} `,err);
+      socket.emit('error message',  err);
       //socket.emit('error message',  `unknown error ${err}`);
     }
   });
 
-  socket.on('challenge', async  (data) => { // emit the challendge so other team players will bargain for the cards
-    var errmsg="";
+  socket.on('challenge', async  (data) => { // emit the challendge so  players of other team will agree with the cards
+    //var errmsg="";
     try {
       console.log("challenge request", "socket.data",socket.data, "data",data);
-      if (typeof socket.data.user_id === "undefined"){
-        errmsg="socket data is corrupted. pls reconnect";
-        socket.emit('error message',  errmsg);
-        throw (errmsg);
-      }  
-      const user = getUser(socket.data.user_id);
-      if ( user === undefined){
-        errmsg="user id not found in the users list";
-        socket.emit('error message',  errmsg);
-        throw (errmsg);
-      }  
-      if (!user.team) {
-        errmsg="user is obsever, not allowed to play";
-        socket.emit('error message',  errmsg);
-        throw (errmsg);
-      }
-      let the_room=getRoom(socket.data.room_id);
-      if (the_room.step) {
-        errmsg="wrong step - current step is Response:" + the_room.step;
-        socket.emit('error message',  errmsg);
-        throw (errmsg);
-      }
-      if (the_room.active_team!= user.team) {
-        errmsg="wrong team - the other team should play this step";
-        socket.emit('error message',  errmsg);
-        throw (errmsg);
-      }  
-      if (data.challenge=="" || data.clicks=="") {
-        errmsg="Challenge or clicks data is missing";
-        socket.emit('error message',  errmsg);
-        throw (errmsg);
-      }
-      var clicks=parseInt(data.clicks);
-      if (!clicks) {
-        errmsg="clicks should be numeric";
-        socket.emit('error message',  errmsg);
-        throw (errmsg);
-      }
-      if (clicks>9) {
-        errmsg="no more than 9 clicks!";
-        socket.emit('error message',  errmsg);
-        throw (errmsg);
-      }
+      gameLogic.checkSocketDataUserIDReady(socket);
+      const user = gameLogic.getUserFromSocket(socket);
+      gameLogic.checkUserHasTeam(user);
+      let the_room=gameLogic.getRoomInChallengeStep(socket,user);
+      var clicks=gameLogic.getChallengeClicks(data);
+
       the_room.step=1;
       the_room.active_team=3-the_room.active_team;
       the_room.clicks[the_room.active_team]+=clicks;
@@ -363,9 +298,9 @@ io.on('connection', (socket) => {
       gameLogic.roomData({room: the_room });
     } catch (err) {
       console.log(socket.id,`challenge request error:`,err);
+      socket.emit('error message',  err);
       //socket.emit('error message',  `unknown error ${err}`);
     }
-
   });
   
   socket.on('leave room', async  (data) => {
