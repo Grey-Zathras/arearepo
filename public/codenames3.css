@@ -119,6 +119,9 @@ padding-top: 3%;
 td.my_card_choice {
     background-color: rgb(226, 101, 29); 
 }
+td.card_choice_no_concent {
+    background-color: rgb(217, 255, 0); 
+}
 .card_text {
     background-color: white;
     text-transform: uppercase;

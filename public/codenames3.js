@@ -61,7 +61,18 @@ function clickTheCard(e) {
     e.target.className=e.target.className +" " + "my_card_choice"; 
     //socket.emit('card_choice', { room: room, user: userName , user_id: userID, card_id: card_id});
     socket.emit('card_choice', {  card_id: card_id});
-  
+}
+
+function noCardConcent(card_response_array){
+    removeClassFromAllElements("card_choice_no_concent");
+    for (const [key, value] of card_response_array) {
+        let cardObj=document.getElementById("card["+key+"]");
+        if (cardObj.classList.contains("my_card_choice")) {
+            alert(key);
+        } else {
+            cardObj.classList.add("card_choice_no_concent");
+        }
+    }
 }
 
 const removeClassFromAllElements = (className) => {
@@ -211,6 +222,10 @@ window.onload = function() {
             challenged_text.innerText=data.challenge;
             card_event=clickTheCard;
             //totalclicks.innerText=data.totalclicks;
+            break;
+        }
+        case 4: { // no consent
+            noCardConcent(data.card_response_array);
             break;
         }
     }

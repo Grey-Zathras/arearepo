@@ -307,11 +307,28 @@ io.on('connection', (socket) => {
       
       the_room.card_response_map.set(user.username,data.card_id); 
       let consent=1;
+      let card_response_array= [];
       for (const [key, value] of the_room.card_response_map) {
         consent=consent && (value==data.card_id) ;
-        console.log(`card_response_map ${key} = ${value}`);
+        if (isInt(value) ) {
+          card_response_array.push(value);
+        }
+        //console.log(`card_response_map ${key} = ${value}`);
       }
-      console.log("card_choice consent", consent);
+      //console.log("card_choice consent", consent);
+      if (consent) {
+        // send final message
+        the_room.clicks[the_room.active_team]--;
+        if (the_room.clicks[the_room.active_team]) {
+          // change the team, the  turn and the step
+          the_room.turn++;
+          the_room.step = 0; //now is the Challenge step 
+          the_room.active_team=3-the_room.active_team;
+        }
+      } else {
+        // send the status update on the card selection
+        io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team has no consent:`, user: data.user, msg_type:4, card_response_array:card_response_array }); // system message no_consent
+      }
       /*
       the_room.step=1;
       the_room.active_team=3-the_room.active_team;
