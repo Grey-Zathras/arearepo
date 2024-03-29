@@ -2,6 +2,7 @@
 const { app, server, io } = require("./glbl_objcts");
 const { addUser, removeUser, getUser, getUsersInRoom,updateUser } = require("./users");
 const { addRoom, removeRoom, getRoom, updateRoom } = require("./rooms");
+const codenames_DB = require('../db');
 
 exports.roomData = function ({room}) {
     //console.log("gamelogic roomData room:",room);
@@ -122,4 +123,71 @@ exports.checkUserTeamIsActive = function (the_room,user) {
         //socket.emit('error message',  errmsg);
         throw (errmsg);
       }  
+}
+exports.readStates = async function (the_room_id) {
+    var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [the_room_id]);
+    if (rows.length === 0) {
+        const errmsg= `Room ${room_id} not found`;
+        throw (errmsg);
+      //socket.emit('error message',  `Room ${room_id} not found`);
+      //res.status(404).send('Room not found');
+    }
+    return rows;
+}
+exports.writeStates = async function (the_room_id,states) {
+    try {
+        await codenames_DB.query('BEGIN');
+        const queryText = 'UPDATE rooms SET states=$2 WHERE id = $1';
+        var { rows } = await codenames_DB.query(queryText, [the_room_id,states]);
+       
+        await codenames_DB.query('COMMIT');
+      } catch (e) {
+        await codenames_DB.query('ROLLBACK');
+        throw e;
+      } finally {
+        //codenames_DB.release()
+      }
+
+    //var { rows } = await codenames_DB.query('UPDATE rooms SET states=\'$2\' WHERE id = $1', [the_room_id]);
+
+    return rows;
+}
+
+exports.getStatesRevertTheCard = async function ({the_room,card_id}) {
+
+    var rows = await exports.readStates(the_room.id);
+
+    if (!Array.isArray(rows[0].states)  ){
+        const errmsg= `Room ${the_room.id} not found`; 
+        throw (errmsg);
+        //socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
+        //console.log(socket.id,` Join Team: User ${socket.data} - Room ${room_id} - game data not found`);
+    }
+    if (rows[0].states[2-the_room.active_team][card_id] >2 ) {
+        const errmsg= `Card ${the_room.id} is already opened`;
+        throw (errmsg);
+    }
+    rows[0].states[2-the_room.active_team][card_id]+=3;
+    if (rows[0].states[2-the_room.active_team][card_id] >3 ) {
+        rows[0].states[the_room.active_team-1][card_id]=rows[0].states[2-the_room.active_team][card_id];
+    }
+    exports.writeStates(the_room.id,rows[0].states); //await not needed ?
+    return rows[0].states;
+
+    /*
+        //console.dir(rows[0].states);
+        updateUser ( { id:socket.data.user_id, active:1,team: team_id});
+        const the_room=getRoom(room_id);
+        gameLogic.roomData({room: the_room });
+        // socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states[team_id-1]});
+        const forbidden=[1,2];
+        rows[0].states[2-team_id].forEach((state,index) => {
+          // cleanup spies
+          if (forbidden.includes(state) ){
+            rows[0].states[2-team_id][index]=0;
+          }
+        });
+        socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states});
+    */
+      
 }

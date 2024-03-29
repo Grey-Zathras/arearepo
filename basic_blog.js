@@ -4,8 +4,9 @@
 //var allUsers= nem Map();
 //var allUsers= {};
 //var allRooms ={};
-const teams_list=["observer","Red","Blue"]; //team membership text for chat
-const step_verbs=["Challenge", "Response"]; // game status terms
+
+//const teams_list=["observer","Red","Blue"]; //team membership text for chat
+//const step_verbs=["Challenge", "Response"]; // game status terms
 
 const express = require('express');
 const path = require('path');
@@ -15,9 +16,9 @@ const socketIo = require('socket.io');
 //const session = require('express-session');
 
 //const fsPromises = require('fs/promises')
-const fs = require('fs');
+//const fs = require('fs');
 
-const { app, server, io } = require("./utils/glbl_objcts.js");
+const { app, server, io, teams_list, step_verbs, wordList, isInt } = require("./utils/glbl_objcts.js");
 const gameLogic = require('./utils/game_logic');
 const cardGenerator = require('./utils/card_generator');
 const { addUser, removeUser, getUser, getUsersInRoom,updateUser } = require("./utils/users");
@@ -72,7 +73,7 @@ const readFileAsync = async () => {
   }
 }
 */
-
+/*
 const fullWordList = fs.readFileSync('wordlist.txt', 'utf-8');
 const wordList = fullWordList.split(/\r?\n/);
 
@@ -85,6 +86,7 @@ function isInt(value) {
     x = parseFloat(value);
     return (x | 0) === x;
   }
+*/
 
 // Home route to list all rooms
 app.get('/', async (req, res) => {
@@ -197,8 +199,9 @@ io.on('connection', (socket) => {
           }
   
       } catch (err){
-        console.log(socket.id,` Join Team: User ${socket.data} has got unknown error`,err);
-        socket.emit('error message',  `unknown error ${err}`);
+        console.log(socket.id,` Join Team: User ${socket.data} has got error`,err);
+        //socket.emit('error message',  `unknown error ${err}`);
+        socket.emit('error message',  err);
       }
 
     }
@@ -257,6 +260,7 @@ io.on('connection', (socket) => {
 
       the_room.game_status=1;
       the_room.step=0;
+      the_room.turn=1;
       the_room.active_team=1;
   
       gameLogic.roomData({room: the_room });
@@ -318,28 +322,34 @@ io.on('connection', (socket) => {
       //console.log("card_choice consent", consent);
       if (consent) {
         // send final message
-        the_room.clicks[the_room.active_team]--;
-        if (the_room.clicks[the_room.active_team]) {
-          // change the team, the  turn and the step
-          the_room.turn++;
-          the_room.step = 0; //now is the Challenge step 
-          the_room.active_team=3-the_room.active_team;
+        // update states in the database
+        var states = await gameLogic.getStatesRevertTheCard({the_room:the_room,card_id:data.card_id});
+          
+        // broadcast new states to all users
+        const reveal_role= states[2-the_room.active_team][data.card_id];
+        io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team has chosen the card:{card_text}, which is {reveal_role}`, user: user.username, card_id:data.card_id,reveal_role:reveal_role,msg_type:5}); // system message card_chosen
+        if (reveal_role==4) {
+          the_room.clicks[the_room.active_team]--;
+          if (!the_room.clicks[the_room.active_team]) {
+            // change the  turn and the step, team is the same
+            the_room.turn++;
+            the_room.step = 0; //now is the Challenge step 
+            //the_room.active_team=3-the_room.active_team;
+            io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team run out of clicks.  New Turn:${the_room.turn} !`, user: user.username, msg_type:6}); // system message end turn
+          }
+        } else {
+            // change the  turn and the step, team is the same
+            the_room.turn++;
+            the_room.step = 0; //now is the Challenge step 
+            //the_room.active_team=3-the_room.active_team;
+            io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team is missed.  New Turn:${the_room.turn} !`, user: user.username, msg_type:6}); // system message end turn
+
         }
+        gameLogic.roomData({room: the_room });
       } else {
         // send the status update on the card selection
-        io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team has no consent:`, user: data.user, msg_type:4, card_response_array:card_response_array }); // system message no_consent
+        io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team has no consent:`, user: user.username, msg_type:4, card_response_array:card_response_array }); // system message no_consent
       }
-      /*
-      the_room.step=1;
-      the_room.active_team=3-the_room.active_team;
-      the_room.clicks[the_room.active_team]+=clicks;
-      the_room.challenge = data.challenge;
-      //preparation for the cards selection by all the team members
-      gameLogic.resetRoomCardsResponsesMap(the_room);
-
-      io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challenge:`, user: data.user,challenge: data.challenge, clicks: clicks, msg_type:3 }); // system message challenge
-      gameLogic.roomData({room: the_room });
-      */
 
     } catch (err) {
       console.log(socket.id,`card_choice error:`,err);

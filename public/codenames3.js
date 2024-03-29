@@ -65,24 +65,24 @@ function clickTheCard(e) {
 
 function noCardConcent(card_response_array){
     removeClassFromAllElements("card_choice_no_concent");
-    for (const [key, value] of card_response_array) {
+    card_response_array.forEach((key)=>{
         let cardObj=document.getElementById("card["+key+"]");
-        if (cardObj.classList.contains("my_card_choice")) {
-            alert(key);
-        } else {
+        if (!cardObj.classList.contains("my_card_choice")) {
             cardObj.classList.add("card_choice_no_concent");
         }
-    }
+
+    });
 }
 
 const removeClassFromAllElements = (className) => {
-    const allElements = document.querySelectorAll('*')
-    allElements.forEach(el => el.classList.remove(className))
+    const allElements = card_table.querySelectorAll('*'); 
+    allElements.forEach(el => el.classList.remove(className));
 }
 
   const activeClass=["inactive","active"]; // member chat status
   const memberTagID = ["Observers","Red_team", "Blue_team"]; // team membership 
-  const player_class_array=['closed', 'spy', 'killer', 'spy_opened','civilian','killer_opened' ]; // cards on the table
+  const player_class_array=['closed', 'spy', 'killer','civilian', 'spy_opened','killer_opened' ]; // cards on the table
+  const card_verbs=['closed', 'spy', 'killer','Мирный житель', 'Шпион','Киллер' ]; // cards on the table
   //var observer_class_array=[ 'spy_opened','civilian','killer_opened' ]; // cards on the table
   const teams_list=["observer","Red","Blue"]; //team membership text for chat
   const step_verbs=["Challenge", "Response"]; // game status terms
@@ -228,6 +228,16 @@ window.onload = function() {
             noCardConcent(data.card_response_array);
             break;
         }
+        case 5: { // card revealed!
+            let cardObj=document.getElementById("card["+data.card_id+"]"); //.querySelector("span")
+            console.log("system message 5 - cardObj:", cardObj.innerText);
+            msg= msg.replace("{card_text}",cardObj.innerText).replace("{reveal_role}",card_verbs[data.reveal_role]);
+            // cleanup choice classes
+            removeClassFromAllElements("my_card_choice");
+            removeClassFromAllElements("card_choice_no_concent");
+            cardObj.classList.add(player_class_array[data.reveal_role]);
+            break;
+        }
     }
     addSysMsgLine(data.user + ": " + msg,"sysmsg");
   });
@@ -333,7 +343,7 @@ window.onload = function() {
   });
 
   // card click event listener
-  document.querySelectorAll('.card').forEach(item => {
+  card_table.querySelectorAll('.card').forEach(item => {
     item.addEventListener('click', event => {
       //handle click
       //clickTheCard(event);
