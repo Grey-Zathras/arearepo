@@ -112,7 +112,8 @@ const removeClassFromAllElements = (className) => {
     } else if (role=="player") {
       for (var i=0;i<25;i++){
         var card = document.getElementById('card['+i+']');
-        card.className=card.className +" " + player_class_array[states[i] ];
+        card.className=card.className + " " +player_class_array[states[i] ]+team;
+        //card.className=card.className +" " + player_class_array[states[i] ];
       }
     } else {
         for (var i=0;i<25;i++){
@@ -235,7 +236,8 @@ window.onload = function() {
             // cleanup choice classes
             removeClassFromAllElements("my_card_choice");
             removeClassFromAllElements("card_choice_no_concent");
-            cardObj.classList.add(player_class_array[data.reveal_role]);
+            cardObj.classList.remove("closed"+(3-data.team));
+            cardObj.classList.add(player_class_array[data.reveal_role]+(3-data.team));
             break;
         }
     }
@@ -250,7 +252,7 @@ window.onload = function() {
     my_team=data.team;
     refreshTable();
     if (data.team >0 ) {
-        refreshTable(data.states[data.team-1],"player");
+        refreshTable(data.states[data.team-1],"player",(data.team));
         refreshTable(data.states[2-data.team],"team",(3-data.team));
         addChatLine("welcome to the "+teams_list[data.team]+" team" ,"sysmsg");
     } else {

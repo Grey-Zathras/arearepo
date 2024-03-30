@@ -62,10 +62,10 @@ font-style: oblique;
 .card.killer_opened , .card.killer_opened1 , .card.killer_opened2{
 background-color: rgb(42, 43, 42);
 }
-.card.spy .card_text{
+.card.spy .card_text, .card.spy1 .card_text, .card.spy2 .card_text {
 background-color: green;
 }
-.card.killer .card_text{
+.card.killer .card_text,.card.killer1 .card_text,.card.killer2 .card_text {
 background-color: rgb(42, 43, 42);
 }
 .border1 {
