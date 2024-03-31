@@ -325,23 +325,27 @@ window.onload = function() {
     //window.onbeforeunload = undefined;
     //return false; 
 
-    ok_to_leave=1;
-    let timeout = setTimeout(function() {
-        // user stayed, do stuff here
-      ok_to_leave=0;
-      socket.emit('cancel leaving room', {  msg: "user stays in the room "+room+" - setTimeout", user: userName, userid:getCookie("userid")});
-      console.log('cancel leaving room');
+    if (ok_to_leave==0){
 
-    }, 1000);
-
-    // You can customize the message, but modern browsers often display their own default message for security reasons.
-    var confirmationMessage = 'Are you sure you want to leave the room?';
-    //const res = window.confirm(confirmationMessage);
-    socket.emit('request to leave room', {  msg: "user leaving the room "+room+" - window beforeunload", user: userName, userid:getCookie("userid")});
-
-    // Some browsers may display this message to the user, prompting them to confirm if they want to leave the page.
-    (e || window.event).returnValue = confirmationMessage; // Gecko + IE
-    return confirmationMessage; // Webkit, Safari, Chrome etc.
+        let timeout = setTimeout(function() {
+            // user stayed, do stuff here
+          socket.emit('cancel leaving room', {  msg: "user stays in the room "+room+" - setTimeout", user: userName, userid:getCookie("userid")});
+          console.log('cancel leaving room');
+    
+        }, 1000);
+    
+        // You can customize the message, but modern browsers often display their own default message for security reasons.
+        var confirmationMessage = 'Are you sure you want to leave the room?';
+        //const res = window.confirm(confirmationMessage);
+        socket.emit('request to leave room', {  msg: "user leaving the room "+room+" - window beforeunload", user: userName, userid:getCookie("userid")});
+    
+        // Some browsers may display this message to the user, prompting them to confirm if they want to leave the page.
+        (e || window.event).returnValue = confirmationMessage; // Gecko + IE
+        return confirmationMessage; // Webkit, Safari, Chrome etc.
+    } else {
+        window.onbeforeunload = undefined;
+        return false;
+    }
   });
   /*
   window.addEventListener('unload', function (e) {
@@ -349,7 +353,18 @@ window.onload = function() {
        socket.emit('leave room', { room: room, msg: "user left the room", user: userName, });
   });
 */
-
+homelink.addEventListener('click', function(e) {
+    var confirmationMessage = 'Are you sure you want to leave the room?';
+    const res = window.confirm(confirmationMessage);
+    if (res) {
+        socket.emit('leave room', { room: room, msg: "user left the room", user: userName, });
+        window.onbeforeunload = undefined;
+        ok_to_leave=1;
+    } else {
+        e.preventDefault();
+    }
+});
+ 
   // card click event listener
   card_table.querySelectorAll('.card').forEach(item => {
     item.addEventListener('click', event => {
