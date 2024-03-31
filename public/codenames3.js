@@ -332,7 +332,7 @@ window.onload = function() {
           socket.emit('cancel leaving room', {  msg: "user stays in the room "+room+" - setTimeout", user: userName, userid:getCookie("userid")});
           console.log('cancel leaving room');
     
-        }, 1000);
+        }, 20000); //20 sec
     
         // You can customize the message, but modern browsers often display their own default message for security reasons.
         var confirmationMessage = 'Are you sure you want to leave the room?';

@@ -192,7 +192,7 @@ exports.getStatesRevertTheCard = async function ({the_room,card_id}) {
       
 }
 
-exports.kickUserFromTheRoom = async function (the_room,userleft) {
+exports.kickUserFromTheRoom = async function (the_room,userleft,socket) {
     io.to(the_room.room_name).emit('chat message', { msg: "user left the room", user: userleft.username, msgclass:"sysmsg" });
     if (the_room.host == userleft.id) {
       const users= getUsersInRoom(the_room.id, 1).filter(user => user.active == 1);
@@ -211,9 +211,10 @@ exports.kickUserFromTheRoom = async function (the_room,userleft) {
         io.to(the_room.room_name).emit('system message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
       }
     }
+    socket.leave(userleft.room);
 }
 
-exports.delayedUserLeaveTheRoom = async function (the_room,user) {
+exports.delayedUserLeaveTheRoom = async function (the_room,user,socket) {
     try {
             // user left ?
             console.log("Timeout on leaving the the room - ",the_room, "user",user);
@@ -224,7 +225,7 @@ exports.delayedUserLeaveTheRoom = async function (the_room,user) {
           }  else {
             console.log("user left the room by timeout - ",the_room, "user",user);
             var userleft=removeUser(user.id);
-            exports.kickUserFromTheRoom(the_room,userleft);
+            exports.kickUserFromTheRoom(the_room,userleft,socket);
           }
     } catch (err) {
         console.log(`delayedUserLeaveTheRoom :`,err,"the_room",the_room, "user",user);

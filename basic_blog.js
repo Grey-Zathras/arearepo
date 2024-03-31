@@ -388,15 +388,13 @@ io.on('connection', (socket) => {
       if (!user.team) {
         // leave the room
         var userleft=removeUser(user.id);
-        gameLogic.kickUserFromTheRoom(the_room,userleft);
+        gameLogic.kickUserFromTheRoom(the_room,userleft,socket);
       } else {
         updateUser ( { id:user.id, active:0 });
         gameLogic.roomData({room: the_room });
         let timeout = setTimeout(function() {
-          // user stayed, do stuff here
-          gameLogic.delayedUserLeaveTheRoom(the_room,user);
-          //console.log("Timeout on leaving the the room - ",the_room, "user",user);
-        }, 15000);
+          gameLogic.delayedUserLeaveTheRoom(the_room,user,socket);
+        }, 30000); //0.5 min
         //let timeout = setTimeout(gameLogic.delayedUserLeaveTheRoom(the_room,user), 1500);
       }
       
@@ -421,7 +419,8 @@ io.on('connection', (socket) => {
     console.log('leave room - userleft:',userleft);
     try { //|| !userleft.room
       let the_room=getRoom(userleft.room);
-      gameLogic.kickUserFromTheRoom(the_room,userleft);
+      gameLogic.kickUserFromTheRoom(the_room,userleft,socket);
+      //socket.leave(userleft.room);
   } 
   catch (err) {
     console.log("no room found to leave for 'userleft'",userleft, "socket.data",socket.data, "data",data,err);
@@ -448,7 +447,10 @@ io.on('connection', (socket) => {
           updateUser ( { id:socket.id, active:0 });
           gameLogic.roomData({room: the_room });
           io.to(the_room.room_name).emit('system message', { msg: `I am disconnected, ${reason}`, user: socket.data.username });
-        } catch (err) {
+          let timeout = setTimeout(function() {
+            gameLogic.delayedUserLeaveTheRoom(the_room,user,socket);
+          }, 120000); // 2 min
+          } catch (err) {
         console.log(socket.id,`disconnect error: User ${socket.data} `,err);
         //socket.emit('error message',  `unknown error ${err}`);
       }
