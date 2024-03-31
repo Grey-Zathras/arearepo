@@ -364,7 +364,7 @@ io.on('connection', (socket) => {
     }
   });
   
-  socket.on('request to leave room', async  (data) => {
+  socket.on('cancel leaving room', async  (data) => {
     try {
       console.log("cancel leaving room", "socket.data",socket.data, "data",data);
       gameLogic.checkSocketDataUserIDReady(socket);
