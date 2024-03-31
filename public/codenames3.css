@@ -86,20 +86,23 @@ border: 1px solid;
 padding: 10px; 
 }
 
+@media (min-width: 640px) {
+
 /* responsive table (left area) */
-.cardspace {
-    /* font-size: x-small; */
-    float: left;
-  padding: 10px; 
-      /* padding-right: 10px; */
-    width: max(300px, 68%);
-    height: max(200px, 100%); 
-}
-/* responsive right area(game log)) */
-.log_area {
-    float: left;
-      /* padding: 15px; */
-    width: max(160px, 27%);
+    .cardspace {
+        /* font-size: x-small; */
+        float: left;
+    padding: 10px; 
+        /* padding-right: 10px; */
+        width: max(300px, 68%);
+        height: max(200px, 100%); 
+    }
+    /* responsive right area(game log)) */
+    .log_area {
+        float: left;
+        /* padding: 15px; */
+        width: max(160px, 27%);
+    }
 }
 
 td.card {
@@ -198,7 +201,6 @@ html {
         line-height: 1.25rem
     }
 }
-
 /*
 @media (min-width: 640px) {
     .card_text {
