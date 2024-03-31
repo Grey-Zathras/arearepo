@@ -369,6 +369,7 @@ io.on('connection', (socket) => {
       console.log("cancel leaving room", "socket.data",socket.data, "data",data);
       gameLogic.checkSocketDataUserIDReady(socket);
       const user = gameLogic.getUserFromSocket(socket);
+      let the_room=getRoom(user.room);
       updateUser ( { id:user.id, active:1 });
       gameLogic.roomData({room: the_room });
     } catch (err) {
