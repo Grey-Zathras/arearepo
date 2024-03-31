@@ -178,7 +178,7 @@ exports.getStatesRevertTheCard = async function ({the_room,card_id}) {
         //console.dir(rows[0].states);
         updateUser ( { id:socket.data.user_id, active:1,team: team_id});
         const the_room=getRoom(room_id);
-        gameLogic.roomData({room: the_room });
+        exports.roomData({room: the_room });
         // socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states[team_id-1]});
         const forbidden=[1,2];
         rows[0].states[2-team_id].forEach((state,index) => {
@@ -191,3 +191,44 @@ exports.getStatesRevertTheCard = async function ({the_room,card_id}) {
     */
       
 }
+
+exports.kickUserFromTheRoom = async function (the_room,userleft) {
+    io.to(the_room.room_name).emit('chat message', { msg: "user left the room", user: userleft.username, msgclass:"sysmsg" });
+    if (the_room.host == userleft.id) {
+      const users= getUsersInRoom(the_room.id, 1).filter(user => user.active == 1);
+      const res1=users.length;
+      console.log('getUsersInRoom:',users,res1);
+      if (!users.length) {
+        console.log("last active user left the room - room will be destroyed");
+        io.to(the_room.room_name).emit('system message', { msg: "last active user left the room - room will be destroyed", user: userleft.username });
+        removeRoom(the_room.id);
+      } else {
+        const new_host = users[0];
+        console.log("reassigning host to the 'host':",new_host.username );
+        updateRoom({id:the_room.id, host:new_host.id });
+        //let the_room=getRoom(the_room.id);
+        exports.roomData({room: the_room , host:new_host.username});
+        io.to(the_room.room_name).emit('system message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
+      }
+    }
+}
+
+exports.delayedUserLeaveTheRoom = async function (the_room,user) {
+    try {
+            // user left ?
+            console.log("Timeout on leaving the the room - ",the_room, "user",user);
+          if(user.active) {
+            console.log("user stays in the room room - ",the_room, "user",user);
+            updateUser ( { id:user.id, active:1 });
+            exports.roomData({room: the_room });
+          }  else {
+            console.log("user left the room by timeout - ",the_room, "user",user);
+            var userleft=removeUser(user.id);
+            exports.kickUserFromTheRoom(the_room,userleft);
+          }
+    } catch (err) {
+        console.log(`delayedUserLeaveTheRoom :`,err,"the_room",the_room, "user",user);
+        //socket.emit('error message',  err);
+    }
+}
+

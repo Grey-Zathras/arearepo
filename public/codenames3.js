@@ -329,20 +329,26 @@ window.onload = function() {
     let timeout = setTimeout(function() {
         // user stayed, do stuff here
       ok_to_leave=0;
+      socket.emit('cancel leaving room', {  msg: "user stays in the room "+room+" - setTimeout", user: userName, userid:getCookie("userid")});
+      console.log('cancel leaving room');
+
     }, 1000);
 
     // You can customize the message, but modern browsers often display their own default message for security reasons.
-    var confirmationMessage = 'You have unsaved changes! Are you sure you want to leave?';
-    socket.emit('chat message', {  msg: "user leaving the room "+room+" - window event1", user: userName, userid:getCookie("userid")});
+    var confirmationMessage = 'Are you sure you want to leave the room?';
+    //const res = window.confirm(confirmationMessage);
+    socket.emit('request to leave room', {  msg: "user leaving the room "+room+" - window beforeunload", user: userName, userid:getCookie("userid")});
 
     // Some browsers may display this message to the user, prompting them to confirm if they want to leave the page.
     (e || window.event).returnValue = confirmationMessage; // Gecko + IE
     return confirmationMessage; // Webkit, Safari, Chrome etc.
   });
+  /*
   window.addEventListener('unload', function (e) {
     //if (ok_to_leave)
        socket.emit('leave room', { room: room, msg: "user left the room", user: userName, });
   });
+*/
 
   // card click event listener
   card_table.querySelectorAll('.card').forEach(item => {
@@ -351,7 +357,7 @@ window.onload = function() {
       //clickTheCard(event);
       is_clickable=event.target.classList.contains("closed"+(3-my_team));
       console.log("card_click_outer, is_clickable", is_clickable, "classList",event.target.classList);
-      if (card_event && is_clickable) {
+      if (card_event && is_clickable && game_obj.step) {
         card_event(event);
       }
     })

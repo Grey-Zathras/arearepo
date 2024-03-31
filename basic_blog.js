@@ -364,6 +364,48 @@ io.on('connection', (socket) => {
     }
   });
   
+  socket.on('request to leave room', async  (data) => {
+    try {
+      console.log("cancel leaving room", "socket.data",socket.data, "data",data);
+      gameLogic.checkSocketDataUserIDReady(socket);
+      const user = gameLogic.getUserFromSocket(socket);
+      updateUser ( { id:user.id, active:1 });
+      gameLogic.roomData({room: the_room });
+    } catch (err) {
+      console.log(socket.id,`card_choice error:`,err);
+      socket.emit('error message',  err);
+    }
+  });
+  
+  socket.on('request to leave room', async  (data) => {
+    try{
+      console.log("request to leave room", "socket.data",socket.data, "data",data);
+      gameLogic.checkSocketDataUserIDReady(socket);
+      const user = gameLogic.getUserFromSocket(socket);
+      let the_room=getRoom(user.room);
+      //gameLogic.checkUserHasTeam(user);
+      if (!user.team) {
+        // leave the room
+        var userleft=removeUser(user.id);
+        gameLogic.kickUserFromTheRoom(the_room,userleft);
+      } else {
+        updateUser ( { id:user.id, active:0 });
+        gameLogic.roomData({room: the_room });
+        let timeout = setTimeout(function() {
+          // user stayed, do stuff here
+          gameLogic.delayedUserLeaveTheRoom(the_room,user);
+          //console.log("Timeout on leaving the the room - ",the_room, "user",user);
+        }, 15000);
+        //let timeout = setTimeout(gameLogic.delayedUserLeaveTheRoom(the_room,user), 1500);
+      }
+      
+    } catch (err) {
+      console.log(socket.id,`challenge request error:`,err);
+      socket.emit('error message',  err);
+      //socket.emit('error message',  `unknown error ${err}`);
+    }
+});
+  
   socket.on('leave room', async  (data) => {
     var userleft;
     if (data.userid) {
@@ -378,24 +420,7 @@ io.on('connection', (socket) => {
     console.log('leave room - userleft:',userleft);
     try { //|| !userleft.room
       let the_room=getRoom(userleft.room);
-      io.to(the_room.room_name).emit('chat message', { msg: "user left the room", user: userleft.username, msgclass:"sysmsg" });
-      if (the_room.host == userleft.id) {
-        const users= getUsersInRoom(the_room.id, 1).filter(user => user.active == 1);
-        const res1=users.length;
-        console.log('getUsersInRoom:',users,res1);
-        if (!users.length) {
-          console.log("last active user left the room - room will be destroyed");
-          io.to(the_room.room_name).emit('system message', { msg: "last active user left the room - room will be destroyed", user: userleft.username });
-          removeRoom(the_room.id);
-        } else {
-          const new_host = users[0];
-          console.log("reassigning host to the 'host':",new_host.username );
-          updateRoom({id:the_room.id, host:new_host.id });
-          //let the_room=getRoom(the_room.id);
-          gameLogic.roomData({room: the_room , host:new_host.username});
-          io.to(the_room.room_name).emit('system message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
-        }
-    }
+      gameLogic.kickUserFromTheRoom(the_room,userleft);
   } 
   catch (err) {
     console.log("no room found to leave for 'userleft'",userleft, "socket.data",socket.data, "data",data,err);
