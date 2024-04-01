@@ -186,6 +186,7 @@ io.on('connection', (socket) => {
                   socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states});
                   io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id , msg_type:1}); // system message
                   console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
+                  socket.join(the_room.room_name+team_id);
                 } else {
                   socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
                   console.log(socket.id,` Join Team: User ${socket.data} - Room ${room_id} - game data not found`);

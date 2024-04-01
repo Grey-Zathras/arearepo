@@ -212,6 +212,9 @@ exports.kickUserFromTheRoom = async function (the_room,userleft,socket) {
       }
     }
     socket.leave(userleft.room);
+    if (userleft.team) {
+        socket.leave(userleft.room++userleft.team);
+    }
 }
 
 exports.delayedUserLeaveTheRoom = async function (the_room,user,socket) {
