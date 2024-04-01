@@ -127,7 +127,7 @@ exports.checkUserTeamIsActive = function (the_room,user) {
 exports.readStates = async function (the_room_id) {
     var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [the_room_id]);
     if (rows.length === 0) {
-        const errmsg= `Room ${room_id} not found`;
+        const errmsg= `Room ${the_room_id} not found`;
         throw (errmsg);
       //socket.emit('error message',  `Room ${room_id} not found`);
       //res.status(404).send('Room not found');
@@ -213,7 +213,7 @@ exports.kickUserFromTheRoom = async function (the_room,userleft,socket) {
     }
     socket.leave(userleft.room);
     if (userleft.team) {
-        socket.leave(userleft.room++userleft.team);
+        socket.leave(userleft.room+userleft.team);
     }
 }
 
