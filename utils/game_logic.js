@@ -250,7 +250,8 @@ exports.getRoomStates = async function (room_id) {
 exports.getTeamStates = async function ({room_id,team_id,states_unsecured}) {
     if (!Array.isArray(states_unsecured)) {
         states_unsecured = await exports.getRoomStates(room_id); 
-    }     
+    }
+    //console.log("getTeamStates, states_unsecured:", states_unsecured);     
     var states = [];
     states[0]=states_unsecured[0].slice();
     states[1]=states_unsecured[1].slice();
@@ -262,6 +263,7 @@ exports.getTeamStates = async function ({room_id,team_id,states_unsecured}) {
         states[2-team_id][index]=0;
       }
     });
+    //console.log(`getTeamStates,team_id, ${team_id}, states:`, states);     
     return states;
 }
 

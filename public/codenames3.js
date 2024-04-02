@@ -181,11 +181,9 @@ window.onload = function() {
         if (userTeam.value) {
             var team = userTeam.value;
             socket.emit('team change', { room: room, team: team, user: userName , user_id: userID });
-            chooseTeamBlock.style.display = "none";
-            userTeam.disabled=true;
-      
+            //chooseTeamBlock.style.display = "none";
+            //userTeam.disabled=true;
             //console.log('team change event', { room: room, team: team, user: userName  });
-            //input.value = '';
           }
     }
 

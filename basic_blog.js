@@ -170,28 +170,16 @@ io.on('connection', (socket) => {
         updateUser ( { id:socket.data.user_id, active:1,team: team_id});
         const the_room=getRoom(room_id);
         gameLogic.roomData({room: the_room });
-        if (team_id >0) { // if (the_room.game_status==1)
-          var states = await gameLogic.getTeamStates({room_id:room_id, team_id:team_id});
-          console.log(` joinTeam, states `,states);
-         /*
-          var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [room_id]);
-          if (rows.length === 0) {
-            throw(`Room ${room_id} not found`);
-          } 
-          if (!Array.isArray(rows[0].states)  ) {
-            throw (`Room ${room_id} - game data not found, pls generate the table`);
+        if (team_id >0) {
+          if(the_room.game_status==1) { // if (the_room.game_status==1)
+            var states = await gameLogic.getTeamStates({room_id:room_id, team_id:team_id});
+            console.log(` joinTeam, states `,states);
+            socket.emit('team scheme',  { room_id: room_id,team:team_id, states: states});
           }
-          const forbidden=[1,2];
-          rows[0].states[2-team_id].forEach((state,index) => {
-            // cleanup spies
-            if (forbidden.includes(state) ){
-              rows[0].states[2-team_id][index]=0;
-            }
-          });
-          */ 
-          socket.emit('team scheme',  { room_id: room_id,team:team_id, states: states});
           socket.join(the_room.room_name+team_id);
-        }
+          //io.to(the_room.room_name+team_id).emit('system message', { msg: "secret team channel test!", user: data.user }); // system message 
+          //console.log(socket.id,` Join Team: User ${team_id} result socket:`,socket);
+        } 
         io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id , msg_type:1}); // system message
         console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
       } catch (err){
@@ -258,7 +246,14 @@ io.on('connection', (socket) => {
       the_room.step=0;
       the_room.turn=1;
       the_room.active_team=1;
-  
+
+      const states_unsecured = await gameLogic.getRoomStates(the_room.id);
+      for (let team_id = 1; team_id<3; team_id++ ){
+        var states = await gameLogic.getTeamStates({room_id:the_room.id, team_id:team_id, states_unsecured: states_unsecured });
+        io.to(the_room.room_name+team_id).emit('team scheme',  { room_id: the_room.id,team:team_id, states: states});
+
+      }
+      
       gameLogic.roomData({room: the_room });
 
       io.to(the_room.room_name).emit('system message', { msg: "Let's start the game!", user: data.user, msg_type:2 }); // system message start game
