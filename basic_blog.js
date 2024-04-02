@@ -163,42 +163,36 @@ io.on('connection', (socket) => {
         socket.data.team = team_id;
         const room_id = socket.data.room_id;
         // read database stats
-        if (isInt(room_id)) {
-          if (team_id >0) {
-              var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [room_id]);
-              if (rows.length === 0) {
-                socket.emit('error message',  `Room ${room_id} not found`);
-                //res.status(404).send('Room not found');
-              } else {
-                if (Array.isArray(rows[0].states)  ) {
-                  //console.dir(rows[0].states);
-                  updateUser ( { id:socket.data.user_id, active:1,team: team_id});
-                  const the_room=getRoom(room_id);
-                  gameLogic.roomData({room: the_room });
-                  // socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states[team_id-1]});
-                  const forbidden=[1,2];
-                  rows[0].states[2-team_id].forEach((state,index) => {
-                    // cleanup spies
-                    if (forbidden.includes(state) ){
-                      rows[0].states[2-team_id][index]=0;
-                    }
-                  });
-                  socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states});
-                  io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id , msg_type:1}); // system message
-                  console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
-                  socket.join(the_room.room_name+team_id);
-                } else {
-                  socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
-                  console.log(socket.id,` Join Team: User ${socket.data} - Room ${room_id} - game data not found`);
-                }
-              }
-            }
-          }  else {
-              // SQL injection attack
-              console.log(`SQL injection attack ${socket.data.room_id}`);
-              socket.emit('error message',  `Room ${room_id} not found`);
+        if (!isInt(room_id)) {
+          console.log(`SQL injection attack ${socket.data.room_id}`);
+          throw(`Room ${room_id} not found`);
+        }  
+        updateUser ( { id:socket.data.user_id, active:1,team: team_id});
+        const the_room=getRoom(room_id);
+        gameLogic.roomData({room: the_room });
+        if (team_id >0) { // if (the_room.game_status==1)
+          var states = gameLogic.getTeamStates({room_id:room_id, team_id:team_id});
+         /*
+          var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [room_id]);
+          if (rows.length === 0) {
+            throw(`Room ${room_id} not found`);
+          } 
+          if (!Array.isArray(rows[0].states)  ) {
+            throw (`Room ${room_id} - game data not found, pls generate the table`);
           }
-  
+          const forbidden=[1,2];
+          rows[0].states[2-team_id].forEach((state,index) => {
+            // cleanup spies
+            if (forbidden.includes(state) ){
+              rows[0].states[2-team_id][index]=0;
+            }
+          });
+          */ 
+          socket.emit('team scheme',  { room_id: room_id,team:team_id, states: states});
+          socket.join(the_room.room_name+team_id);
+        }
+        io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id , msg_type:1}); // system message
+        console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
       } catch (err){
         console.log(socket.id,` Join Team: User ${socket.data} has got error`,err);
         //socket.emit('error message',  `unknown error ${err}`);
