@@ -284,7 +284,12 @@ window.onload = function() {
     if (data.room.game_status>0) { //game started, cannot join the Team
       chooseTeamBlock.style.display = "none";
       game_progress.style.display = "contents";
-      gamestat.innerText = "Game Started"; 
+      if (game_obj.room.active_team==my_team) {
+        gamestat.innerHTML="Game Started:&nbsp;<b>Your turn!</b>";
+      } else {
+        gamestat.innerText = "Game Started";
+      }
+       
       activeteam.innerText =  memberTagID[data.room.active_team];
       activestep.innerText =  step_verbs[data.room.step];
       turn.innerText =  data.room.turn;
