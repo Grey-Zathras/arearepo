@@ -298,12 +298,10 @@ window.onload = function() {
         yourteam.style.display = "contents";
         yourteam.innerHTML=`<span class="${memberTagID[my_team]}">${teams_list[my_team]}&nbsp;Team</span>`;
         if (data.room.active_team==my_team && !data.room.step) { // challedge phase
-            //challengeBlock.disabled=false;
             challengeBlock.querySelector("button").disabled=false;
             challenge.disabled=false;
             clicks.disabled=false;
         } else { // not my team  - or Response phase / card choice
-            //challengeBlock.disabled=true;
             challengeBlock.querySelector("button").disabled=true;
             challenge.disabled=true;
             clicks.disabled=true;
@@ -317,7 +315,26 @@ window.onload = function() {
         challenge.disabled=true;
         clicks.disabled=true;
       }
-    }
+    } else {
+        //Game Not Started
+        //gamestat.innerHTML = `Game Not Started: ${(game_obj.host == userName ? "<b>Click start!</b>" : "" )}`;
+         /*
+        if (game_obj.host == userName) {
+            gamestat.innerHTML="Game Not Started:&nbsp;<b>Click start!</b>";
+          } else {
+            gamestat.innerText = "Game Not Started";
+          }
+         // */
+         let game_str="";
+         if (game_obj.host == userName) {
+            if (! (game_obj.users.filter(user => user.team == 1).length && game_obj.users.filter(user => user.team == 2).length) ) {
+                game_str = "one of the teams is empty";
+            } else {
+                game_str = "<b>Click start!</b>";
+            }
+         }
+         gamestat.innerHTML = `Game Not Started ${(game_str ? `: ${game_str}` : "" )}`;
+        }
     
     //
   });

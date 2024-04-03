@@ -47,7 +47,7 @@ exports.getRoomWithTeamsReady = function (socket) {
       }
     let users = getUsersInRoom(the_room.id, 0);
     if (! (users.filter(user => user.team == 1).length && users.filter(user => user.team == 2).length) ) {
-     const  errmsg="one of the teams are empty";
+     const  errmsg="one of the teams is empty";
       //socket.emit('error message',  errmsg);
       throw (errmsg);
     }
