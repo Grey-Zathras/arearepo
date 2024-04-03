@@ -46,17 +46,23 @@ font-style: oblique;
 .card.spy_opened , .card.spy_opened1 , .card.spy_opened2{
     background-color: green;
 }
-/* both civilians */
-.card.civilian.civilian1 , .card.civilian.civilian2, .card.civilian1.civilian2 {
-    background-color: maroon;
-}
 /*  civilian1 */
-.card.civilian.closed1 , .card.civilian1.closed2{
-    background-color: blueviolet;
+.card.civilian.closed1 , .card.civilian1{
+    /* background-color: blueviolet; */
+    background-image: url("/civilian1_bgimage.gif");
+    background-position: center;
 }
 /*  civilian2 */
-.card.civilian.closed2 , .card.closed1.civilian2{
-    background-color: salmon;
+.card.civilian.closed2 , .card.civilian2{
+    /* background-color: salmon; */
+    background-image: url("/civilian2_bgimage.gif");
+    background-position: center;
+}
+/* both civilians */
+.card.civilian.civilian1 , .card.civilian.civilian2, .card.civilian1.civilian2 {
+    /* background-color: maroon; */
+    background-image: url("/civilians_bgimage.gif");
+    background-position: center;
 }
 
 .card.killer_opened , .card.killer_opened1 , .card.killer_opened2{
@@ -67,6 +73,7 @@ background-color: green;
 }
 .card.killer .card_text,.card.killer1 .card_text,.card.killer2 .card_text {
 background-color: rgb(42, 43, 42);
+color: white;
 }
 .border1 {
     border: 1px solid red;
