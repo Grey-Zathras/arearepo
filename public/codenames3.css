@@ -9,39 +9,48 @@ body  {
     background-color: lightblue;
     font-size: 16px;
 }
+.card_text {
+    background-color: white;
+    text-transform: uppercase;
+    padding-left: 3px;
+    padding-right: 3px;
+    /* vertical-align: bottom; */
+    display: inline-block;
+    pointer-events: none; /* Important!! - not to intract, not to click */
+}
 .inactive{
-text-decoration: overline;
+    text-decoration: overline;
 }
 .div-table {
-display: table;         
-width: 100%;         
-background-color: #eee;         
-border: 1px solid #666666;         
-border-spacing: 5px; /* cellspacing:poor IE support for  this */
+    display: table;         
+    width: 100%;         
+    background-color: #eee;         
+    border: 1px solid #666666;         
+    border-spacing: 5px; /* cellspacing:poor IE support for  this */
 }
 .div-table-row {
-display: table-row;
-width: auto;
-clear: both;
+    display: table-row;
+    width: auto;
+    clear: both;
 }
 .div-table-col {
-float: left; /* fix for  buggy browsers */
-display: table-column;         
-width: 30%;         
-background-color: #ccc;  
+    float: left; /* fix for  buggy browsers */
+    display: table-column;         
+    width: 30%;         
+    background-color: #ccc;  
 }
 .Red_team{
-color:red;
+    color:red;
 }
 .Blue_team{
-color:blue;
+    color:blue;
 }
 .members li{
-list-style-type: none;
+    list-style-type: none;
 }
 .members{
-font-size: smaller;
-font-style: oblique;
+    font-size: smaller;
+    font-style: oblique;
 }
 .card.spy_opened , .card.spy_opened1 , .card.spy_opened2{
     background-color: green;
@@ -131,15 +140,6 @@ td.my_card_choice {
 }
 td.card_choice_no_concent {
     background-color: rgb(217, 255, 0); 
-}
-.card_text {
-    background-color: white;
-    text-transform: uppercase;
-    padding-left: 3px;
-    padding-right: 3px;
-    /* vertical-align: bottom; */
-    display: inline-block;
-    pointer-events: none; /* Important!! - not to intract, not to click */
 }
 
 /* option 1 for proportional size */
