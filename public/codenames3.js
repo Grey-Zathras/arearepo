@@ -263,6 +263,7 @@ window.onload = function() {
     userID = socket.id;
     setCookie("userid", userID, 7);
   });
+  
   socket.on('roomData', function(data) { // general refresh page / status event
     console.log('roomData',data);
     // check for host and start button
@@ -288,12 +289,14 @@ window.onload = function() {
         gamestat.innerText = "Game Started";
       }
        
-      activeteam.innerText =  memberTagID[data.room.active_team];
+      activeteam.innerHTML = `<span class="${memberTagID[data.room.active_team]}">${teams_list[data.room.active_team]}&nbsp;Team</span>`;  //teams_list[data.room.active_team];
       activestep.innerText =  step_verbs[data.room.step];
       turn.innerText =  data.room.turn;
       if (my_team>0) { // game started, show the Challenge block to the Team member or enable click event to the cards
         challengeBlock.style.display = "contents";
         totalclicks.innerText=data.room.clicks[my_team];
+        yourteam.style.display = "contents";
+        yourteam.innerHTML=`<span class="${memberTagID[my_team]}">${teams_list[my_team]}&nbsp;Team</span>`;
         if (data.room.active_team==my_team && !data.room.step) { // challedge phase
             //challengeBlock.disabled=false;
             challengeBlock.querySelector("button").disabled=false;
@@ -373,7 +376,7 @@ homelink.addEventListener('click', function(e) {
     item.addEventListener('click', event => {
       //handle click
       //clickTheCard(event);
-      is_clickable=event.target.classList.contains("closed"+(3-my_team));
+      const is_clickable=event.target.classList.contains("closed"+(3-my_team));
       console.log("card_click_outer, is_clickable", is_clickable, "classList",event.target.classList);
       if (card_event && is_clickable && game_obj.room.step) {
         card_event(event);
