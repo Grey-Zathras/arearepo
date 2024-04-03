@@ -192,32 +192,42 @@ exports.getStatesRevertTheCard = async function ({the_room,card_id}) {
       
 }
 
-exports.kickUserFromTheRoom = async function (the_room,userleft,socket) {
-    io.to(the_room.room_name).emit('chat message', { msg: "user left the room", user: userleft.username, msgclass:"sysmsg" });
-    if (the_room.host == userleft.id) {
-      const users= getUsersInRoom(the_room.id, 1).filter(user => user.active == 1);
-      const res1=users.length;
-      console.log('getUsersInRoom:',users,res1);
-      if (!users.length) {
-        console.log("last active user left the room - room will be destroyed");
-        io.to(the_room.room_name).emit('system message', { msg: "last active user left the room - room will be destroyed", user: userleft.username });
-        removeRoom(the_room.id);
-      } else {
-        const new_host = users[0];
-        console.log("reassigning host to the 'host':",new_host.username );
-        updateRoom({id:the_room.id, host:new_host.id });
-        //let the_room=getRoom(the_room.id);
-        exports.roomData({room: the_room , host:new_host.username});
-        io.to(the_room.room_name).emit('system message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
-      }
-    }
-    socket.leave(userleft.room);
-    if (userleft.team) {
-        socket.leave(userleft.room+userleft.team);
+exports.kickUserFromTheRoom =  function (the_room,userleft,socket) {
+    try {
+        if (!userleft) {
+            throw ("no user data to clean");
+        }
+        if (!the_room) 
+            throw ("no room found to disconnect");
+        io.to(the_room.room_name).emit('chat message', { msg: "user left the room", user: userleft.username, msgclass:"sysmsg" });
+        if (the_room.host == userleft.id) {
+          const users= getUsersInRoom(the_room.id, 1).filter(user => user.active == 1);
+          const res1=users.length;
+          console.log('getUsersInRoom:',users,res1);
+          if (!users.length) {
+            console.log("last active user left the room - room will be destroyed");
+            io.to(the_room.room_name).emit('system message', { msg: "last active user left the room - room will be destroyed", user: userleft.username });
+            removeRoom(the_room.id);
+          } else {
+            const new_host = users[0];
+            console.log("reassigning host to the 'host':",new_host.username );
+            updateRoom({id:the_room.id, host:new_host.id });
+            //let the_room=getRoom(the_room.id);
+            exports.roomData({room: the_room , host:new_host.username});
+            io.to(the_room.room_name).emit('system message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
+          }
+        }
+        socket.leave(userleft.room);
+        if (userleft.team) {
+            socket.leave(userleft.room+userleft.team);
+        }
+    } catch (err) {
+        console.log(socket.id,`kickUserFromTheRoom error:  the_room ${the_room}, userleft: ${userleft} `,err);
+        throw (err);
     }
 }
 
-exports.delayedUserLeaveTheRoom = async function (the_room,user,socket) {
+exports.delayedUserLeaveTheRoom =  function (the_room,user,socket) {
     try {
             // user left ?
             console.log("Timeout on leaving the the room - ",the_room, "user",user);

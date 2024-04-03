@@ -442,20 +442,10 @@ io.on('connection', (socket) => {
             gameLogic.delayedUserLeaveTheRoom(the_room,user,socket);
           }, 120000); // 2 min
           } catch (err) {
-        console.log(socket.id,`disconnect error: User ${socket.data} `,err);
-        //socket.emit('error message',  `unknown error ${err}`);
-      }
-  
-
-      /*
-      room = ... user.room
-      io.to(room).emit('roomData', {
-        room: user.room,
-        users: getUsersInRoom(user.room)
-      });
-      */
-
-      console.log(socket.id,`user ${user.username} disconnected`, reason);
+            console.log(socket.id,`disconnect error: User ${socket.data} `,err);
+            //socket.emit('error message',  `unknown error ${err}`);
+          }
+          console.log(socket.id,`user ${user.username} disconnected`, reason);
     }
   });
 });
