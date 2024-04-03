@@ -203,7 +203,7 @@ io.on('connection', (socket) => {
       //addUser(socket.id,data.user,data.room_id); 
       
       if (res.msg && res.user.team){
-        joinTeam(res.user.team, data);
+        await joinTeam(res.user.team, data);
         console.log(socket.id,` User ${data.user}/${data.user_id} reconnected to room: ${the_room.room_name} and team ${res.user.team}`);
         //console.log(socket.id,` res.user `, res.user);
       } else {

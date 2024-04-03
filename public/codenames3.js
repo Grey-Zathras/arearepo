@@ -292,6 +292,10 @@ window.onload = function() {
       activeteam.innerHTML = `<span class="${memberTagID[data.room.active_team]}">${teams_list[data.room.active_team]}&nbsp;Team</span>`;  //teams_list[data.room.active_team];
       activestep.innerText =  step_verbs[data.room.step];
       turn.innerText =  data.room.turn;
+      if (data.room.step ) { // Response step
+        challenged_text.innerText=game_obj.room.challenge;
+        card_event=clickTheCard;
+      }
       if (my_team>0) { // game started, show the Challenge block to the Team member or enable click event to the cards
         challengeBlock.style.display = "contents";
         totalclicks.innerText=data.room.clicks[my_team];
