@@ -3,6 +3,26 @@ var card_event=""; // event dumb object
 var my_team=0; // current team 0|1|2
 var game_obj = {}; // game status / room object
 
+/*
+var chat_messages ??= document.getElementById('chat_messages');
+var system_messages ??= document.getElementById('system_messages');
+var card_table ??= document.getElementById('card_table');
+var challenge ??= document.getElementById('challenge');
+var room ??= "";
+var room_id ??= "";
+var clicks ??= document.getElementById('clicks');
+var userTeam ??= document.getElementById('userTeam');
+var startButton ??= document.getElementById('startButton');
+var challenged_text ??= document.getElementById('challenged_text');
+var startButton ??= document.getElementById('startButton');
+var chooseTeamBlock ??= document.getElementById('chooseTeamBlock');
+var game_progress ??= document.getElementById('game_progress');
+var gamestat ??= document.getElementById('gamestat');
+var activeteam ??= document.getElementById('activeteam');
+var activestep ??= document.getElementById('activestep');
+var turn ??= document.getElementById('turn');
+*/
+
 function getCookie(name) {
     var value = "; " + document.cookie;
     var parts = value.split("; " + name + "=");

@@ -135,6 +135,8 @@ td.card_choice_no_concent {
 .card_text {
     background-color: white;
     text-transform: uppercase;
+    padding-left: 3px;
+    padding-right: 3px;
     /* vertical-align: bottom; */
     display: inline-block;
     pointer-events: none; /* Important!! - not to intract, not to click */
