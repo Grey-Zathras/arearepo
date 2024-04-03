@@ -375,7 +375,7 @@ homelink.addEventListener('click', function(e) {
       //clickTheCard(event);
       is_clickable=event.target.classList.contains("closed"+(3-my_team));
       console.log("card_click_outer, is_clickable", is_clickable, "classList",event.target.classList);
-      if (card_event && is_clickable && game_obj.step) {
+      if (card_event && is_clickable && game_obj.room.step) {
         card_event(event);
       }
     })

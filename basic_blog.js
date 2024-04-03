@@ -319,7 +319,7 @@ io.on('connection', (socket) => {
         // broadcast new states to all users
         const reveal_role= states[2-the_room.active_team][data.card_id];
         io.to(the_room.room_name).emit('system message', { 
-            msg: `${teams_list[user.team] } team has chosen the card:{card_text}, which is {reveal_role}`, 
+            msg: `${teams_list[user.team] } team has chosen the card: {card_text}, which is {reveal_role}`, 
             user: user.username,
             team: the_room.active_team,
             card_id:data.card_id,
