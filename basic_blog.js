@@ -142,53 +142,37 @@ app.post('/create', async (req, res) => {
 //const io = socketIo(server);
 
 io.on('connection', (socket) => {
-    console.log(socket.id,'a user connected');
-/*    
-    function roomData({room}) {
-      const room_id= room.id;
-      const host = getUser(room.host)
-      const hostname = getUser(room.host).username; 
-      const room_name = room.room_name;
-      let room2= Object.assign({}, room); 
-      delete room2.host;
-      io.to(room_name).emit('roomData', {
-        room: room2,
-        host: hostname,
-        users: getUsersInRoom(room_id)
-      });
-    }
-*/
-    async function joinTeam(team_id, data) { // data.room
-      try {
-        socket.data.team = team_id;
-        const room_id = socket.data.room_id;
-        // read database stats
-        if (!isInt(room_id)) {
-          console.log(` joinTeam - SQL injection attack ${socket.data.room_id}`);
-          throw(`Room ${room_id} not found`);
-        }  
-        updateUser ( { id:socket.data.user_id, active:1,team: team_id});
-        const the_room=getRoom(room_id);
-        gameLogic.roomData({room: the_room });
-        if (team_id >0) {
-          if(the_room.game_status==1) { // if (the_room.game_status==1)
-            var states = await gameLogic.getTeamStates({room_id:room_id, team_id:team_id});
-            console.log(` joinTeam, states `,states);
-            socket.emit('team scheme',  { room_id: room_id,team:team_id, states: states});
-          }
-          socket.join(the_room.room_name+team_id);
-          //io.to(the_room.room_name+team_id).emit('system message', { msg: "secret team channel test!", user: data.user }); // system message 
-          //console.log(socket.id,` Join Team: User ${team_id} result socket:`,socket);
-        } 
-        io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id , msg_type:1}); // system message
-        console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
-      } catch (err){
-        console.log(socket.id,` Join Team: User ${socket.data} has got error`,err);
-        //socket.emit('error message',  `unknown error ${err}`);
-        socket.emit('error message',  err);
-      }
+  console.log(socket.id,'a user connected');
 
+  async function joinTeam(team_id, data) { // data.room
+    try {
+      socket.data.team = team_id;
+      const room_id = socket.data.room_id;
+      // read database stats
+      if (!isInt(room_id)) {
+        console.log(` joinTeam - SQL injection attack ${socket.data.room_id}`);
+        throw(`Room ${room_id} not found`);
+      }  
+      updateUser ( { id:socket.data.user_id, active:1,team: team_id});
+      const the_room=getRoom(room_id);
+      gameLogic.roomData({room: the_room });
+      if (team_id >0) {
+        if(the_room.game_status==1) { // if (the_room.game_status==1)
+          var states = await gameLogic.getTeamStates({room_id:room_id, team_id:team_id});
+          console.log(` joinTeam, states `,states);
+          socket.emit('team scheme',  { room_id: room_id,team:team_id, states: states});
+        }
+        socket.join(the_room.room_name+team_id);
+        //io.to(the_room.room_name+team_id).emit('system message', { msg: "secret team channel test!", user: data.user }); // system message 
+        //console.log(socket.id,` Join Team: User ${team_id} result socket:`,socket);
+      } 
+      io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id , msg_type:1}); // system message
+      console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
+    } catch (err){
+      console.log(socket.id,` Join Team: User ${socket.data} has got error`,err);
+      socket.emit('error message',  err);
     }
+  }
   
     // Join a room
   socket.on('join room', async (data) => {
@@ -218,7 +202,6 @@ io.on('connection', (socket) => {
       
       //addUser(socket.id,data.user,data.room_id); 
       
-      gameLogic.roomData({room: the_room });
       if (res.msg && res.user.team){
         joinTeam(res.user.team, data);
         console.log(socket.id,` User ${data.user}/${data.user_id} reconnected to room: ${the_room.room_name} and team ${res.user.team}`);
@@ -226,6 +209,7 @@ io.on('connection', (socket) => {
       } else {
         console.log(socket.id,` User ${data.user} joined room: ${the_room.room_name}`);
       }
+      gameLogic.roomData({room: the_room });
     } 
   });
 
