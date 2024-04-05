@@ -148,11 +148,9 @@ td.card_choice_no_concent {
 }
 .team1 .closed1:hover {
     background: orange;
-    /* background-blend-mode: saturation; */
 }
 .team2 .closed2:hover {
     background: orange;
-    /* background-blend-mode: saturation; */
 }
 
 /* option 1 for proportional size */

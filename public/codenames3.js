@@ -316,13 +316,17 @@ window.onload = function() {
       turn.innerText =  data.room.turn;
       if (data.room.step ) { // Response step
         challenged_text.innerText=game_obj.room.challenge;
-        card_event=clickTheCard;
-        card_table.classList.add("team"+(3-my_team)); // for hover css 
       } else {
-        card_table.classList.remove("team"+(3-my_team));
+        challenged_text.innerText="";
       }
       if (my_team>0) { // game started, show the Challenge block to the Team member or enable click event to the cards
-        challengeBlock.style.display = "contents";
+        if (data.room.step ) { // Response step and within some team
+          card_event=clickTheCard;
+          card_table.classList.add("team"+(3-my_team)); // for hover css 
+        } else {
+          card_table.classList.remove("team"+(3-my_team));
+        }
+          challengeBlock.style.display = "contents";
         totalclicks.innerText=data.room.clicks[my_team];
         yourteam.style.display = "contents";
         yourteam.innerHTML=`<span class="${memberTagID[my_team]}">${teams_list[my_team]}&nbsp;Team</span>`;
@@ -346,14 +350,6 @@ window.onload = function() {
       }
     } else {
         //Game Not Started
-        //gamestat.innerHTML = `Game Not Started: ${(game_obj.host == userName ? "<b>Click start!</b>" : "" )}`;
-         /*
-        if (game_obj.host == userName) {
-            gamestat.innerHTML="Game Not Started:&nbsp;<b>Click start!</b>";
-          } else {
-            gamestat.innerText = "Game Not Started";
-          }
-         // */
          let game_str="";
          if (game_obj.host == userName) {
             if (! (game_obj.users.filter(user => user.team == 1).length && game_obj.users.filter(user => user.team == 2).length) ) {
