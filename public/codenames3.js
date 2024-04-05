@@ -320,10 +320,11 @@ window.onload = function() {
         challenged_text.innerText="";
       }
       if (my_team>0) { // game started, show the Challenge block to the Team member or enable click event to the cards
-        if (data.room.step ) { // Response step and within some team
+        if (game_obj.room.active_team==my_team && data.room.step ) { // Response step and my team
           card_event=clickTheCard;
           card_table.classList.add("team"+(3-my_team)); // for hover css 
-        } else {
+        } else { // not my team  - or challenge phase
+          card_event="";
           card_table.classList.remove("team"+(3-my_team));
         }
           challengeBlock.style.display = "contents";
@@ -339,14 +340,19 @@ window.onload = function() {
             challenge.disabled=true;
             clicks.disabled=true;
         }
+        /*
         if (data.room.active_team!=my_team || !data.room.step){ // not my team  - or challenge phase
             card_event=""; 
-        }         
+        } 
+        */        
       } else { // Observer role
         card_event=""; 
         challengeBlock.disabled=true;
         challenge.disabled=true;
         clicks.disabled=true;
+        yourteam.style.display="none";
+        challengeBlock.style.display ="none";
+        totalclicks.innerText=data.room.clicks[game_obj.room.active_team];
       }
     } else {
         //Game Not Started
