@@ -146,6 +146,14 @@ td.my_card_choice {
 td.card_choice_no_concent {
     background-color: rgb(217, 255, 0); 
 }
+.team1 .closed1:hover {
+    background: orange;
+    /* background-blend-mode: saturation; */
+}
+.team2 .closed2:hover {
+    background: orange;
+    /* background-blend-mode: saturation; */
+}
 
 /* option 1 for proportional size */
 .card_text.bottom_a {

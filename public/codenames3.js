@@ -223,6 +223,7 @@ window.onload = function() {
   socket.on('system message', function(data) {
     console.log('system message data', data);
     var msg=data.msg;
+    card_table.classList.remove("team"+(3-my_team));
     switch (data.msg_type) {
         case 1: { // joining the team
             msg+=" "+memberTagID[data.team];
@@ -240,6 +241,7 @@ window.onload = function() {
             msg+=" "+data.challenge+ ", clicks " + data.clicks;
             challenged_text.innerText=data.challenge;
             card_event=clickTheCard;
+            card_table.classList.add("team"+(3-my_team)); // for hover css 
             //totalclicks.innerText=data.totalclicks;
             break;
         }
@@ -315,6 +317,9 @@ window.onload = function() {
       if (data.room.step ) { // Response step
         challenged_text.innerText=game_obj.room.challenge;
         card_event=clickTheCard;
+        card_table.classList.add("team"+(3-my_team)); // for hover css 
+      } else {
+        card_table.classList.remove("team"+(3-my_team));
       }
       if (my_team>0) { // game started, show the Challenge block to the Team member or enable click event to the cards
         challengeBlock.style.display = "contents";
