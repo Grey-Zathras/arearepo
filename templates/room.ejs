@@ -37,7 +37,7 @@
      </span>
        </div>
   
-    <table class="border1" id="card_table" width="100%">
+    <table class="border1 secret_on" id="card_table" width="100%">
       <% for(var i =0; i<5; i++) { %>
         <tr>
         <% for(var j =0; j<5; j++) { 
@@ -52,7 +52,63 @@
         </tr>
       <% } %>
     </table>
-  
+    <label for="secretOn">secret cards On</label>
+    <input type="checkbox" id="secretOn" name="secretOn"  value="secret cards On" checked />
+    <br>
+    <label for="legend">Legend: </label>
+    <input type="checkbox" id="legend" name="legend"  value="Legend On" checked />
+    <table class="border1 secret_on" id="legend_table" width="100%">
+        <tr>
+          <td  class="card spy">
+            <div class="card_text">
+							hidden spy
+						</div> 
+          </td>
+          <td  class="card closed">
+            <div class="card_text">
+							closed card
+						</div> 
+          </td>
+          <td  class="card killer">
+            <div class="card_text">
+							hidden killer
+						</div> 
+          </td>
+        </tr><tr>
+          <td  class="card spy_opened">
+            <div class="card_text">
+							Opened Spy
+						</div> 
+          </td>
+          <td  class="card ">
+            <div class="card_text">
+							 
+						</div> 
+          </td>
+          <td  class="card killer_opened">
+            <div class="card_text">
+							Opened Killer
+						</div> 
+          </td>
+        </tr><tr>
+          <td  class="card civilian1">
+            <div class="card_text">
+							civilian Blue Team
+						</div> 
+          </td>
+          <td  class="card civilian2">
+            <div class="card_text">
+							civilian Red Team
+						</div> 
+          </td>
+          <td  class="card civilian1 civilian2">
+            <div class="card_text">
+							civilian both Teams
+						</div> 
+          </td>
+        </tr>
+    </table>
+
   </div>
   <div class="log_area" >
   <div class="chat_header">

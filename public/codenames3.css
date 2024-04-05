@@ -10,11 +10,10 @@ body  {
     font-size: 16px;
 }
 .card_text {
-    background-color: white;
+    background-color: rgb(182, 171, 117); /* white; */
     text-transform: uppercase;
     padding-left: 3px;
     padding-right: 3px;
-    /* vertical-align: bottom; */
     display: inline-block;
     pointer-events: none; /* Important!! - not to intract, not to click */
 }
@@ -58,6 +57,7 @@ body  {
 /*  civilian1 */
 .card.civilian.closed1 , .card.civilian1{
     /* background-color: blueviolet; */
+    /* background-image: url("https://cdn.glitch.global/14b90c05-0271-44f7-9887-e76ca7c2d88c/civilian1_bgimage.gif"); */
     background-image: url("/civilian1_bgimage.gif");
     background-position: center;
 }
@@ -77,12 +77,17 @@ body  {
 .card.killer_opened , .card.killer_opened1 , .card.killer_opened2{
 background-color: rgb(42, 43, 42);
 }
-.card.spy .card_text, .card.spy1 .card_text, .card.spy2 .card_text {
-background-color: green;
+.secret_on .card.spy .card_text, .secret_on .card.spy1 .card_text, .secret_on .card.spy2 .card_text {
+  background-color: green;
+  color: rgb(196, 193, 186); /* white ? */
 }
-.card.killer .card_text,.card.killer1 .card_text,.card.killer2 .card_text {
-background-color: rgb(42, 43, 42);
-color: white;
+.secret_on .card.killer .card_text, .secret_on .card.killer1 .card_text, .secret_on .card.killer2 .card_text {
+  background-color: rgb(42, 43, 42);
+  color: rgb(196, 193, 186); /* white ? */
+}
+.card.spy_opened1 .card_text, .card.spy_opened2 .card_text {
+    background-color: darkgreen;
+    color: rgb(182, 171, 117)
 }
 .border1 {
     border: 1px solid red;

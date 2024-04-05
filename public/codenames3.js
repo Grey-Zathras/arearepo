@@ -102,7 +102,7 @@ const removeClassFromAllElements = (className) => {
   const activeClass=["inactive","active"]; // member chat status
   const memberTagID = ["Observers","Red_team", "Blue_team"]; // team membership 
   const player_class_array=['closed', 'spy', 'killer','civilian', 'spy_opened','killer_opened' ]; // cards on the table
-  const card_verbs=['closed', 'spy', 'killer','Мирный житель', 'Шпион','Киллер' ]; // cards on the table
+  const card_verbs=['closed', 'spy', 'killer','Мирный житель', 'Шпион','Киллер' ]; // cards on the table - text for chat
   //var observer_class_array=[ 'spy_opened','civilian','killer_opened' ]; // cards on the table
   const teams_list=["observer","Red","Blue"]; //team membership text for chat
   const step_verbs=["Challenge", "Response"]; // game status terms
@@ -423,5 +423,22 @@ homelink.addEventListener('click', function(e) {
         card_event(event);
       }
     })
+  });
+ 
+  // secretOn checkbox event listener
+  secretOn.addEventListener('change', function() {
+    if ( secretOn.checked ) {
+      if (!card_table.classList.contains("secret_on")) {
+        card_table.classList.add("secret_on");
+      }
+    } else {
+      card_table.classList.remove("secret_on");
+    }
   })
+  //Legend checkbox event listener
+  legend.addEventListener('change', function() {
+    legend_table.style.display = (legend.checked ?"block":"none");
+  })
+
+
 };
