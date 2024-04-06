@@ -217,6 +217,27 @@ io.on('connection', (socket) => {
     joinTeam(data.team, data);
   });
 
+  socket.on('stop game', async  (data) => {
+    try {
+      console.log("stop game request", "socket.data",socket.data, "data",data);
+      gameLogic.checkSocketDataUserIDReady(socket);
+      const user = gameLogic.getUserFromSocket(socket);
+      //let the_room=gameLogic.getRoomWithTeamsReady(socket);
+      let the_room=getRoom(socket.data.room_id);
+      gameLogic.checkHost({user:user, room:the_room });
+
+
+      the_room.game_status=0;
+      // clean teams? hide states? 
+
+      io.to(the_room.room_name).emit('system message', { msg: "the game has stopped!", user: data.user, msg_type:6 }); // system message stop game
+      gameLogic.roomData({room: the_room });
+    } catch (err) {
+      console.log(socket.id,`start game  request error: User ${socket.data}, request: ${data} `,err);
+      socket.emit('error message',  err);
+    }
+  });
+
   socket.on('start game', async  (data) => {
     //var errmsg="";
     try {
@@ -225,6 +246,7 @@ io.on('connection', (socket) => {
       gameLogic.checkSocketDataUserIDReady(socket);
       const user = gameLogic.getUserFromSocket(socket);
       let the_room=gameLogic.getRoomWithTeamsReady(socket);
+      gameLogic.checkHost({user:user, room:the_room });
 
       the_room.game_status=1;
       the_room.step=0;

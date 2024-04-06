@@ -211,10 +211,11 @@ window.onload = function() {
   //  document.getElementById('startButton').addEventListener('click', function(e) {
 
   startButton.addEventListener('click', function(e) {
-    
     socket.emit('start game', { room: room, user: userName , user_id: userID });
-    //startButton.disabled = true;
-    });
+  });
+  stopButton.addEventListener('click', function(e) {
+    socket.emit('stop game', { room: room, user: userName , user_id: userID });
+  });
 
   socket.on('chat message', function(data) {
     console.log('chat message data', data);
@@ -264,7 +265,17 @@ window.onload = function() {
             }
             break;
         }
-    }
+        case 6: { // stop the game
+          // clean stats at the table
+          for(var i =1; i<3; i++){ // both teams
+            for(var j =0; j<6; j++) {
+              removeClassFromAllElements(player_class_array[j]+i);  
+            }
+          }
+          //removeClassFromAllElements();
+          break;
+      }
+  }
     addSysMsgLine(data.user + ": " + msg,"sysmsg");
   });
   socket.on('error message', function(data) {
@@ -295,18 +306,20 @@ window.onload = function() {
     // check for host and start button
     game_obj=data;
     document.getElementById('host').innerText = data.host;
-    if (data.host==userName && !data.room.game_status){
-        startButton.disabled=false;
-    } else {
-        startButton.disabled=true;
-    }
     // refresh Teams and Player status
     ResetMembers();
     data.users.forEach((element) => {
       //console.log(element);
       AddMemberLine (element);
-    }); 
+    });
+    startButton.disabled=true;
+    stopButton.disabled=true;
     if (data.room.game_status>0) { //game started, cannot join the Team
+      startButton.style.display="none";
+      stopButton.style.display="inline-block";
+      if (data.host==userName ){
+        stopButton.disabled=false;
+      } 
       chooseTeamBlock.style.display = "none";
       game_progress.style.display = "contents";
       if (game_obj.room.active_team==my_team) {
@@ -360,16 +373,25 @@ window.onload = function() {
       }
     } else {
         //Game Not Started
-         let game_str="";
-         if (game_obj.host == userName) {
-            if (! (game_obj.users.filter(user => user.team == 1).length && game_obj.users.filter(user => user.team == 2).length) ) {
-                game_str = "one of the teams is empty";
-            } else {
-                game_str = "<b>Click start!</b>";
-            }
-         }
-         gamestat.innerHTML = `Game Not Started ${(game_str ? `: ${game_str}` : "" )}`;
+        stopButton.style.display="none";
+        startButton.style.display="inline-block";
+        if (data.host==userName ){
+          startButton.disabled=false;
+        } 
+        game_progress.style.display = "none";
+        challengeBlock.style.display = "none";
+        chooseTeamBlock.style.display = "contents";
+
+        let game_str="";
+        if (game_obj.host == userName) {
+          if (! (game_obj.users.filter(user => user.team == 1).length && game_obj.users.filter(user => user.team == 2).length) ) {
+              game_str = "one of the teams is empty";
+          } else {
+              game_str = "<b>Click start!</b>";
+          }
         }
+        gamestat.innerHTML = `Game Not Started ${(game_str ? `: ${game_str}` : "" )}`;
+      }
     
     //
   });

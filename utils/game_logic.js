@@ -17,14 +17,22 @@ exports.roomData = function ({room}) {
       host: hostname,
       users: getUsersInRoom(room_id)
     });
-  }
+}
 
-  exports.checkSocketDataUserIDReady = function (socket) {
+exports.checkSocketDataUserIDReady = function (socket) {
     //console.log("checkSocketDataUserIDReady socket",socket);
     if (typeof socket.data.user_id === "undefined"){
         const errmsg="socket data is corrupted. pls reconnect";
         //socket.emit('error message',  errmsg);
         throw (errmsg);
+    }
+}
+
+exports.checkHost = function ({user,room}) {
+    if (user.id!=room.host){
+      const errmsg="host role is required!";
+      //socket.emit('error message',  errmsg);
+      throw (errmsg);
     }
 }
 
