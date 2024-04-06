@@ -247,7 +247,8 @@ window.onload = function() {
             break;
         }
         case 4: { // no consent
-            noCardConcent(data.card_response_array);
+          card_table.classList.add("team"+(3-my_team)); // for hover css 
+          noCardConcent(data.card_response_array);
             break;
         }
         case 5: { // card revealed!
