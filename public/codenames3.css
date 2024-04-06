@@ -50,6 +50,7 @@ body  {
 .members{
     font-size: smaller;
     font-style: oblique;
+    border-top: 1px solid black;
 }
 .card.spy_opened , .card.spy_opened1 , .card.spy_opened2{
     background-color: green;
