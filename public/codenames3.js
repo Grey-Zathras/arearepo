@@ -265,7 +265,7 @@ window.onload = function() {
             }
             break;
         }
-        case 6: { // stop the game
+        case 7: { // stop the game
           // clean stats at the table
           for(var i =1; i<3; i++){ // both teams
             for(var j =0; j<6; j++) {

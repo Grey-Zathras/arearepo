@@ -230,7 +230,7 @@ io.on('connection', (socket) => {
       the_room.game_status=0;
       // clean teams? hide states? 
 
-      io.to(the_room.room_name).emit('system message', { msg: "the game has stopped!", user: data.user, msg_type:6 }); // system message stop game
+      io.to(the_room.room_name).emit('system message', { msg: "the game has stopped!", user: data.user, msg_type:7 }); // system message stop game
       gameLogic.roomData({room: the_room });
     } catch (err) {
       console.log(socket.id,`start game  request error: User ${socket.data}, request: ${data} `,err);
