@@ -54,12 +54,12 @@ const updateRoom = ( {id,  game_status, active_team, turn, step, host, challenge
       rooms[index].host = host;
       if (challenge !== undefined)
       rooms[index].challenge = challenge;
-      if (clicks !== undefined){
+      if (Array.isArray(clicks)){
         clicks.forEach((click, team_index) => {
           rooms[index].clicks[team_index] = click;
         });
       }
-      rooms[index].clicks = clicks;
+      //rooms[index].clicks = clicks;
     
     if (active_team !== undefined)
       rooms[index].active_team = active_team;
