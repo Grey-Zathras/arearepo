@@ -61,18 +61,21 @@ body  {
     /* background-image: url("https://cdn.glitch.global/14b90c05-0271-44f7-9887-e76ca7c2d88c/civilian1_bgimage.gif"); */
     background-image: url("/civilian1_bgimage.gif");
     background-position: center;
+    background-size: cover;
 }
 /*  civilian2 */
 .card.civilian.closed2 , .card.civilian2{
     /* background-color: salmon; */
     background-image: url("/civilian2_bgimage.gif");
     background-position: center;
+    background-size: cover;
 }
 /* both civilians */
 .card.civilian.civilian1 , .card.civilian.civilian2, .card.civilian1.civilian2 {
     /* background-color: maroon; */
     background-image: url("/civilians_bgimage.gif");
     background-position: center;
+    background-size: cover;
 }
 
 .card.killer_opened , .card.killer_opened1 , .card.killer_opened2{
