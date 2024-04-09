@@ -159,13 +159,16 @@ io.on('connection', (socket) => {
       if (team_id >0) {
         if(the_room.game_status==1) { // if (the_room.game_status==1)
           var states = await gameLogic.getTeamStates({room_id:room_id, team_id:team_id});
-          console.log(` joinTeam, states `,states);
+          //console.log(` joinTeam, states `,states);
           socket.emit('team scheme',  { room_id: room_id,team:team_id, states: states});
         }
         socket.join(the_room.room_name+team_id);
         //io.to(the_room.room_name+team_id).emit('system message', { msg: "secret team channel test!", user: data.user }); // system message 
         //console.log(socket.id,` Join Team: User ${team_id} result socket:`,socket);
-      } 
+      } else { // reconnect for observer
+        var states = await gameLogic.getTeamStates({room_id:the_room.id, team_id:0 });
+        socket.emit('team scheme',  { room_id: room_id,team:0, states: states}); // Observer
+      }
       io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id , msg_type:1}); // system message
       console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
     } catch (err){
@@ -207,7 +210,10 @@ io.on('connection', (socket) => {
         console.log(socket.id,` User ${data.user}/${data.user_id} reconnected to room: ${the_room.room_name} and team ${res.user.team}`);
         //console.log(socket.id,` res.user `, res.user);
       } else {
-        console.log(socket.id,` User ${data.user} joined room: ${the_room.room_name}`);
+        console.log(socket.id,` User ${data.user} joined room: ${the_room.room_name} as Observer`);
+        if (the_room.game_status){
+          await joinTeam(0, data); // send schema to observer
+        }
       }
       gameLogic.roomData({room: the_room });
     } 
@@ -254,15 +260,19 @@ io.on('connection', (socket) => {
       the_room.active_team=1;
 
       const states_unsecured = await gameLogic.getRoomStates(the_room.id);
+
+        //send team sheme to the team
       for (let team_id = 1; team_id<3; team_id++ ){
         var states = await gameLogic.getTeamStates({room_id:the_room.id, team_id:team_id, states_unsecured: states_unsecured });
         io.to(the_room.room_name+team_id).emit('team scheme',  { room_id: the_room.id,team:team_id, states: states});
-
       }
       
-      gameLogic.roomData({room: the_room });
-
+      // send team scheme to observers
+      var states = await gameLogic.getTeamStates({room_id:the_room.id, team_id:0, states_unsecured: states_unsecured });
+      console.log(`start game - observer schema: `,states);
+      io.to(the_room.room_name).emit('team scheme',  { room_id: the_room.id, states: states}); // no team!
       io.to(the_room.room_name).emit('system message', { msg: "Let's start the game!", user: data.user, msg_type:2 }); // system message start game
+      gameLogic.roomData({room: the_room });
       //const { rows } = await codenames_DB.query('UPDATE rooms SET stat=$2 WHERE id = $1', [room_id],[0]);  
       console.log("start game success, room:",the_room);
     } catch (err) {

@@ -275,12 +275,23 @@ exports.getTeamStates = async function ({room_id,team_id,states_unsecured}) {
     states[1]=states_unsecured[1].slice();
     
     const forbidden=[1,2];
-    states[2-team_id].forEach((state,index) => {
-      // cleanup spies
-      if (forbidden.includes(state) ){
-        states[2-team_id][index]=0;
-      }
-    });
+    if (team_id) {
+      states[2-team_id].forEach((state,index) => {
+        // cleanup spies
+        if (forbidden.includes(state) ){
+          states[2-team_id][index]=0;
+        }
+      });
+    } else {
+      // secure both teams
+      states.forEach((arr) => {
+        arr.forEach((state,index) => {
+          if (forbidden.includes(state) ){
+            arr[index]=0;
+          }
+        });
+      });
+    }
     //console.log(`getTeamStates,team_id, ${team_id}, states:`, states);     
     return states;
 }

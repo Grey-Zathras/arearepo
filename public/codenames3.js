@@ -224,7 +224,9 @@ window.onload = function() {
   socket.on('system message', function(data) {
     console.log('system message data', data);
     var msg=data.msg;
-    card_table.classList.remove("team"+(3-my_team));
+    if (my_team) {
+      card_table.classList.remove("team"+(3-my_team)); // cleanup for hover css 
+    }
     switch (data.msg_type) {
         case 1: { // joining the team
             msg+=" "+memberTagID[data.team];
@@ -241,15 +243,20 @@ window.onload = function() {
         case 3: { // challenge -> card choice
             msg+=" "+data.challenge+ ", clicks " + data.clicks;
             challenged_text.innerText=data.challenge;
-            card_event=clickTheCard;
-            card_table.classList.add("team"+(3-my_team)); // for hover css 
+            if (my_team) {
+              card_event=clickTheCard;
+              card_table.classList.add("team"+(3-my_team)); // for hover css 
+            }
             //totalclicks.innerText=data.totalclicks;
             break;
         }
         case 4: { // no consent
-          card_table.classList.add("team"+(3-my_team)); // for hover css 
+          if (my_team) {
+            card_event=clickTheCard;
+            card_table.classList.add("team"+(3-my_team)); // for hover css 
+          }
           noCardConcent(data.card_response_array);
-            break;
+          break;
         }
         case 5: { // card revealed!
             let cardObj=document.getElementById("card["+data.card_id+"]"); //.querySelector("span")
@@ -279,23 +286,39 @@ window.onload = function() {
   }
     addSysMsgLine(data.user + ": " + msg,"sysmsg");
   });
+
   socket.on('error message', function(data) {
     console.log('error message data', data);
     addSysMsgLine(data,"errormsg");
   });
+
   socket.on('team scheme', function(data) {
     console.log('team scheme data',data);
-    my_team=data.team;
-    refreshTable();
-    if (data.team >0 ) {
-        refreshTable(data.states[data.team-1],"player",(data.team));
-        refreshTable(data.states[2-data.team],"team",(3-data.team));
-        addChatLine("welcome to the "+teams_list[data.team]+" team" ,"sysmsg");
-    } else {
-        refreshTable(data.states[data.team-1],"team",(data.team));
-        refreshTable(data.states[2-data.team],"team",(3-data.team));
+    if (data.team) {
+      refreshTable();
+      my_team=data.team;
+      refreshTable(data.states[my_team-1],"player",(my_team));
+      refreshTable(data.states[2-my_team],"team",(3-my_team));
+      //addChatLine("welcome to the "+teams_list[my_team]+" team" ,"sysmsg"); //starting game as XXX team
+  } else {
+    if (!my_team){
+      refreshTable();
+      refreshTable(data.states[1],"team",(2));
+      refreshTable(data.states[0],"team",(1));
     }
+  }
+  /*
+    if (my_team >0 ) {
+        refreshTable(data.states[my_team-1],"player",(my_team));
+        refreshTable(data.states[2-my_team],"team",(3-my_team));
+        addChatLine("welcome to the "+teams_list[my_team]+" team" ,"sysmsg");
+    } else {
+        refreshTable(data.states[my_team-1],"team",(my_team));
+        refreshTable(data.states[2-my_team],"team",(3-my_team));
+    }
+    */
   });
+
   socket.on('userID', function(data) {
     console.log('userID data',data,"socket.id",socket.id );
     userID = socket.id;
