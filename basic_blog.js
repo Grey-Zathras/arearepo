@@ -354,9 +354,7 @@ io.on('connection', (socket) => {
             // change the  turn and the step, team is the same
             the_room.turn++;
             the_room.step = 0; //now is the Challenge step 
-            //the_room.active_team=3-the_room.active_team;
             io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team is missed.  New Turn:${the_room.turn} !`, user: user.username, msg_type:6}); // system message end turn
-
         }
         gameLogic.roomData({room: the_room });
       } else {
@@ -368,6 +366,38 @@ io.on('connection', (socket) => {
       console.log(socket.id,`card_choice error:`,err);
       socket.emit('error message',  err);
       //socket.emit('error message',  `unknown error ${err}`);
+    }
+  });
+
+  socket.on('end_turn', async  (data) => { // emit the system message so team will agree to end the turn
+    try {
+      console.log("end_turn", "socket.data",socket.data, "data",data);
+      gameLogic.checkSocketDataUserIDReady(socket);
+      const user = gameLogic.getUserFromSocket(socket);
+      gameLogic.checkUserHasTeam(user);
+      let the_room=gameLogic.getRoomInResponseStep(socket,user);
+      
+      the_room.end_turn_map.set(user.username,"end_turn"); 
+      let consent=1;
+      let end_turn_array= [];
+      for (const [key, value] of the_room.end_turn_map) {
+        consent=consent && (value=="end_turn") ;
+        if (isInt(value) ) {
+          end_turn_array.push(value);
+        }
+      }
+       if (consent) {
+            // change the  turn and the step, team is the same
+            the_room.turn++;
+            the_room.step = 0; //now is the Challenge step 
+            io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team decided to end current turn.  New Turn:${the_room.turn} !`, user: user.username, msg_type:6}); // system message end turn
+            gameLogic.roomData({room: the_room });
+       } else {
+        io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team has no consent for end turn `, user: user.username, msg_type:0 }); // system message / general
+       }
+   } catch (err) {
+      console.log(socket.id,`end_turn error:`,err);
+      socket.emit('error message',  err);      
     }
   });
   

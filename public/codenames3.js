@@ -216,6 +216,9 @@ window.onload = function() {
   stopButton.addEventListener('click', function(e) {
     socket.emit('stop game', { room: room, user: userName , user_id: userID });
   });
+  endTurnButton.addEventListener('click', function(e) {
+    socket.emit('end_turn', { room: room, user: userName , user_id: userID });
+  });
 
   socket.on('chat message', function(data) {
     console.log('chat message data', data);
@@ -363,10 +366,12 @@ window.onload = function() {
       if (my_team>0) { // game started, show the Challenge block to the Team member or enable click event to the cards
         if (game_obj.room.active_team==my_team && data.room.step ) { // Response step and my team
           card_event=clickTheCard;
-          card_table.classList.add("team"+(3-my_team)); // for hover css 
+          card_table.classList.add("team"+(3-my_team)); // for hover css
+          endTurnButton.disabled=false; 
         } else { // not my team  - or challenge phase
           card_event="";
           card_table.classList.remove("team"+(3-my_team));
+          endTurnButton.disabled=true;
         }
           challengeBlock.style.display = "contents";
         totalclicks.innerText=data.room.clicks[my_team];
@@ -393,7 +398,7 @@ window.onload = function() {
         clicks.disabled=true;
         yourteam.style.display="none";
         challengeBlock.style.display ="none";
-        totalclicks.innerText=data.room.clicks[game_obj.room.active_team];
+        totalclicks.innerText=data.room.clicks[data.room.active_team];
       }
     } else {
         //Game Not Started

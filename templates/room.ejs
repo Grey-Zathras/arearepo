@@ -52,9 +52,10 @@
         </tr>
       <% } %>
     </table>
-    <label for="secretOn">secret cards On</label>
-    <input type="checkbox" id="secretOn" name="secretOn"  value="secret cards On" checked />
-    <br>
+    <div id="secretCheckbox">
+      <label for="secretOn">secret cards On</label>
+      <input type="checkbox" id="secretOn" name="secretOn"  value="secret cards On" checked />
+    </div>
     <label for="legend">Legend: </label>
     <input type="checkbox" id="legend" name="legend"  value="Legend On" checked />
     <table class="border1 secret_on" id="legend_table" width="100%">
@@ -115,7 +116,7 @@
     <div class="host">
       Room host:  <span id="host"></span> <button id="startButton" disabled>Start game</button> <button id="stopButton" disabled style="display:none;">Stop game</button>
     </div>
-      <div class="div-table" >
+      <div class="div-table teams" >
       <div class="div-table-row" >
         <div class="div-table-col Observers">
           Observers
@@ -135,6 +136,8 @@
       </div>
     </div>
   <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
+  <button id="endTurnButton" style="margin-left: auto; display: block; margin-right: 0;"  disabled>End Turn</button>
+
   <form id="userForm" action="">
     <div id="chooseTeamBlock">
       Your team: <select  id="userTeam" name="userTeam">
@@ -145,7 +148,7 @@
         <button>Join</button>
       </div>
       <div id="challengeBlock" style="display:none;">
-        <br>
+        
         Challenge: <input type="text" id="challenge" name="challenge" disabled /> &nbsp;&nbsp; Attempts:&nbsp;<input type="text" id="clicks" name="clicks" maxlength="2" size="2" disabled /><button>Send</button>
       </div>
       <br /><br />

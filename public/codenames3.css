@@ -35,7 +35,7 @@ body  {
 .div-table-col {
     float: left; /* fix for  buggy browsers */
     display: table-column;         
-    width: 30%;         
+    width: 33%;         
     background-color: #ccc;  
 }
 .Red_team{
@@ -224,8 +224,17 @@ html {
         font-size: .875rem;
         line-height: 1.25rem
     }
+    .log_area{
+        font-size: .875rem;
+    line-height: 1.25rem;
+    }
 }
-/*
+@media (min-width: 650px) and (max-width: 800px) {
+    .log_area .teams{
+        font-size: .675rem;
+      }
+}
+/* 
 @media (min-width: 640px) {
     .card_text {
         font-size: 1.875rem;
@@ -292,7 +301,7 @@ html {
     }
 }
 
-*/
+/* */
 
 /* junk section */ 
 /*
