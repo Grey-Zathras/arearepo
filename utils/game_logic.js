@@ -210,7 +210,7 @@ exports.kickUserFromTheRoom =  function (the_room,userleft,socket) {
         }
         if (!the_room) 
             throw ("no room found to disconnect");
-        io.to(the_room.room_name).emit('chat message', { msg: "user left the room", user: userleft.username, msgclass:"sysmsg" });
+        io.to(the_room.room_name).emit('system message', { msg: "user left the room", user: userleft.username, msgclass:"sysmsg" });
         if (the_room.host == userleft.id) {
           const users= getUsersInRoom(the_room.id, 1).filter(user => user.active == 1);
           const res1=users.length;
@@ -227,6 +227,8 @@ exports.kickUserFromTheRoom =  function (the_room,userleft,socket) {
             exports.roomData({room: the_room , host:new_host.username});
             io.to(the_room.room_name).emit('system message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
           }
+        } else {
+          exports.roomData({room: the_room });
         }
         socket.leave(userleft.room);
         if (userleft.team) {
