@@ -343,7 +343,12 @@ io.on('connection', (socket) => {
             msg_type:5}); // system message card_chosen
         if (reveal_role==4) {
           the_room.clicks[the_room.active_team]--;
-          if (!the_room.clicks[the_room.active_team]) {
+          //check if any spies are left?
+          if (!gameLogic.countHiddenSPies(states) ) {
+            // end game
+            the_room.game_status=0;
+            io.to(the_room.room_name).emit('system message', { msg: "You all are WINNERS - the game has finished!", user: data.user, msg_type:7 }); // system message stop game
+          } else if (!the_room.clicks[the_room.active_team]) {
             // change the  turn and the step, team is the same
             the_room.turn++;
             the_room.step = 0; //now is the Challenge step 

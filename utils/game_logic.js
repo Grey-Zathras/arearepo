@@ -297,5 +297,17 @@ exports.getTeamStates = async function ({room_id,team_id,states_unsecured}) {
     }
     //console.log(`getTeamStates,team_id, ${team_id}, states:`, states);     
     return states;
+  }
+
+  exports.countHiddenSPies =  function (states) {
+    let hidden_spies=0;
+    states.forEach((arr) => {
+      arr.forEach((state,index) => {
+        if (state==1 ){
+          hidden_spies++;
+        }
+      });
+    });
+    return hidden_spies;
 }
 
