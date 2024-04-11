@@ -140,9 +140,9 @@ td.card {
     width: 20%;
     text-align: center;
     border: 1px solid;
-background-color: rgb(182, 171, 117); /* rgb(206, 179, 26); */
-padding-bottom: 3%;
-padding-top: 3%;
+    background-color: rgb(182, 171, 117); /* rgb(206, 179, 26); */
+    padding-bottom: 3%;
+    padding-top: 3%;
 }
 td.my_card_choice {
     background-color: rgb(226, 101, 29); 
@@ -157,30 +157,6 @@ td.card_choice_no_concent {
     background: orange;
 }
 
-/* option 1 for proportional size */
-.card_text.bottom_a {
-    margin-top: 30%;
-}
-/* option 2  for proportional size */
-.card .v_spacer {
-    width: 0;
-    padding-top: 30%; 
-    /* position: relative; */
-}
-
-
-/* option 3 outer-inner */
-.card .outer {
-    width: 100%;
-    padding-top: 60%; 
-    position: relative;
-}
-.card .outer .inner {
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-}
-
 #system_messages, #chat_messages  {
     list-style-type: none;
     padding-left: 5px;
@@ -192,6 +168,17 @@ td.card_choice_no_concent {
 }
 .game_head{
     text-align: center;
+}
+.userControl{
+    display: ruby-text;
+}
+#reconnectButton {
+    /* margin-left: 0; display: block; margin-right: auto; */
+    float: left;
+}
+#endTurnButton {
+    /* margin-left: auto; display: block; margin-right: 0; */
+    float: right;
 }
 
 .user_chat {

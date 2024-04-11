@@ -135,24 +135,26 @@
         </div>
       </div>
     </div>
-  <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
-  <button id="endTurnButton" style="margin-left: auto; display: block; margin-right: 0;"  disabled>End Turn</button>
+    <div class="userControl"  >
+      <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
+      <button id="reconnectButton">Reconnect</button>
+      <button id="endTurnButton"  disabled>End Turn</button>
 
-  <form id="userForm" action="">
-    <div id="chooseTeamBlock">
-      Your team: <select  id="userTeam" name="userTeam">
-        <option value="0">Observer, no team</option>
-        <option value="1" style="color: red;">Red team</option>
-        <option value="2" style="color: blue;">Blue team</option>
-        </select>
-        <button>Join</button>
-      </div>
-      <div id="challengeBlock" style="display:none;">
-        
-        Challenge: <input type="text" id="challenge" name="challenge" disabled /> &nbsp;&nbsp; Attempts:&nbsp;<input type="text" id="clicks" name="clicks" maxlength="2" size="2" disabled /><button>Send</button>
-      </div>
-      <br /><br />
-    </form>
+      <form id="userForm" action="">
+        <div id="chooseTeamBlock">
+          Your team: <select  id="userTeam" name="userTeam">
+            <option value="0">Observer, no team</option>
+            <option value="1" style="color: red;">Red team</option>
+            <option value="2" style="color: blue;">Blue team</option>
+          </select>
+          <button>Join</button>
+        </div>
+        <div id="challengeBlock" style="display:none;">
+          Challenge: <input type="text" id="challenge" name="challenge" disabled /> &nbsp;&nbsp; Attempts:&nbsp;<input type="text" id="clicks" name="clicks" maxlength="2" size="2" disabled /><button>Send</button>
+        </div>
+        <br /><br />
+      </form>
+    </div>
     System Log:<br/>
   <div class="chat_msg">
     <ul id="system_messages"></ul>
@@ -160,7 +162,7 @@
   </div>
     <div class="user_chat">
       <form id="chatForm" action="">
-        Your name: <input type="text" id="userName" name="userName" disabled />
+        Your name: <input type="text" id="userNameBox" name="userNameBox" disabled />
           <input id="input" autocomplete="off" /><button>Send</button>
     </form>
         User Chat:<br/>

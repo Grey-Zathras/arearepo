@@ -161,15 +161,16 @@ window.onload = function() {
       }
     } 
 
-  var chatForm = document.getElementById('chatForm');
-  var userForm = document.getElementById('userForm');
-  var input = document.getElementById('input');
-  
-  //var roomInput = document.getElementById('room');
-  document.getElementById('userName').value = userName;
+    //var chatForm = document.getElementById('chatForm');
+    //var userForm = document.getElementById('userForm');
+    //var input = document.getElementById('input');
+    
+    //var roomInput = document.getElementById('room');
+    //document.getElementById('userNameBox').value = userName;
+    userNameBox.value = userName;
 
-  // Join a room
-  //document.getElementById('joinRoom').onclick = function() {
+    // Join a room
+    //document.getElementById('joinRoom').onclick = function() {
     //var room = roomInput.value;
     socket.emit('join room', { room: room, user: userName, room_id: room_id, user_id: userID  });
     socket.emit('chat message', { room: room, msg: "welcome to chat" , user: userName, msgclass:"sysmsg"});
@@ -461,8 +462,8 @@ window.onload = function() {
     //if (ok_to_leave)
        socket.emit('leave room', { room: room, msg: "user left the room", user: userName, });
   });
-*/
-homelink.addEventListener('click', function(e) {
+  */
+  homelink.addEventListener('click', function(e) {
     var confirmationMessage = 'Are you sure you want to leave the room?';
     const res = window.confirm(confirmationMessage);
     if (res) {
@@ -472,7 +473,13 @@ homelink.addEventListener('click', function(e) {
     } else {
         e.preventDefault();
     }
-});
+  });
+  reconnectButton.addEventListener('click', function(e) {
+        //socket.emit('leave room', { room: room, msg: "user left the room", user: userName, });
+        window.onbeforeunload = undefined;
+        ok_to_leave=1;
+        location.reload();
+  });
  
   // card click event listener
   card_table.querySelectorAll('.card').forEach(item => {
