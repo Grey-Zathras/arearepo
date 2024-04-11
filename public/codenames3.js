@@ -376,6 +376,7 @@ window.onload = function() {
         }
           challengeBlock.style.display = "contents";
         totalclicks.innerText=data.room.clicks[my_team];
+        secretCheckbox.style.display = "block";
         yourteam.style.display = "contents";
         yourteam.innerHTML=`<span class="${memberTagID[my_team]}">${teams_list[my_team]}&nbsp;Team</span>`;
         if (data.room.active_team==my_team && !data.room.step) { // challedge phase
@@ -410,6 +411,7 @@ window.onload = function() {
         } 
         game_progress.style.display = "none";
         challengeBlock.style.display = "none";
+        secretCheckbox.style.display = "none";
         chooseTeamBlock.style.display = "contents";
 
         let game_str="";
