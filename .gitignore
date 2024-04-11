@@ -132,3 +132,8 @@ dist
 # my config files
 db.js
 package-lock.json
+
+# random files
+codenames04.html
+test.html
+test1.js
