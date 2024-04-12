@@ -16,6 +16,7 @@ body  {
     padding-right: 3px;
     display: inline-block;
     pointer-events: none; /* Important!! - not to intract, not to click */
+    font-family: Songer Condensed Extra Bold;
 }
 .inactive{
     text-decoration: overline;
@@ -195,6 +196,82 @@ td.card_choice_no_concent {
     font-size: smaller;
     font-style: oblique;
 }
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% 30%; /* 5% from the top and centered */
+    padding: 10px 20px;
+    border: 1px solid #888;
+    width: 40%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  line-height: 20px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+  
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+}
+  
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
 html {
     line-height: 1.5;
     -webkit-text-size-adjust: 100%;
@@ -206,6 +283,42 @@ html {
     font-feature-settings: normal;
     font-variation-settings: normal
 }
+@media only screen and (min-width: 800px) {
+    .card_text {
+        font-size: 1.275rem;
+        line-height: 1.25rem
+    }
+   .log_area{
+        font-size: .875rem;
+    line-height: 1.25rem;
+    }
+}
+@media (min-width: 650px) and (max-width: 800px) {
+    .log_area .teams{
+        font-size: .675rem;
+      }
+}
+@media only screen and (min-width: 920px) {
+    .card_text {
+        font-size: 1.575rem;
+        line-height: 1.25rem
+    }
+}
+@media  (min-width: 1200px) {
+    .card_text {
+        font-size: 1.875rem;
+        line-height: 1.25rem
+    }
+}
+@font-face {
+    font-family: "Songer Condensed Extra Bold";
+    src: url("https://cdn.glitch.global/14b90c05-0271-44f7-9887-e76ca7c2d88c/SONGERCondensed-ExtraBold.woff2?v=1712954170274")format("woff2"),
+    url("https://cdn.glitch.global/14b90c05-0271-44f7-9887-e76ca7c2d88c/SONGERCondensed-ExtraBold.woff?v=1712954162485")format("woff"),
+    url("https://cdn.glitch.global/14b90c05-0271-44f7-9887-e76ca7c2d88c/SONGERCondensed-ExtraBold.ttf?v=1712954153054")format("truetype");
+}
+
+
+/* 
 @media only screen and (max-width: 800px) {
     .card_text {
         font-size: .875rem;
@@ -221,7 +334,6 @@ html {
         font-size: .675rem;
       }
 }
-/* 
 @media (min-width: 640px) {
     .card_text {
         font-size: 1.875rem;
