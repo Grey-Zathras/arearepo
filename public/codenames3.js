@@ -544,5 +544,9 @@ window.onload = function() {
   modalCloseButton.onclick = function(event) {
     modal.style.display = "none";
   }
-
+  kickUserButton.onclick = function() {
+    //modal.style.display = "none";
+    console.log('kick user', { room: room, msg: "host kicks the user:", host: userName, user:modalUserList.value });
+    socket.emit('kick user', { room: room, msg: "host kicks the user:", host: userName, user:modalUserList.value });    
+  }
 };
