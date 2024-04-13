@@ -17,10 +17,10 @@
 </head>
 <body>
   <div class="header">
-  <h1>Room name: <%= room.title %></h1>
   <div class="navigation">
     <a href="/" id="homelink">Back to home</a>
   </div>
+  <h1>Room name: <%= room.title %></h1>
   <p><%= room.content %> </p>
   </div>
   <div>
@@ -113,66 +113,66 @@
 
   </div>
   <div class="log_area" >
-  <div class="chat_header">
-    <div class="host">
-      Room host:  <span id="host"></span> <button id="startButton" disabled>Start game</button> <button id="stopButton" disabled style="display:none;">Stop game</button> 
-      <button id="manageUsersButton" disabled>Manage Room</button>
-    </div>
-      <div class="div-table teams" >
-      <div class="div-table-row" >
-        <div class="div-table-col Observers">
-          Observers
-          <div class="members" id="Observers">
+    <div class="chat_header">
+      <div class="host">
+        Room host:  <span id="host"></span> <button id="startButton" disabled>Start game</button> <button id="stopButton" disabled style="display:none;">Stop game</button> 
+        <button id="manageUsersButton" disabled>Manage Room</button>
+      </div>
+        <div class="div-table teams" >
+        <div class="div-table-row" >
+          <div class="div-table-col Observers">
+            Observers
+            <div class="members" id="Observers">
+            </div>
           </div>
-        </div>
-        <div class="div-table-col Red_team" >
-          Red&nbsp;Team
-          <div class="members" id="Red_team">
+          <div class="div-table-col Red_team" >
+            Red&nbsp;Team
+            <div class="members" id="Red_team">
+            </div>
           </div>
-        </div>
-        <div class="div-table-col Blue_team">
-          Blue&nbsp;Team
-          <div class="members" id="Blue_team">
+          <div class="div-table-col Blue_team">
+            Blue&nbsp;Team
+            <div class="members" id="Blue_team">
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="userControl"  >
-      <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
-      <button id="reconnectButton">Reconnect</button>
-      <button id="endTurnButton"  disabled>End Turn</button>
+      <div class="userControl"  >
+        <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
+        <button id="reconnectButton">Reconnect</button>
+        <button id="endTurnButton"  disabled>End Turn</button>
 
-      <form id="userForm" action="">
-        <div id="chooseTeamBlock">
-          Your team: <select  id="userTeam" name="userTeam">
-            <option value="0">Observer, no team</option>
-            <option value="1" style="color: red;">Red team</option>
-            <option value="2" style="color: blue;">Blue team</option>
-          </select>
-          <button>Join</button>
-        </div>
-        <div id="challengeBlock" style="display:none;">
-          Challenge: <input type="text" id="challenge" name="challenge" disabled /> &nbsp;&nbsp; Attempts:&nbsp;<input type="text" id="clicks" name="clicks" maxlength="2" size="2" disabled /><button>Send</button>
-        </div>
-        <br /><br />
-      </form>
+        <form id="userForm" action="">
+          <div id="chooseTeamBlock" style="white-space: nowrap;">
+            Choose&nbsp;team: <select  id="userTeam" name="userTeam">
+              <option value="0">Observer, no team</option>
+              <option value="1" style="color: red;">Red team</option>
+              <option value="2" style="color: blue;">Blue team</option>
+            </select>
+            <button>Join</button>
+          </div>
+          <div id="challengeBlock" style="display:none;">
+            Challenge: <input type="text" id="challenge" name="challenge" disabled /> <br/> 
+            Attempts:&nbsp;<input type="text" id="clicks" name="clicks" maxlength="2" size="2" disabled /><button>Send</button>
+          </div>
+        </form>
+      </div>
+      System Log:<br/>
+      <div class="chat_msg">
+        <ul id="system_messages"></ul>
+      </div>
     </div>
-    System Log:<br/>
-  <div class="chat_msg">
-    <ul id="system_messages"></ul>
-  </div>
-  </div>
-    <div class="user_chat">
-      <form id="chatForm" action="">
-        Your name: <input type="text" id="userNameBox" name="userNameBox" disabled />
+      <div class="user_chat">
+        <form id="chatForm" action="">
+          Your name: <input type="text" id="userNameBox" name="userNameBox" disabled />
           <input id="input" autocomplete="off" /><button>Send</button>
-    </form>
+        </form>
         User Chat:<br/>
-    <div class="chat_msg">
-      <ul id="chat_messages"></ul>
+        <div class="chat_msg">
+          <ul id="chat_messages"></ul>
+        </div>
+      </div>
   </div>
-    </div>
-</div>
 </div>
 <!-- The Modal -->
 <div id="myModal" class="modal">
