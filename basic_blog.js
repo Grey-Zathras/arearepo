@@ -21,7 +21,7 @@ const socketIo = require('socket.io');
 const { app, server, io, teams_list, step_verbs, wordList, isInt } = require("./utils/glbl_objcts.js");
 const gameLogic = require('./utils/game_logic');
 const cardGenerator = require('./utils/card_generator');
-const { addUser, removeUser, getUser, getUsersInRoom,updateUser } = require("./utils/users");
+const { addUser, removeUser, getUser, getUsersInRoom, getUserByRoomAndName, updateUser } = require("./utils/users");
 const { addRoom, removeRoom, getRoom, updateRoom } = require("./utils/rooms");
 const codenames_DB = require('./db');
 
@@ -445,29 +445,46 @@ io.on('connection', (socket) => {
       socket.emit('error message',  err);
       //socket.emit('error message',  `unknown error ${err}`);
     }
-});
-  
+  });
+    
   socket.on('leave room', async  (data) => {
     var userleft;
     if (data.userid) {
       userleft=removeUser(data.userid);
     } else if (socket.data.user_id){
-       userleft=removeUser(socket.data.user_id);
-   } 
-   if (typeof userleft === "undefined" ) {
-     userleft="undefined";
-   }
+      userleft=removeUser(socket.data.user_id);
+    } 
+    if (typeof userleft === "undefined" ) {
+      userleft="undefined";
+    }
     
     console.log('leave room - userleft:',userleft);
     try { //|| !userleft.room
       let the_room=getRoom(userleft.room);
       gameLogic.kickUserFromTheRoom(the_room,userleft,socket);
       //socket.leave(userleft.room);
-  } 
-  catch (err) {
-    console.log("no room found to leave for 'userleft'",userleft, "socket.data",socket.data, "data",data,err);
-  }
-});
+    } 
+    catch (err) {
+      console.log("no room found to leave for 'userleft'",userleft, "socket.data",socket.data, "data",data,err);
+    }
+  });
+    
+  socket.on('kick user', async  (data) => {
+    try {
+      console.log("kick user request", "socket.data",socket.data, "data",data);
+      gameLogic.checkSocketDataUserIDReady(socket);
+      const user = gameLogic.getUserFromSocket(socket);
+      //let the_room=gameLogic.getRoomWithTeamsReady(socket);
+      let the_room=getRoom(socket.data.room_id);
+      gameLogic.checkHost({user:user, room:the_room });
+      //const users = gameLogic.getUsersInRoom(the_room.id, 0);
+      const userleft = getUserByRoomAndName({room:the_room.id, username:data.user, strcit:1});
+
+    } catch (err) {
+      console.log(socket.id,`challenge request error:`,err);
+      socket.emit('error message',  err);
+    }
+  });
 
   // Listen for chat messages and emit to the room
   socket.on('chat message', (data) => {
@@ -501,6 +518,7 @@ io.on('connection', (socket) => {
   });
 });
 
+//process.env.PORT 
 server.listen(3000, () => {
   console.log('listening chat server on *:3000');
 });

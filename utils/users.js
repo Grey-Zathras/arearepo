@@ -1,5 +1,25 @@
 const users = [];
 
+function ciEquals(a, b) {
+    return typeof a === 'string' && typeof b === 'string'
+        ? a.localeCompare(b, undefined, { sensitivity: 'base' }) === 0
+        : a === b; // sensitivity: 'accent'
+}
+
+const getUserByRoomAndName =  ({room, username,strict}) => {
+  var existingUser;
+  if (strict){
+    existingUser = users.find(user => {
+      return user.room === room && user.username == username;
+    });
+  } else {
+    existingUser = users.find(user => {
+      return user.room === room && ciEquals(user.username, username);
+    });
+  } 
+  return existingUser;
+};
+
 const addUser = ({ id, username, room }) => {
   // Clean the data
   
@@ -13,11 +33,9 @@ const addUser = ({ id, username, room }) => {
     };
   }
 
-  // Check for existing user
-  const existingUser = users.find(user => {
-    return user.room === room && user.username === username;
-  });
-
+  // Check for existing user 
+  const existingUser = getUserByRoomAndName({room:room, username:username, strict:0});
+  
   // Validate username
   if (existingUser) {
     const user = getUser(id);
@@ -86,6 +104,7 @@ module.exports = {
   removeUser,
   getUser,
   getUsersInRoom,
+  getUserByRoomAndName,
   updateUser
 };
 
