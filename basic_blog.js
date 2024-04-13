@@ -18,7 +18,7 @@ const socketIo = require('socket.io');
 //const fsPromises = require('fs/promises')
 //const fs = require('fs');
 
-const { app, server, io, teams_list, step_verbs, wordList, isInt } = require("./utils/glbl_objcts.js");
+const { app, server, io, teams_list, step_verbs, wordList, log_debug_on, isInt } = require("./utils/glbl_objcts.js");
 const gameLogic = require('./utils/game_logic');
 const cardGenerator = require('./utils/card_generator');
 const { addUser, removeUser, getUser, getUsersInRoom, getUserByRoomAndName, updateUser } = require("./utils/users");

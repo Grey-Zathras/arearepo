@@ -1,3 +1,5 @@
+const log_debug_on=1;
+
 const teams_list=["observer","Red","Blue"]; //team membership text for chat
 const step_verbs=["Challenge", "Response"]; // game status terms
 
@@ -32,5 +34,6 @@ module.exports = {
   teams_list,
   step_verbs,
   wordList,
+  log_debug_on,
   isInt
 }

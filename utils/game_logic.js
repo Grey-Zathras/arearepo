@@ -1,5 +1,5 @@
 
-const { app, server, io } = require("./glbl_objcts");
+const { app, server, io, log_debug_on } = require("./glbl_objcts");
 const { addUser, removeUser, getUser, getUsersInRoom,updateUser } = require("./users");
 const { addRoom, removeRoom, getRoom, updateRoom } = require("./rooms");
 const codenames_DB = require('../db');
