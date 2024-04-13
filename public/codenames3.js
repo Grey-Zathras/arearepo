@@ -4,6 +4,7 @@ var card_event=""; // event dumb object
 var my_team=0; // current team 0|1|2
 var game_obj = {}; // game status / room object
 
+/*
 function getCookie(name) {
     var value = "; " + document.cookie;
     var parts = value.split("; " + name + "=");
@@ -19,6 +20,7 @@ function setCookie(name, value, days) {
     }
     document.cookie = name + "=" + (value || "") + expires + "; path=/";
 }
+*/
 
 function addChatLine (text, msgclass=""){
     var item = document.createElement('li');

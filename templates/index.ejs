@@ -3,11 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <title>Code Names Board Game</title>
+  <script type="text/javascript"  src="/utils.js"></script>
+  <script>
+    window.onload = function() {
+      userNameBox.value = getCookie("username");
+    }
+  </script>
+  
   <!-- Link to your stylesheet here -->
 </head>
 <body>
   <h1>Welcome to the Code Names Duet</h1>
-
+  Your name: <input type="text" id="userNameBox" name="userNameBox"  />
+          <button  onclick="setCookie('username', userNameBox.value, 7);">Change</button>
+          <br/><br/>
   <!-- Link to your stylesheet here -->
   <a href="/create">
     <button>Create a Game Room</button>
