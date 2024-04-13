@@ -478,7 +478,9 @@ io.on('connection', (socket) => {
       let the_room=getRoom(socket.data.room_id);
       gameLogic.checkHost({user:user, room:the_room });
       //const users = gameLogic.getUsersInRoom(the_room.id, 0);
-      const userleft = getUserByRoomAndName({room:the_room.id, username:data.user, strcit:1});
+      var userleft = getUserByRoomAndName({room:the_room.id, username:data.user, strict:1});
+      userleft=removeUser(userleft.id);
+      gameLogic.kickUserFromTheRoom(the_room,userleft,socket);
 
     } catch (err) {
       console.log(socket.id,`challenge request error:`,err);
