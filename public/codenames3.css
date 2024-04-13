@@ -12,8 +12,7 @@ body  {
 .card_text {
     background-color: rgb(182, 171, 117); /* white; */
     text-transform: uppercase;
-    padding-left: 3px;
-    padding-right: 3px;
+    padding: 3px 6px;
     display: inline-block;
     pointer-events: none; /* Important!! - not to intract, not to click */
     font-family: Songer Condensed Extra Bold;
