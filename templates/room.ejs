@@ -114,7 +114,8 @@
   <div class="log_area" >
   <div class="chat_header">
     <div class="host">
-      Room host:  <span id="host"></span> <button id="startButton" disabled>Start game</button> <button id="stopButton" disabled style="display:none;">Stop game</button>
+      Room host:  <span id="host"></span> <button id="startButton" disabled>Start game</button> <button id="stopButton" disabled style="display:none;">Stop game</button> 
+      <button id="manageUsersButton" disabled>Manage Room</button>
     </div>
       <div class="div-table teams" >
       <div class="div-table-row" >
@@ -171,6 +172,23 @@
   </div>
     </div>
 </div>
+</div>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <div class="game_head"><h1>Manage room</h1></div>
+    Select user to expel from room: 
+    <select id="modalUserList">
+      
+    </select> 
+    <button id="kickUserButton">Kick User</button> 
+    <br />
+    <button id="modalCloseButton">Close</button> 
+  </div>
+
 </div>
 </body>
 </html>

@@ -1,27 +1,8 @@
+
 var ok_to_leave=0;
 var card_event=""; // event dumb object 
 var my_team=0; // current team 0|1|2
 var game_obj = {}; // game status / room object
-
-/*
-var chat_messages ??= document.getElementById('chat_messages');
-var system_messages ??= document.getElementById('system_messages');
-var card_table ??= document.getElementById('card_table');
-var challenge ??= document.getElementById('challenge');
-var room ??= "";
-var room_id ??= "";
-var clicks ??= document.getElementById('clicks');
-var userTeam ??= document.getElementById('userTeam');
-var startButton ??= document.getElementById('startButton');
-var challenged_text ??= document.getElementById('challenged_text');
-var startButton ??= document.getElementById('startButton');
-var chooseTeamBlock ??= document.getElementById('chooseTeamBlock');
-var game_progress ??= document.getElementById('game_progress');
-var gamestat ??= document.getElementById('gamestat');
-var activeteam ??= document.getElementById('activeteam');
-var activestep ??= document.getElementById('activestep');
-var turn ??= document.getElementById('turn');
-*/
 
 function getCookie(name) {
     var value = "; " + document.cookie;
@@ -145,6 +126,34 @@ const removeClassFromAllElements = (className) => {
 }
 
 window.onload = function() {
+    /*
+    var chat_messages ??= document.getElementById('chat_messages');
+    var system_messages ??= document.getElementById('system_messages');
+    var card_table ??= document.getElementById('card_table');
+    var challenge ??= document.getElementById('challenge');
+    var room ??= "";
+    var room_id ??= "";
+    var clicks ??= document.getElementById('clicks');
+    var userTeam ??= document.getElementById('userTeam');
+    var startButton ??= document.getElementById('startButton');
+    var challenged_text ??= document.getElementById('challenged_text');
+    var startButton ??= document.getElementById('startButton');
+    var chooseTeamBlock ??= document.getElementById('chooseTeamBlock');
+    var game_progress ??= document.getElementById('game_progress');
+    var gamestat ??= document.getElementById('gamestat');
+    var activeteam ??= document.getElementById('activeteam');
+    var activestep ??= document.getElementById('activestep');
+    var turn ??= document.getElementById('turn');
+    */
+    // Get the modal
+    var modal = document.getElementById("myModal");
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("manageUsersButton");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
     var userName = getCookie("username");
     var userID = getCookie("userid");
     if (!userName) {
@@ -342,6 +351,7 @@ window.onload = function() {
     });
     startButton.disabled=true;
     stopButton.disabled=true;
+    manageUsersButton.disabled=( data.host!=userName);
     if (data.room.game_status>0) { //game started, cannot join the Team
       startButton.style.display="none";
       stopButton.style.display="inline-block";
@@ -511,5 +521,28 @@ window.onload = function() {
     legend_table.style.display = (legend.checked ?"block":"none");
   })
 
+  // When the user clicks on the button, open the modal
+  btn.onclick = function() {
+    modalUserList.innerHTML="";
+    game_obj.users.forEach(user => {
+      var txt = `${user.username} - ${memberTagID[user.team]}`;
+      var opt1= new Option(txt,user.username);
+        modalUserList.add(opt1);
+    });
+    modal.style.display = "block";
+  }
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+  modalCloseButton.onclick = function(event) {
+    modal.style.display = "none";
+  }
 
 };
