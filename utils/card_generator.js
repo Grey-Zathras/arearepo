@@ -57,9 +57,9 @@ function getRandomInt(max) {
         }
     }
     //generate(shuffle) the killers (9-11), randomly shared or not
-    for (var j=0; j<2;j++){
+    for (var i=9; i<12;i++){
         limit--;
-        for (var i=9; i<12;i++){
+        for (var j=0; j<2;j++){
             var n=getRandomInt(limit+1);
             spies[j][i]=cards[j][n];
             cards[j][n] = cards[j][limit];
