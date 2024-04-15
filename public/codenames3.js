@@ -104,9 +104,16 @@ const removeClassFromAllElements = (className) => {
       item1.textContent = username;
       item1.className=activeClass[active];
       document.getElementById(memberTagID[team]).appendChild(item);
-  }
+    }
 
-  function refreshTable(states, role,team){
+    function rebuildTable(new_cards){
+      for (var i=0;i<25;i++){
+        var card = document.getElementById('card['+i+']');
+        card.querySelectorAll("div")[0].innerText=new_cards[i];
+      }
+    }
+
+  function refreshStates(states, role,team){
     if (typeof states === "undefined") {
         for (var i=0;i<25;i++){
             var card = document.getElementById('card['+i+']');
@@ -307,31 +314,26 @@ window.onload = function() {
     addSysMsgLine(data,"errormsg");
   });
 
+  socket.on('new table', function(data) {
+    console.log('new table data', data);
+    rebuildTable(data.cards);
+  });
+
   socket.on('team scheme', function(data) {
     console.log('team scheme data',data);
     if (data.team) {
-      refreshTable();
+      refreshStates();
       my_team=data.team;
-      refreshTable(data.states[my_team-1],"player",(my_team));
-      refreshTable(data.states[2-my_team],"team",(3-my_team));
+      refreshStates(data.states[my_team-1],"player",(my_team));
+      refreshStates(data.states[2-my_team],"team",(3-my_team));
       //addChatLine("welcome to the "+teams_list[my_team]+" team" ,"sysmsg"); //starting game as XXX team
-  } else {
-    if (!my_team){
-      refreshTable();
-      refreshTable(data.states[1],"team",(2));
-      refreshTable(data.states[0],"team",(1));
-    }
-  }
-  /*
-    if (my_team >0 ) {
-        refreshTable(data.states[my_team-1],"player",(my_team));
-        refreshTable(data.states[2-my_team],"team",(3-my_team));
-        addChatLine("welcome to the "+teams_list[my_team]+" team" ,"sysmsg");
     } else {
-        refreshTable(data.states[my_team-1],"team",(my_team));
-        refreshTable(data.states[2-my_team],"team",(3-my_team));
+      if (!my_team){
+        refreshStates();
+        refreshStates(data.states[1],"team",(2));
+        refreshStates(data.states[0],"team",(1));
+      }
     }
-    */
   });
 
   socket.on('userID', function(data) {
@@ -424,7 +426,7 @@ window.onload = function() {
         game_progress.style.display = "none";
         challengeBlock.style.display = "none";
         secretCheckbox.style.display = "none";
-        chooseTeamBlock.style.display = "contents";
+        chooseTeamBlock.style.display = "inline-block";
 
         let game_str="";
         if (game_obj.host == userName) {
@@ -548,7 +550,10 @@ window.onload = function() {
   }
   kickUserButton.onclick = function() {
     //modal.style.display = "none";
-    console.log('kick user', { room: room, msg: "host kicks the user:", host: userName, user:modalUserList.value });
     socket.emit('kick user', { room: room, msg: "host kicks the user:", host: userName, user:modalUserList.value });    
+  }
+  rebuildTableButton.onclick = function() {
+    //modal.style.display = "none";
+    socket.emit('rebuild table request', { room: room, msg: "Let's rebuild the table with the new cards:", user: userName});    
   }
 };

@@ -145,11 +145,16 @@ exports.readStates = async function (the_room_id) {
     }
     return rows;
 }
-exports.writeStates = async function (the_room_id,states) {
+exports.writeStates = async function ({the_room_id,cards,states}) {
     try {
         await codenames_DB.query('BEGIN');
-        const queryText = 'UPDATE rooms SET states=$2 WHERE id = $1';
-        var { rows } = await codenames_DB.query(queryText, [the_room_id,states]);
+        if (cards) {
+          const queryText = 'UPDATE rooms SET states=$2, cards=$3 WHERE id = $1';
+          var { rows } = await codenames_DB.query(queryText, [the_room_id,states,cards]);
+        } else {
+          const queryText = 'UPDATE rooms SET states=$2 WHERE id = $1';
+          var { rows } = await codenames_DB.query(queryText, [the_room_id,states]);
+        }
        
         await codenames_DB.query('COMMIT');
       } catch (e) {
@@ -182,7 +187,7 @@ exports.getStatesRevertTheCard = async function ({the_room,card_id}) {
     if (rows[0].states[2-the_room.active_team][card_id] >3 ) { //4 = spy, 5 = killer
         rows[0].states[the_room.active_team-1][card_id]=rows[0].states[2-the_room.active_team][card_id];
     }
-    exports.writeStates(the_room.id,rows[0].states); //await not needed ?
+    exports.writeStates({the_room_id: the_room.id, states: rows[0].states}); //await not needed ?
     return rows[0].states;
 
     /*

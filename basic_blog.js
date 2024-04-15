@@ -223,6 +223,29 @@ io.on('connection', (socket) => {
     joinTeam(data.team, data);
   });
 
+  socket.on('rebuild table request', async  (data) => {
+    try {
+      console.log("rebuild table request", "socket.data",socket.data, "data",data);
+      gameLogic.checkSocketDataUserIDReady(socket);
+      const user = gameLogic.getUserFromSocket(socket);
+      //let the_room=gameLogic.getRoomWithTeamsReady(socket);
+      let the_room=getRoom(socket.data.room_id);
+      gameLogic.checkHost({user:user, room:the_room });
+      if (the_room.game_status) {
+        throw "Cannot generate new cards and spies, game is still in progress!";
+      }
+
+      var cards = cardGenerator.generateCards25(wordList);
+      var states = cardGenerator.generateSpies();
+      gameLogic.writeStates({the_room_id: the_room.id, states: states, cards: cards});
+      io.to(the_room.room_name).emit('new table',  { room_id: the_room.id, cards: cards}); // no team!
+      io.to(the_room.room_name).emit('system message', { msg: "Table recreated!", user: data.user, msg_type:0}); // general system message
+    } catch (err) {
+      console.log(socket.id,`rebuild table request error: User ${socket.data}, request: ${data} `,err);
+      socket.emit('error message',  err);
+    }
+  });
+
   socket.on('stop game', async  (data) => {
     try {
       console.log("stop game request", "socket.data",socket.data, "data",data);
