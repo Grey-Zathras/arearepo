@@ -64,8 +64,6 @@ function getRandomInt(max) {
             spies[j][i]=cards[j][n];
             cards[j][n] = cards[j][limit];
             cards[j][limit]=spies[j][i];
-            cards[1-j][n] = cards[1-j][limit];
-            cards[1-j][limit]=spies[1-j][i];
         }
     }
 
