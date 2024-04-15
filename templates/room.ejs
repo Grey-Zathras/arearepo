@@ -143,13 +143,16 @@
         <button id="endTurnButton"  disabled>End Turn</button>
 
         <form id="userForm" action="">
-          <div id="chooseTeamBlock" style="white-space: nowrap;">
-            Choose&nbsp;team: <select  id="userTeam" name="userTeam">
-              <option value="0">Observer, no team</option>
-              <option value="1" style="color: red;">Red team</option>
-              <option value="2" style="color: blue;">Blue team</option>
-            </select>
-            <button>Join</button>
+          <div id="chooseTeamBlock" >
+            <div>Choose&nbsp;team: </div>
+            <div>
+              <select  id="userTeam" name="userTeam">
+                <option value="0">Observer, no team</option>
+                <option value="1" style="color: red;">Red team</option>
+                <option value="2" style="color: blue;">Blue team</option>
+              </select>
+              <button>Join</button>
+            </div>
           </div>
           <div id="challengeBlock" style="display:none;">
             Challenge: <input type="text" id="challenge" name="challenge" disabled /> <br/> 
@@ -180,13 +183,15 @@
   <!-- Modal content -->
   <div class="modal-content">
     <span class="close">&times;</span>
-    <div class="game_head"><h1>Manage room</h1></div>
+    <div class="game_head"><h3>Manage room</h3></div>
+    <hr/>
     Select user to expel from room: 
     <select id="modalUserList">
       
     </select> 
     <button id="kickUserButton">Kick User</button> 
     <br />
+    <hr/>
     <button id="modalCloseButton">Close</button> 
   </div>
 

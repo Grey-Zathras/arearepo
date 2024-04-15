@@ -282,6 +282,11 @@ html {
     font-feature-settings: normal;
     font-variation-settings: normal
 }
+@media (min-width: 640px) and (max-width: 800px) {
+    .log_area .teams{
+        font-size: .675rem;
+      }
+}
 @media only screen and (min-width: 800px) {
     .card_text {
         font-size: 1.275rem;
@@ -291,11 +296,6 @@ html {
         font-size: .875rem;
     line-height: 1.25rem;
     }
-}
-@media (min-width: 650px) and (max-width: 800px) {
-    .log_area .teams{
-        font-size: .675rem;
-      }
 }
 @media only screen and (min-width: 920px) {
     .card_text {
