@@ -564,11 +564,20 @@ window.onload = function() {
   kickUserButton.onclick = function() {
     //modal.style.display = "none";
     let userleft =modalUserList.value;
-    socket.emit('kick user request', { room: room, msg: "host kicks the user:", host: userName, user: userleft });
-    for (var i=0; i<modalUserList.length; i++) {
-      if (modalUserList.options[i].value == userleft)
-        modalUserList.remove(i);
-    }    
+    if (userleft==game_obj.host) {
+      var confirmationMessage = 'Are you sure you want to kick yourself?';
+      const res = window.confirm(confirmationMessage);
+        if (!res) {
+          userleft="";
+        }
+    }
+    if (userleft) {
+      socket.emit('kick user request', { room: room, msg: "host kicks the user:", host: userName, user: userleft });
+      for (var i=0; i<modalUserList.length; i++) {
+        if (modalUserList.options[i].value == userleft)
+          modalUserList.remove(i);
+      }    
+    }
   }
   rebuildTableButton.onclick = function() {
     //modal.style.display = "none";
