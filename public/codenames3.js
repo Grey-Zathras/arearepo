@@ -40,98 +40,103 @@ function addChatLine (text, msgclass=""){
 }
 
 function addSysMsgLine (text, msgclass=""){
-    var item = document.createElement('li');
-    if (msgclass==""){
-      item.textContent = text;
-    } else{
-      var item1 = document.createElement('span');
-      item1.className=msgclass;
-      item.appendChild(item1);
-      item1.textContent = text;
-      //console.log(item.outerHTML, text);
-    }
-    system_messages.insertBefore(item, system_messages.firstChild);
-      //messages.appendChild(item);
-      //window.scrollTo(0, document.body.scrollHeight);
-    //window.scrollTo(0, 0); // Scroll to the top to show the newest message
+  var item = document.createElement('li');
+  if (msgclass==""){
+    item.textContent = text;
+  } else{
+    var item1 = document.createElement('span');
+    item1.className=msgclass;
+    item.appendChild(item1);
+    item1.textContent = text;
+    //console.log(item.outerHTML, text);
+  }
+  system_messages.insertBefore(item, system_messages.firstChild);
+    //messages.appendChild(item);
+    //window.scrollTo(0, document.body.scrollHeight);
+  //window.scrollTo(0, 0); // Scroll to the top to show the newest message
 }
 
 function clickTheCard(e) {
-    let rx= /\[(\d+)\]/ ;
-    var card_id = e.target.id.match(rx)[1];
-    console.log("clickTheCard", e.target.id, "id:",card_id);
-    removeClassFromAllElements("my_card_choice");
-    e.target.className=e.target.className +" " + "my_card_choice"; 
-    //socket.emit('card_choice', { room: room, user: userName , user_id: userID, card_id: card_id});
-    socket.emit('card_choice', {  card_id: card_id});
+  let rx= /\[(\d+)\]/ ;
+  var card_id = e.target.id.match(rx)[1];
+  console.log("clickTheCard", e.target.id, "id:",card_id);
+  removeClassFromAllElements("my_card_choice");
+  e.target.className=e.target.className +" " + "my_card_choice"; 
+  //socket.emit('card_choice', { room: room, user: userName , user_id: userID, card_id: card_id});
+  socket.emit('card_choice', {  card_id: card_id});
 }
 
 function noCardConcent(card_response_array){
-    removeClassFromAllElements("card_choice_no_concent");
-    card_response_array.forEach((key)=>{
-        let cardObj=document.getElementById("card["+key+"]");
-        if (!cardObj.classList.contains("my_card_choice")) {
-            cardObj.classList.add("card_choice_no_concent");
-        }
+  removeClassFromAllElements("card_choice_no_concent");
+  card_response_array.forEach((key)=>{
+    let cardObj=document.getElementById("card["+key+"]");
+    if (!cardObj.classList.contains("my_card_choice")) {
+        cardObj.classList.add("card_choice_no_concent");
+    }
+  });
+}
 
-    });
+const countSpies = () => {
+  //let spies=0;
+  //return states[0].filter (state => state==4).length;
+  return card_table.querySelectorAll("td.spy_opened1").length;
 }
 
 const removeClassFromAllElements = (className) => {
-    const allElements = card_table.querySelectorAll('*'); 
-    allElements.forEach(el => el.classList.remove(className));
+  const allElements = card_table.querySelectorAll('*'); 
+  allElements.forEach(el => el.classList.remove(className));
 }
 
-  const activeClass=["inactive","active"]; // member chat status
-  const memberTagID = ["Observers","Red_team", "Blue_team"]; // team membership 
-  const player_class_array=['closed', 'spy', 'killer','civilian', 'spy_opened','killer_opened' ]; // cards on the table
-  const card_verbs=['closed', 'spy', 'killer','Мирный житель', 'Шпион','Киллер' ]; // cards on the table - text for chat
-  //var observer_class_array=[ 'spy_opened','civilian','killer_opened' ]; // cards on the table
-  const teams_list=["observer","Red","Blue"]; //team membership text for chat
-  const step_verbs=["Challenge", "Response"]; // game status terms
-  
-  var socket = io();
+const activeClass=["inactive","active"]; // member chat status
+const memberTagID = ["Observers","Red_team", "Blue_team"]; // team membership 
+const player_class_array=['closed', 'spy', 'killer','civilian', 'spy_opened','killer_opened' ]; // cards on the table
+const card_verbs=['closed', 'spy', 'killer','Мирный житель', 'Шпион','Киллер' ]; // cards on the table - text for chat
+//var observer_class_array=[ 'spy_opened','civilian','killer_opened' ]; // cards on the table
+const teams_list=["observer","Red","Blue"]; //team membership text for chat
+const step_verbs=["Challenge", "Response"]; // game status terms
 
-  function ResetMembers(){
-    for(var i =0; i<3; i++)
-      document.getElementById(memberTagID[i]).innerHTML="";
+var socket = io();
+
+function ResetMembers(){
+  for(var i =0; i<3; i++)
+    document.getElementById(memberTagID[i]).innerHTML="";
+}
+function AddMemberLine ({username, team, active}) {
+  var item = document.createElement('li');
+  var item1 = document.createElement('span');
+  //item1.className=activeClass[active];
+  item.appendChild(item1);
+  item1.textContent = username;
+  item1.className=activeClass[active];
+  document.getElementById(memberTagID[team]).appendChild(item);
+}
+
+function rebuildTable(new_cards){
+  for (var i=0;i<25;i++){
+    var card = document.getElementById('card['+i+']');
+    card.querySelectorAll("div")[0].innerText=new_cards[i];
   }
-  function AddMemberLine ({username, team, active}) {
-      var item = document.createElement('li');
-      var item1 = document.createElement('span');
-      //item1.className=activeClass[active];
-      item.appendChild(item1);
-      item1.textContent = username;
-      item1.className=activeClass[active];
-      document.getElementById(memberTagID[team]).appendChild(item);
-    }
+}
 
-    function rebuildTable(new_cards){
+function refreshStates(states, role,team){
+  if (typeof states === "undefined") {
       for (var i=0;i<25;i++){
-        var card = document.getElementById('card['+i+']');
-        card.querySelectorAll("div")[0].innerText=new_cards[i];
-      }
+          var card = document.getElementById('card['+i+']');
+          card.className="card ";
+        }
+  } else if (role=="player") {
+    for (var i=0;i<25;i++){
+      var card = document.getElementById('card['+i+']');
+      card.className=card.className + " " +player_class_array[states[i] ]+team;
+      //card.className=card.className +" " + player_class_array[states[i] ];
     }
-
-  function refreshStates(states, role,team){
-    if (typeof states === "undefined") {
-        for (var i=0;i<25;i++){
-            var card = document.getElementById('card['+i+']');
-            card.className="card ";
-          }
-    } else if (role=="player") {
+  } else {
       for (var i=0;i<25;i++){
-        var card = document.getElementById('card['+i+']');
-        card.className=card.className + " " +player_class_array[states[i] ]+team;
-        //card.className=card.className +" " + player_class_array[states[i] ];
-      }
-    } else {
-        for (var i=0;i<25;i++){
-            var card = document.getElementById('card['+i+']');
-            card.className=card.className + " " +player_class_array[states[i] ]+team;
-          }
-    
-    }
+          var card = document.getElementById('card['+i+']');
+          card.className=card.className + " " +player_class_array[states[i] ]+team;
+        }
+  
+  }
 }
 
 window.onload = function() {
@@ -369,7 +374,7 @@ window.onload = function() {
       } else {
         gamestat.innerText = "Game Started";
       }
-       
+      spies_left.innerText = 15 - countSpies();       
       activeteam.innerHTML = `<span class="${memberTagID[data.room.active_team]}">${teams_list[data.room.active_team]}&nbsp;Team</span>`;  //teams_list[data.room.active_team];
       activestep.innerText =  step_verbs[data.room.step];
       turn.innerText =  data.room.turn;
@@ -391,7 +396,7 @@ window.onload = function() {
           challengeBlock.style.display = "contents";
         totalclicks.innerText=data.room.clicks[my_team];
         secretCheckbox.style.display = "block";
-        yourteam.style.display = "contents";
+        yourteamContainer.style.display = "contents";
         yourteam.innerHTML=`<span class="${memberTagID[my_team]}">${teams_list[my_team]}&nbsp;Team</span>`;
         if (data.room.active_team==my_team && !data.room.step) { // challedge phase
             challengeBlock.querySelector("button").disabled=false;
@@ -412,7 +417,7 @@ window.onload = function() {
         challengeBlock.disabled=true;
         challenge.disabled=true;
         clicks.disabled=true;
-        yourteam.style.display="none";
+        yourteamContainer.style.display="none";
         challengeBlock.style.display ="none";
         totalclicks.innerText=data.room.clicks[data.room.active_team];
       }
