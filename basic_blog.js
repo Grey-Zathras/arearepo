@@ -511,7 +511,7 @@ io.on('connection', (socket) => {
     }
   });
     
-  socket.on('kick user', async  (data) => {
+  socket.on('kick user request', async  (data) => {
     try {
       console.log("kick user request", "socket.data",socket.data, "data",data);
       gameLogic.checkSocketDataUserIDReady(socket);

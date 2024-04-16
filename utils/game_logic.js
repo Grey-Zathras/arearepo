@@ -219,14 +219,14 @@ exports.kickUserFromTheRoom = async function ({the_room,userleft,socket}) {
         if (the_room.host == userleft.id) {
           const users= getUsersInRoom(the_room.id, 1).filter(user => user.active == 1);
           const res1=users.length;
-          console.log('getUsersInRoom:',users,res1);
+          console.log('kickUserFromTheRoom - getUsersInRoom:',users,res1);
           if (!users.length) {
             console.log("last active user left the room - room will be destroyed");
             io.to(the_room.room_name).emit('system message', { msg: "last active user left the room - room will be destroyed", user: userleft.username });
             removeRoom(the_room.id);
           } else {
             const new_host = users[0];
-            console.log("reassigning host to the 'host':",new_host.username );
+            console.log("kickUserFromTheRoom - reassigning host to the 'host':",new_host.username );
             updateRoom({id:the_room.id, host:new_host.id });
             //let the_room=getRoom(the_room.id);
             exports.roomData({room: the_room , host:new_host.username});
@@ -236,17 +236,22 @@ exports.kickUserFromTheRoom = async function ({the_room,userleft,socket}) {
           exports.roomData({room: the_room });
         }
         if (socket) { //user is leaving
+          socket.disconnect(true);
+          /*
           socket.leave(userleft.room);
           if (userleft.team) {
               socket.leave(userleft.room+userleft.team);
           }
+          */
         } else {  // owner is kicking the user
           const userSockets = await io.of('/').in(the_room.room_name).fetchSockets(); // await ?
-          console.log(`kickUserFromTheRoom debug: the_room ${the_room}, userleft: ${userleft} `,"userSockets",userSockets);
+          //console.log(`kickUserFromTheRoom debug: the_room ${the_room}, userleft: ${userleft} `,"userSockets",userSockets);
           const userSocket = userSockets.find(the_socket => the_socket.data.user_id.toString() === userleft.id);
-          console.log(`kickUserFromTheRoom debug: the_room ${the_room}, userleft: ${userleft} `,"userSocket",userSocket);
-          userSocket.disconnect(true);
-    
+          //console.log(`kickUserFromTheRoom debug: the_room ${the_room}, userleft: ${userleft} `,"userSocket",userSocket);
+          if (userSocket) {
+            userSocket.emit('go away', { msg: "host kicked you from the room" });
+            userSocket.disconnect(true);
+          }
         }
     } catch (err) {
         console.log(`kickUserFromTheRoom error:  the_room ${the_room}, userleft: ${userleft} `,err);

@@ -319,6 +319,14 @@ window.onload = function() {
     addSysMsgLine(data,"errormsg");
   });
 
+  socket.on('go away', function(data) {
+    console.log('go away',data,"socket.id",socket.id );
+
+    window.onbeforeunload = undefined;
+    ok_to_leave=1;
+    window.location.href="/";
+  });
+
   socket.on('new table', function(data) {
     console.log('new table data', data);
     rebuildTable(data.cards);
@@ -556,7 +564,7 @@ window.onload = function() {
   kickUserButton.onclick = function() {
     //modal.style.display = "none";
     let userleft =modalUserList.value;
-    socket.emit('kick user', { room: room, msg: "host kicks the user:", host: userName, user: userleft });
+    socket.emit('kick user request', { room: room, msg: "host kicks the user:", host: userName, user: userleft });
     for (var i=0; i<modalUserList.length; i++) {
       if (modalUserList.options[i].value == userleft)
         modalUserList.remove(i);
