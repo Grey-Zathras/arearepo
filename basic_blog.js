@@ -246,6 +246,25 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('delete room', async  (data) => {
+    try {    
+      gameLogic.checkSocketDataUserIDReady(socket);
+      const user = gameLogic.getUserFromSocket(socket);
+      //let the_room=gameLogic.getRoomWithTeamsReady(socket);
+      let the_room=getRoom(socket.data.room_id);
+      gameLogic.checkHost({user:user, room:the_room });
+      if (the_room.game_status) {
+        throw "Cannot delete room, game is still in progress!";
+      }
+
+      //io.socketsLeave("room1");
+
+    } catch (err) {
+      console.log(socket.id,`delete room request error: User ${socket.data}, request: ${data} `,err);
+      socket.emit('error message',  err);
+    }
+  });
+
   socket.on('stop game', async  (data) => {
     try {
       console.log("stop game request", "socket.data",socket.data, "data",data);
@@ -453,7 +472,7 @@ io.on('connection', (socket) => {
       if (!user.team) {
         // leave the room
         var userleft=removeUser(user.id);
-        gameLogic.kickUserFromTheRoom(the_room,userleft,socket);
+        gameLogic.kickUserFromTheRoom({the_room: the_room, userleft: userleft, socket: socket});
       } else {
         updateUser ( { id:user.id, active:0 });
         gameLogic.roomData({room: the_room });
@@ -484,7 +503,7 @@ io.on('connection', (socket) => {
     console.log('leave room - userleft:',userleft);
     try { //|| !userleft.room
       let the_room=getRoom(userleft.room);
-      gameLogic.kickUserFromTheRoom(the_room,userleft,socket);
+      gameLogic.kickUserFromTheRoom({the_room: the_room, userleft: userleft, socket: socket});
       //socket.leave(userleft.room);
     } 
     catch (err) {
@@ -503,7 +522,7 @@ io.on('connection', (socket) => {
       //const users = gameLogic.getUsersInRoom(the_room.id, 0);
       var userleft = getUserByRoomAndName({room:the_room.id, username:data.user, strict:1});
       userleft=removeUser(userleft.id);
-      gameLogic.kickUserFromTheRoom(the_room,userleft,socket);
+      gameLogic.kickUserFromTheRoom({the_room,userleft});
 
     } catch (err) {
       console.log(socket.id,`challenge request error:`,err);

@@ -208,7 +208,7 @@ exports.getStatesRevertTheCard = async function ({the_room,card_id}) {
       
 }
 
-exports.kickUserFromTheRoom =  function (the_room,userleft,socket) {
+exports.kickUserFromTheRoom = async function ({the_room,userleft,socket}) {
     try {
         if (!userleft) {
             throw ("no user data to clean");
@@ -235,12 +235,21 @@ exports.kickUserFromTheRoom =  function (the_room,userleft,socket) {
         } else {
           exports.roomData({room: the_room });
         }
-        socket.leave(userleft.room);
-        if (userleft.team) {
-            socket.leave(userleft.room+userleft.team);
+        if (socket) { //user is leaving
+          socket.leave(userleft.room);
+          if (userleft.team) {
+              socket.leave(userleft.room+userleft.team);
+          }
+        } else {  // owner is kicking the user
+          const userSockets = await io.of('/').in(the_room.room_name).fetchSockets(); // await ?
+          console.log(`kickUserFromTheRoom debug: the_room ${the_room}, userleft: ${userleft} `,"userSockets",userSockets);
+          const userSocket = userSockets.find(the_socket => the_socket.data.user_id.toString() === userleft.id);
+          console.log(`kickUserFromTheRoom debug: the_room ${the_room}, userleft: ${userleft} `,"userSocket",userSocket);
+          userSocket.disconnect(true);
+    
         }
     } catch (err) {
-        console.log(socket.id,`kickUserFromTheRoom error:  the_room ${the_room}, userleft: ${userleft} `,err);
+        console.log(`kickUserFromTheRoom error:  the_room ${the_room}, userleft: ${userleft} `,err);
         throw (err);
     }
 }
@@ -256,7 +265,7 @@ exports.delayedUserLeaveTheRoom =  function (the_room,user,socket) {
           }  else {
             console.log("user left the room by timeout - ",the_room, "user",user);
             var userleft=removeUser(user.id);
-            exports.kickUserFromTheRoom(the_room,userleft,socket);
+            exports.kickUserFromTheRoom({the_room: the_room, userleft: userleft, socket: socket});
           }
     } catch (err) {
         console.log(`delayedUserLeaveTheRoom :`,err,"the_room",the_room, "user",user);
