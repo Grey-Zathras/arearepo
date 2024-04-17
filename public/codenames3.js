@@ -579,8 +579,12 @@ window.onload = function() {
       }    
     }
   }
+  deletRooomButton.onclick = function() {
+    modal.style.display = "none";
+    socket.emit('delete room', { room: room, msg: "delete this room", user: userName, room: room});    
+  }
   rebuildTableButton.onclick = function() {
-    //modal.style.display = "none";
+    modal.style.display = "none";
     socket.emit('rebuild table request', { room: room, msg: "Let's rebuild the table with the new cards:", user: userName});    
   }
 };

@@ -125,7 +125,7 @@ app.get('/create', (req, res) => {
 // Route to create a new room
 app.post('/create', async (req, res) => {
   const { title, code } = req.body;
-  console.log(`creating new room  ${title}`); //{req.body}
+  //console.log(`creating new room  ${title}`); //{req.body}
   var cards = cardGenerator.generateCards25(wordList);
   var states = cardGenerator.generateSpies();
   
@@ -134,7 +134,9 @@ app.post('/create', async (req, res) => {
     [title, code, cards, states]
   );
   //res.status(201).json(rows[0]);
-  res.status(201).render('create_confirmation', { room:  req.body });
+  console.log(`creating new room  ${title}`,JSON.stringify(rows[0])); //{req.body}
+  
+  res.status(201).render('create_confirmation', { room:  req.body , rows:rows[0]});
 });
 
 // chat server support
@@ -256,9 +258,17 @@ io.on('connection', (socket) => {
       if (the_room.game_status) {
         throw "Cannot delete room, game is still in progress!";
       }
+      const users = getUsersInRoom(the_room.id, 1);
+      users.forEach(userleft => {
+        removeUser(userleft.id);
+         gameLogic.kickUserFromTheRoom({the_room,userleft});  // await ?
+      });      
 
-      //io.socketsLeave("room1");
-
+      io.socketsLeave(the_room.room_name);
+      const { rows } =  codenames_DB.query(
+        'DELETE FROM rooms WHERE id = $1 RETURNING *',
+        [the_room.id]
+      ); //no await
     } catch (err) {
       console.log(socket.id,`delete room request error: User ${socket.data}, request: ${data} `,err);
       socket.emit('error message',  err);
