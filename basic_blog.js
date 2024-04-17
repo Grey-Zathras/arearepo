@@ -22,7 +22,7 @@ const { app, server, io, teams_list, step_verbs, wordList, log_debug_on, isInt }
 const gameLogic = require('./utils/game_logic');
 const cardGenerator = require('./utils/card_generator');
 const { addUser, removeUser, getUser, getUsersInRoom, getUserByRoomAndName, updateUser } = require("./utils/users");
-const { addRoom, removeRoom, getRoom, updateRoom } = require("./utils/rooms");
+const { addRoom, removeRoom, getRoom, updateRoom, makeid } = require("./utils/rooms");
 const codenames_DB = require('./db');
 
 //const app = express();
@@ -119,7 +119,7 @@ app.get('/room/:id', async (req, res) => {
 
 // Route to display the form for creating a new room
 app.get('/create', (req, res) => {
-    res.render('create');
+    res.render('create', {code: makeid(6)});
   });
   
 // Route to create a new room

@@ -10,13 +10,13 @@
   <form action="/create" method="POST">
     <div>
       <label for="title">Title:</label>
-      <input type="text" id="title" name="title" required>
+      <input type="text" id="title" name="title" required><br>
     </div>
-    <div>
+    <div style="display: none;">
       <label for="code">Code:</label>
-      <input id="code" name="code" required></textarea>
+      <input id="code" name="code" required value="<%= code %>" maxlength="8" size="8"><br><br>
     </div>
-    <button type="submit">Create Room</button>
+    <button type="submit">Create Room</button><br><br>
   </form>
   <a href="/">Back to home</a>
 </body>
