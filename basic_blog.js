@@ -478,19 +478,11 @@ io.on('connection', (socket) => {
       gameLogic.checkSocketDataUserIDReady(socket);
       const user = gameLogic.getUserFromSocket(socket);
       let the_room=getRoom(user.room);
-      //gameLogic.checkUserHasTeam(user);
-      if (!user.team) {
-        // leave the room
-        var userleft=removeUser(user.id);
-        gameLogic.kickUserFromTheRoom({the_room: the_room, userleft: userleft, socket: socket});
-      } else {
         updateUser ( { id:user.id, active:0 });
         gameLogic.roomData({room: the_room });
         let timeout = setTimeout(function() {
           gameLogic.delayedUserLeaveTheRoom(the_room,user,socket);
         }, 30000); //0.5 min
-        //let timeout = setTimeout(gameLogic.delayedUserLeaveTheRoom(the_room,user), 1500);
-      }
       
     } catch (err) {
       console.log(socket.id,`challenge request error:`,err);

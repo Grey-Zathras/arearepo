@@ -22,7 +22,7 @@ body  {
     font-family: Songer Condensed Extra Bold;
 }
 .inactive{
-    text-decoration: overline;
+    text-decoration: line-through;
 }
 .div-table {
     display: table;         
