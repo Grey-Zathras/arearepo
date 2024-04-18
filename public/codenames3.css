@@ -119,6 +119,9 @@ padding: 10px;
     overflow-y: scroll; 
     height:200px;  /* 20vh; */
 }
+.chat_msg .Blue_team, .chat_msg .Red_team {
+    font-weight: bold;
+}
 @media (min-width: 640px) {
 
 /* responsive table (left area) */

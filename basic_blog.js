@@ -351,7 +351,7 @@ io.on('connection', (socket) => {
       //preparation for the cards selection by all the team members
       gameLogic.resetRoomCardsResponsesMap(the_room);
 
-      io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challenge:`, user: data.user,challenge: data.challenge, clicks: clicks, msg_type:3 }); // system message challenge
+      io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challenge:`, user: data.user, team: user.team, challenge: data.challenge, clicks: clicks, msg_type:3 }); // system message challenge
       gameLogic.roomData({room: the_room });
     } catch (err) {
       console.log(socket.id,`challenge request error:`,err);

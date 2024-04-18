@@ -47,7 +47,8 @@ function addSysMsgLine (text, msgclass=""){
     var item1 = document.createElement('span');
     item1.className=msgclass;
     item.appendChild(item1);
-    item1.textContent = text;
+    item1.innerHTML = text;
+    //item1.textContent = text;
     //console.log(item.outerHTML, text);
   }
   system_messages.insertBefore(item, system_messages.firstChild);
@@ -268,7 +269,8 @@ window.onload = function() {
             break;
         }
         case 3: { // challenge -> card choice
-            msg+=" "+data.challenge+ ", clicks " + data.clicks;
+          msg+=` <span class="${memberTagID[data.team]}"> ${data.challenge}</span>, clicks ${data.clicks}`;
+          //msg+=" "+data.challenge+ ", clicks " + data.clicks;
             challenged_text.innerText=data.challenge;
             if (my_team) {
               card_event=clickTheCard;
