@@ -397,10 +397,13 @@ window.onload = function() {
         if (game_obj.room.active_team==my_team && data.room.step ) { // Response step and my team
           card_event=clickTheCard;
           card_table.classList.add("team"+(3-my_team)); // for hover css
-          endTurnButton.disabled=false; 
         } else { // not my team  - or challenge phase
           card_event="";
           card_table.classList.remove("team"+(3-my_team));
+        }
+        if (game_obj.room.active_team==my_team ) {
+          endTurnButton.disabled=false; 
+        } else {
           endTurnButton.disabled=true;
         }
           challengeBlock.style.display = "contents";
