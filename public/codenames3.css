@@ -115,7 +115,10 @@ font-size: 1.8em;
 border: 1px solid;
 padding: 10px; 
 }
-
+.chat_msg {
+    overflow-y: scroll; 
+    height:200px;  
+}
 @media (min-width: 640px) {
 
 /* responsive table (left area) */
