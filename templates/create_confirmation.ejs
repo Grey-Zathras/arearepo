@@ -3,11 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <title>Room created</title>
+  <link rel="stylesheet"  type="text/css" href="/codenames3.css">
+  <script>
+    window.onload = function() {
+      newRoomLink.click();
+    }
+  </script>
   <!-- Link to your stylesheet here -->
 </head>
 <body>
-  <p>Room <%= room.title %> created</p>
-  <a href="/room/<%= rows.id %>"><%= room.title %></a><br>
+  <p>Room <strong><%= room.title %> created</strong></p>
+  <a href="/room/<%= rows.id %>" id="newRoomLink"><%= room.title %></a><br>
   <a href="/">Back to home</a>
 </body>
 </html>

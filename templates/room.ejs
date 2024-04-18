@@ -17,188 +17,185 @@
 </head>
 <body>
   <div class="header">
-  <div class="navigation">
-    <a href="/" id="homelink">Back to home</a>
-  </div>
-  <h1>Room name: <%= room.title %></h1>
-  <p><%= room.content %> </p>
+    <div class="navigation">
+      <a href="/" id="homelink">Back to home</a>
+    </div>
+    <h1>Room name: <%= room.title %></h1>
   </div>
   <div>
-
-  <div class="cardspace border1">
-    <div class="game_head">
-      <span id="gamestat">Game Not Started</span> &nbsp;&nbsp;&nbsp;
-       <span class="game_progress" id="game_progress">
-        Turn:&nbsp;<span id="turn">0</span>  &nbsp;&nbsp;&nbsp;
-        Spies&nbsp;left:&nbsp;<span id="spies_left"></span>  &nbsp;&nbsp;&nbsp;
-        <span id="yourteamContainer">Your&nbsp;team:&nbsp;<span id="yourteam"></span>  &nbsp;&nbsp;&nbsp;</span>
-        Active&nbsp;team:&nbsp;<span id="activeteam"></span>  &nbsp;&nbsp;&nbsp;
-         Step:&nbsp;<span id="activestep"></span>  &nbsp;&nbsp;&nbsp;
-         Clicks:&nbsp;<span id="totalclicks"></span>  &nbsp;&nbsp;&nbsp;
-         Current&nbsp;challenge:&nbsp;<span id="challenged_text"></span> &nbsp;&nbsp;&nbsp;
-     </span>
-       </div>
+    <div class="cardspace border1">
+      <div class="game_head">
+        <span id="gamestat">Game Not Started</span> &nbsp;&nbsp;&nbsp;
+        <span class="game_progress" id="game_progress">
+          Turn:&nbsp;<span id="turn">0</span>  &nbsp;&nbsp;&nbsp;
+          Spies&nbsp;left:&nbsp;<span id="spies_left"></span>  &nbsp;&nbsp;&nbsp;
+          <span id="yourteamContainer">Your&nbsp;team:&nbsp;<span id="yourteam"></span>  &nbsp;&nbsp;&nbsp;</span>
+          Active&nbsp;team:&nbsp;<span id="activeteam"></span>  &nbsp;&nbsp;&nbsp;
+          Step:&nbsp;<span id="activestep"></span>  &nbsp;&nbsp;&nbsp;
+          Clicks:&nbsp;<span id="totalclicks"></span>  &nbsp;&nbsp;&nbsp;
+          Current&nbsp;challenge:&nbsp;<span id="challenged_text"></span> &nbsp;&nbsp;&nbsp;
+        </span>
+      </div>
   
-    <table class="border1 secret_on" id="card_table" width="100%">
-      <% for(var i =0; i<5; i++) { %>
-        <tr>
-        <% for(var j =0; j<5; j++) { 
-          const ind=(i*5) + (j);
-          %>
-          <td  class="card " id="card[<%= ind %>]">
-            <div class="card_text">
-							<%= room.cards[ind] %>
-						</div> 
-            </td>
+      <table class="border1 secret_on" id="card_table" width="100%">
+        <% for(var i =0; i<5; i++) { %>
+          <tr>
+          <% for(var j =0; j<5; j++) { 
+            const ind=(i*5) + (j);
+            %>
+            <td  class="card " id="card[<%= ind %>]">
+              <div class="card_text">
+                <%= room.cards[ind] %>
+              </div> 
+              </td>
+          <% } %>
+          </tr>
         <% } %>
-        </tr>
-      <% } %>
-    </table>
-    <div id="secretCheckbox" style="display:none;">
-      <label for="secretOn">secret cards On</label>
-      <input type="checkbox" id="secretOn" name="secretOn"  value="secret cards On" checked />
-    </div>
-    <label for="legend">Legend: </label>
-    <input type="checkbox" id="legend" name="legend"  value="Legend On" checked />
-    <table class="border1 secret_on" id="legend_table" width="100%">
-        <tr>
-          <td  class="card spy">
-            <div class="card_text">
-							hidden spy
-						</div> 
-          </td>
-          <td  class="card closed">
-            <div class="card_text">
-							hidden civilian
-						</div> 
-          </td>
-          <td  class="card killer">
-            <div class="card_text">
-							hidden killer
-						</div> 
-          </td>
-        </tr><tr>
-          <td  class="card spy_opened">
-            <div class="card_text">
-							Opened Spy
-						</div> 
-          </td>
-          <td  class="card ">
-            <div class="card_text">
-              closed card
-						</div> 
-          </td>
-          <td  class="card killer_opened">
-            <div class="card_text">
-							Opened Killer
-						</div> 
-          </td>
-        </tr><tr>
-          <td  class="card civilian1">
-            <div class="card_text">
-							Blue Team missed
-						</div> 
-          </td>
-          <td  class="card civilian1 civilian2">
-            <div class="card_text">
-							civilian both Teams
-						</div> 
-          </td>
-          <td  class="card civilian2">
-            <div class="card_text">
-							Red Team missed
-						</div> 
-          </td>
-        </tr>
-    </table>
-
-  </div>
-  <div class="log_area" >
-    <div class="chat_header">
-      <div class="host">
-        Room host:  <span id="host"></span> <button id="startButton" disabled>Start game</button> <button id="stopButton" disabled style="display:none;">Stop game</button> 
-        <button id="manageUsersButton" disabled>Manage Room</button>
+      </table>
+      <div id="secretCheckbox" style="display:none;">
+        <label for="secretOn">secret cards On</label>
+        <input type="checkbox" id="secretOn" name="secretOn"  value="secret cards On" checked />
       </div>
-        <div class="div-table teams" >
-        <div class="div-table-row" >
-          <div class="div-table-col Observers">
-            Observers
-            <div class="members" id="Observers">
+      <label for="legend">Legend: </label>
+      <input type="checkbox" id="legend" name="legend"  value="Legend On" checked />
+      <table class="border1 secret_on" id="legend_table" width="100%">
+          <tr>
+            <td  class="card spy">
+              <div class="card_text">
+                hidden spy
+              </div> 
+            </td>
+            <td  class="card closed">
+              <div class="card_text">
+                hidden civilian
+              </div> 
+            </td>
+            <td  class="card killer">
+              <div class="card_text">
+                hidden killer
+              </div> 
+            </td>
+          </tr><tr>
+            <td  class="card spy_opened">
+              <div class="card_text">
+                Opened Spy
+              </div> 
+            </td>
+            <td  class="card ">
+              <div class="card_text">
+                closed card
+              </div> 
+            </td>
+            <td  class="card killer_opened">
+              <div class="card_text">
+                Opened Killer
+              </div> 
+            </td>
+          </tr><tr>
+            <td  class="card civilian1">
+              <div class="card_text">
+                Blue Team missed
+              </div> 
+            </td>
+            <td  class="card civilian1 civilian2">
+              <div class="card_text">
+                civilian both Teams
+              </div> 
+            </td>
+            <td  class="card civilian2">
+              <div class="card_text">
+                Red Team missed
+              </div> 
+            </td>
+          </tr>
+      </table>
+    </div>
+    <div class="log_area" >
+      <div class="chat_header">
+        <div class="host">
+          Room host:  <span id="host"></span> <button id="startButton" disabled>Start game</button> <button id="stopButton" disabled style="display:none;">Stop game</button> 
+          <button id="manageUsersButton" disabled>Manage Room</button>
+        </div>
+          <div class="div-table teams" >
+          <div class="div-table-row" >
+            <div class="div-table-col Observers">
+              Observers
+              <div class="members" id="Observers">
+              </div>
             </div>
-          </div>
-          <div class="div-table-col Red_team" >
-            Red&nbsp;Team
-            <div class="members" id="Red_team">
+            <div class="div-table-col Red_team" >
+              Red&nbsp;Team
+              <div class="members" id="Red_team">
+              </div>
             </div>
-          </div>
-          <div class="div-table-col Blue_team">
-            Blue&nbsp;Team
-            <div class="members" id="Blue_team">
+            <div class="div-table-col Blue_team">
+              Blue&nbsp;Team
+              <div class="members" id="Blue_team">
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="userControl"  >
-        <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
-        <button id="reconnectButton">Reconnect</button>
-        <button id="endTurnButton"  disabled>End Turn</button>
+        <div class="userControl"  >
+          <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
+          <button id="reconnectButton">Reconnect</button>
+          <button id="endTurnButton"  disabled>End Turn</button>
 
-        <form id="userForm" action="">
-          <div id="chooseTeamBlock" >
-            <div>Choose&nbsp;team: </div>
-            <div>
-              <select  id="userTeam" name="userTeam">
-                <option value="0">Observer, no team</option>
-                <option value="1" style="color: red;">Red team</option>
-                <option value="2" style="color: blue;">Blue team</option>
-              </select>
-              <button>Join</button>
+          <form id="userForm" action="">
+            <div id="chooseTeamBlock" >
+              <div>Choose&nbsp;team: </div>
+              <div>
+                <select  id="userTeam" name="userTeam">
+                  <option value="0">Observer, no team</option>
+                  <option value="1" style="color: red;">Red team</option>
+                  <option value="2" style="color: blue;">Blue team</option>
+                </select>
+                <button>Join</button>
+              </div>
             </div>
-          </div>
-          <div id="challengeBlock" style="display:none;">
-            Challenge: <input type="text" id="challenge" name="challenge" disabled /> <br/> 
-            Attempts:&nbsp;<input type="text" id="clicks" name="clicks" maxlength="2" size="2" disabled /><button>Send</button>
-          </div>
-        </form>
-      </div>
-      System Log:<br/>
-      <div class="chat_msg">
-        <ul id="system_messages"></ul>
-      </div>
-    </div>
-      <div class="user_chat">
-        <form id="chatForm" action="">
-          Your name: <input type="text" id="userNameBox" name="userNameBox" disabled />
-          <input id="input" autocomplete="off" /><button>Send</button>
-        </form>
-        User Chat:<br/>
+            <div id="challengeBlock" style="display:none;">
+              Challenge: <input type="text" id="challenge" name="challenge" disabled /> <br/> 
+              Attempts:&nbsp;<input type="text" id="clicks" name="clicks" maxlength="2" size="2" disabled /><button>Send</button>
+            </div>
+          </form>
+        </div>
+        System Log:<br/>
         <div class="chat_msg">
-          <ul id="chat_messages"></ul>
+          <ul id="system_messages"></ul>
         </div>
       </div>
+        <div class="user_chat">
+          <form id="chatForm" action="">
+            Your name: <input type="text" id="userNameBox" name="userNameBox" disabled />
+            <input id="input" autocomplete="off" /><button>Send</button>
+          </form>
+          User Chat:<br/>
+          <div class="chat_msg">
+            <ul id="chat_messages"></ul>
+          </div>
+        </div>
+    </div>
   </div>
-</div>
-<!-- The Modal -->
-<div id="myModal" class="modal">
+  <!-- The Modal -->
+  <div id="myModal" class="modal">
 
-  <!-- Modal content -->
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <div class="game_head"><h3>Manage room</h3></div>
-    <hr/>
-    Select user to expel from room: 
-    <select id="modalUserList">
-      
-    </select> 
-    <button id="kickUserButton">Kick User</button> 
-    <br />
-    <hr/>
-    <button id="rebuildTableButton">Rebuild Table</button> &nbsp;&nbsp;&nbsp; <button id="deletRooomButton">Delete Room</button> 
-    <br />
-    <hr/>
-    <button id="modalCloseButton">Close</button> 
+    <!-- Modal content -->
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div class="game_head"><h3>Manage room</h3></div>
+      <hr/>
+      Select user to expel from room: 
+      <select id="modalUserList">
+        
+      </select> 
+      <button id="kickUserButton">Kick User</button> 
+      <br />
+      <hr/>
+      <button id="rebuildTableButton">Rebuild Table</button> &nbsp;&nbsp;&nbsp; <button id="deletRooomButton">Delete Room</button> 
+      <br />
+      <hr/>
+      <button id="modalCloseButton">Close</button> 
+    </div>
+
   </div>
-
-</div>
 </body>
 </html>

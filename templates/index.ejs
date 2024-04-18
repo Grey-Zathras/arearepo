@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Code Names Board Game</title>
+  <link rel="stylesheet"  type="text/css" href="/codenames3.css">
   <script type="text/javascript"  src="/utils.js"></script>
   <script>
     window.onload = function() {
@@ -13,19 +14,21 @@
   <!-- Link to your stylesheet here -->
 </head>
 <body>
-  <h1>Welcome to the Code Names Duet</h1>
-  Your name: <input type="text" id="userNameBox" name="userNameBox"  />
-          <button  onclick="setCookie('username', userNameBox.value, 7);">Change</button>
-          <br/><br/>
-  <!-- Link to your stylesheet here -->
-  <a href="/create">
-    <button>Create a Game Room</button>
-  </a>
-  <ul>
-    <% 
-    rooms.forEach(function(room) { %>
-      <li><a href="/room/<%= room.id %>"><%= room.title %></a></li>
-    <% }) %>
-  </ul>
+  <h1>Welcome to the Code&nbsp;Names&nbsp;Duet</h1>
+  <div class="body-main">
+    Your name: <input type="text" id="userNameBox" name="userNameBox"  />
+            <button  onclick="setCookie('username', userNameBox.value, 7);">Change</button>
+            <br/><br/>
+    <!-- Link to your stylesheet here -->
+    <a href="/create">
+      <button>Create a Game Room</button>
+    </a>
+    <ul>
+      <% 
+      rooms.forEach(function(room) { %>
+        <li><a href="/room/<%= room.id %>"><%= room.title %></a></li>
+      <% }) %>
+    </ul>
+  </div>
 </body>
 </html>

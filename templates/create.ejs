@@ -3,21 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <title>Create New Room</title>
-  <!-- Link to your stylesheet here -->
+  <link rel="stylesheet"  type="text/css" href="/codenames3.css">
 </head>
 <body>
-  <h1>Create a New Game Room</h1>
-  <form action="/create" method="POST">
-    <div>
-      <label for="title">Title:</label>
-      <input type="text" id="title" name="title" required><br>
+  <div class="header">
+    <div class="navigation">
+      <a href="/" id="homelink">Back to home</a>
     </div>
-    <div style="display: none;">
-      <label for="code">Code:</label>
-      <input id="code" name="code" required value="<%= code %>" maxlength="8" size="8"><br><br>
-    </div>
-    <button type="submit">Create Room</button><br><br>
-  </form>
-  <a href="/">Back to home</a>
+    <h1>Create a New Game Room</h1>
+  </div>
+  <div class="body-main">
+    <form action="/create" method="POST">
+      <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required><br><br>
+      </div>
+      <div style="display: none;">
+        <label for="code">Code:</label>
+        <input id="code" name="code" required value="<%= code %>" maxlength="8" size="8"><br><br>
+      </div>
+      <button type="submit">Create Room</button><br><br>
+    </form>
+    <a href="/">Back to home</a>
+  </div>
 </body>
 </html>
