@@ -539,27 +539,30 @@ io.on('connection', (socket) => {
   });
   
   socket.on('disconnect', (reason) => {
-    const user = getUser(socket.id);
-    if (user === undefined){
-      console.log("disconnect - socket_data",socket.data);
-      console.log(socket.id,`disconnect - unknown user ${socket.data.user_id} disconnected`, reason);
-    } else  {
-      try {
-        if ( !socket.data.room ) {
-          throw "no room in socket";
-        }
-          const the_room = socket.data.room;
-          updateUser ( { id:socket.id, active:0 });
-          gameLogic.roomData({room: the_room });
-          io.to(the_room.room_name).emit('system message', { msg: `I am disconnected, ${reason}`, user: socket.data.username });
-          let timeout = setTimeout(function() {
-            gameLogic.delayedUserLeaveTheRoom(the_room,user,socket);
-          }, 120000); // 2 min
-          } catch (err) {
-            console.log(socket.id,`disconnect error: User ${socket.data} `,err);
-            //socket.emit('error message',  `unknown error ${err}`);
+    try {
+      let user = getUser(socket.id);
+      if (user === undefined){
+        user = getUser(socket.data.user_id);
+      }
+      if (user === undefined){
+        console.log("disconnect - socket_data",socket.data);
+        console.log(socket.id,`disconnect - unknown user ${socket.data.user_id} disconnected`, reason);
+      } else  {
+          if ( !socket.data.room_id ) {
+            throw "no room in socket";
           }
-          console.log(socket.id,`user ${user.username} disconnected`, reason);
+            const the_room = getRoom(socket.data.room_id);
+            updateUser ( { id:user.id, active:0 });
+            gameLogic.roomData({room: the_room });
+            io.to(the_room.room_name).emit('system message', { msg: `I am disconnected, ${reason}`, user: user.username });
+            let timeout = setTimeout(function() {
+              gameLogic.delayedUserLeaveTheRoom(the_room,user,socket);
+            }, 120000); // 2 min
+            console.log(socket.id,`user ${user.username} disconnected`, reason);
+      }
+    } catch (err) {
+      console.log(socket.id,`disconnect error: User ${socket.data}, reason ${reason}, `,err);
+      //socket.emit('error message',  `unknown error ${err}`);
     }
   });
 });
