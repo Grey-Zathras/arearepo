@@ -591,7 +591,7 @@ window.onload = function() {
       }    
     }
   }
-  deleteRooomButton.onclick = function() {
+  deleteRoomButton.onclick = function() {
     modal.style.display = "none";
     socket.emit('delete room', { room: room, msg: "delete this room", user: userName, room: room});    
   }

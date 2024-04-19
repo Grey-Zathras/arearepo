@@ -1,5 +1,5 @@
 
-const { app, server, io, log_debug_on } = require("./glbl_objcts");
+const { app, server, io, log_debug_on, teams_list } = require("./glbl_objcts");
 const { addUser, removeUser, getUser, getUsersInRoom,updateUser } = require("./users");
 const { addRoom, removeRoom, getRoom, updateRoom } = require("./rooms");
 const codenames_DB = require('../db');
@@ -136,14 +136,20 @@ exports.checkUserTeamIsActive = function (the_room,user) {
       }  
 }
 exports.readStates = async function (the_room_id) {
-    var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [the_room_id]);
-    if (rows.length === 0) {
-        const errmsg= `Room ${the_room_id} not found`;
-        throw (errmsg);
-      //socket.emit('error message',  `Room ${room_id} not found`);
-      //res.status(404).send('Room not found');
-    }
-    return rows;
+  var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [the_room_id]);
+  if (rows.length === 0) {
+      const errmsg= `Room ${the_room_id} not found`;
+      throw (errmsg);
+    //socket.emit('error message',  `Room ${room_id} not found`);
+    //res.status(404).send('Room not found');
+  }
+  if (!Array.isArray(rows[0].states)  ){
+    const errmsg= `Room ${the_room.id} not found`; 
+    throw (errmsg);
+    //socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
+    //console.log(socket.id,` Join Team: User ${socket.data} - Room ${room_id} - game data not found`);
+  }
+  return rows;
 }
 exports.writeStates = async function ({the_room_id,cards,states}) {
     try {
@@ -171,41 +177,18 @@ exports.writeStates = async function ({the_room_id,cards,states}) {
 
 exports.getStatesRevertTheCard = async function ({the_room,card_id}) {
 
-    var rows = await exports.readStates(the_room.id);
+  var rows = await exports.readStates(the_room.id);
 
-    if (!Array.isArray(rows[0].states)  ){
-        const errmsg= `Room ${the_room.id} not found`; 
-        throw (errmsg);
-        //socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
-        //console.log(socket.id,` Join Team: User ${socket.data} - Room ${room_id} - game data not found`);
-    }
-    if (rows[0].states[2-the_room.active_team][card_id] >2 ) {
-        const errmsg= `Card ${the_room.id} is already opened`;
-        throw (errmsg);
-    }
-    rows[0].states[2-the_room.active_team][card_id]+=3;
-    if (rows[0].states[2-the_room.active_team][card_id] >3 ) { //4 = spy, 5 = killer
-        rows[0].states[the_room.active_team-1][card_id]=rows[0].states[2-the_room.active_team][card_id];
-    }
-    exports.writeStates({the_room_id: the_room.id, states: rows[0].states}); //await not needed ?
-    return rows[0].states;
-
-    /*
-        //console.dir(rows[0].states);
-        updateUser ( { id:socket.data.user_id, active:1,team: team_id});
-        const the_room=getRoom(room_id);
-        exports.roomData({room: the_room });
-        // socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states[team_id-1]});
-        const forbidden=[1,2];
-        rows[0].states[2-team_id].forEach((state,index) => {
-          // cleanup spies
-          if (forbidden.includes(state) ){
-            rows[0].states[2-team_id][index]=0;
-          }
-        });
-        socket.emit('team scheme',  { room_id: room_id,team:team_id, states: rows[0].states});
-    */
-      
+  if (rows[0].states[2-the_room.active_team][card_id] >2 ) {
+      const errmsg= `Card ${the_room.id} is already opened`;
+      throw (errmsg);
+  }
+  rows[0].states[2-the_room.active_team][card_id]+=3;
+  if (rows[0].states[2-the_room.active_team][card_id] >3 ) { //4 = spy, 5 = killer
+      rows[0].states[the_room.active_team-1][card_id]=rows[0].states[2-the_room.active_team][card_id];
+  }
+  exports.writeStates({the_room_id: the_room.id, states: rows[0].states}); //await not needed ?
+  return rows[0].states;      
 }
 
 exports.kickUserFromTheRoom = async function ({the_room,userleft,socket}) {
@@ -332,12 +315,18 @@ exports.countHiddenSPies =  function (states) {
   return hidden_spies;
 }
 
-exports.endTurn =  function (the_room) {
+exports.endTurn =  function (the_room, states) {
   if ( !the_room.step ) {  //the Challenge step
     the_room.active_team=3-the_room.active_team;
   }
   the_room.turn++;
-  the_room.step = 0; //now is the Challenge step 
+  the_room.step = 0; //now is the Challenge step
+  //states[the_room.active_team-1].filter 
+  let count = states[the_room.active_team-1].reduce((total,x) => total+(x==1), 0);
+  if (!count){
+    io.to(the_room.room_name).emit('system message', { msg: `${teams_list[the_room.active_team] } team has no more spies!`, user: "game", msg_type:0 }); // system message / general
+    the_room.active_team=3-the_room.active_team;
+  } 
   exports.resetRoomCardsResponsesMap(the_room);
 }
 
