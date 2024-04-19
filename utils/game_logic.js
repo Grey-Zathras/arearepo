@@ -290,45 +290,54 @@ exports.getRoomStates = async function (room_id) {
 }
 
 exports.getTeamStates = async function ({room_id,team_id,states_unsecured}) {
-    if (!Array.isArray(states_unsecured)) {
-        states_unsecured = await exports.getRoomStates(room_id); 
-    }
-    //console.log("getTeamStates, states_unsecured:", states_unsecured);     
-    var states = [];
-    states[0]=states_unsecured[0].slice();
-    states[1]=states_unsecured[1].slice();
-    
-    const forbidden=[1,2];
-    if (team_id) {
-      states[2-team_id].forEach((state,index) => {
-        // cleanup spies
-        if (forbidden.includes(state) ){
-          states[2-team_id][index]=0;
-        }
-      });
-    } else {
-      // secure both teams
-      states.forEach((arr) => {
-        arr.forEach((state,index) => {
-          if (forbidden.includes(state) ){
-            arr[index]=0;
-          }
-        });
-      });
-    }
-    //console.log(`getTeamStates,team_id, ${team_id}, states:`, states);     
-    return states;
+  if (!Array.isArray(states_unsecured)) {
+      states_unsecured = await exports.getRoomStates(room_id); 
   }
-
-  exports.countHiddenSPies =  function (states) {
-    let hidden_spies=0;
+  //console.log("getTeamStates, states_unsecured:", states_unsecured);     
+  var states = [];
+  states[0]=states_unsecured[0].slice();
+  states[1]=states_unsecured[1].slice();
+  
+  const forbidden=[1,2];
+  if (team_id) {
+    states[2-team_id].forEach((state,index) => {
+      // cleanup spies
+      if (forbidden.includes(state) ){
+        states[2-team_id][index]=0;
+      }
+    });
+  } else {
+    // secure both teams
     states.forEach((arr) => {
       arr.forEach((state,index) => {
-        if (state==1 ){
-          hidden_spies++;
+        if (forbidden.includes(state) ){
+          arr[index]=0;
         }
       });
     });
-    return hidden_spies;
+  }
+  //console.log(`getTeamStates,team_id, ${team_id}, states:`, states);     
+  return states;
+}
+
+exports.countHiddenSPies =  function (states) {
+  let hidden_spies=0;
+  states.forEach((arr) => {
+    arr.forEach((state,index) => {
+      if (state==1 ){
+        hidden_spies++;
+      }
+    });
+  });
+  return hidden_spies;
+}
+
+exports.endTurn =  function (the_room) {
+  if ( !the_room.step ) {  //the Challenge step
+    the_room.active_team=3-the_room.active_team;
+  }
+  the_room.turn++;
+  the_room.step = 0; //now is the Challenge step 
+  exports.resetRoomCardsResponsesMap(the_room);
 }
 
