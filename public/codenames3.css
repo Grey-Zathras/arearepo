@@ -122,6 +122,12 @@ padding: 10px;
 .chat_msg .Blue_team, .chat_msg .Red_team {
     font-weight: bold;
 }
+#system_messages.team1 .Blue_team, #system_messages.team2 .Red_team{
+  /*   background-color: yellow; */
+}
+#system_messages.team2 .Blue_team, #system_messages.team1 .Red_team{
+    background-color: yellow;
+}
 @media (min-width: 640px) {
 
 /* responsive table (left area) */

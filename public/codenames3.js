@@ -401,8 +401,15 @@ window.onload = function() {
           card_event="";
           card_table.classList.remove("team"+(3-my_team));
         }
+        system_messages.classList.remove("team"+(3-my_team));
+        system_messages.classList.remove("team"+(my_team));
         if (game_obj.room.active_team==my_team ) {
-          endTurnButton.disabled=false; 
+          endTurnButton.disabled=false;
+          if (data.room.step) { // Response step and my team, highlight the other team's challendge
+            system_messages.classList.add("team"+(3-my_team)); // for highligt
+          } else { // Challendgs step and my team, highlight the other team's challendge
+            system_messages.classList.add("team"+(my_team)); // for highligt
+          }
         } else {
           endTurnButton.disabled=true;
         }
