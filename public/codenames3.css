@@ -160,6 +160,7 @@ td.card {
     background-color: rgb(182, 171, 117); /* rgb(206, 179, 26); */
     padding-bottom: 3%;
     padding-top: 3%;
+    transition: transform 2s cubic-bezier(0.0, 0.5, 0.5 ,1.0);
 }
 td.my_card_choice {
     background-color: rgb(226, 101, 29); 
@@ -173,7 +174,9 @@ td.card_choice_no_concent {
 .team2 .closed2:hover {
     background: orange;
 }
-
+.rotated {
+    transform: rotate3d(0, 1, 0, 90deg);
+}
 #system_messages, #chat_messages  {
     list-style-type: none;
     padding-left: 5px;

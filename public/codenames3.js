@@ -21,7 +21,14 @@ function setCookie(name, value, days) {
     document.cookie = name + "=" + (value || "") + expires + "; path=/";
 }
 */
+function cardAnimation(card) {
+  card.classList.add("rotated");
+  let timeout = setTimeout(function() {
+    
+    card.classList.remove("rotated");
+  }, 3000); //3 sec
 
+}
 function addChatLine (text, msgclass=""){
     var item = document.createElement('li');
     if (msgclass==""){
@@ -300,6 +307,7 @@ window.onload = function() {
               cardObj.classList.remove("closed"+(3-data.team));
               cardObj.classList.add(player_class_array[data.reveal_role]+(3-data.team));
             }
+            cardAnimation(cardObj);
             break;
         }
         case 7: { // stop the game
