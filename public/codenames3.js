@@ -21,10 +21,12 @@ function setCookie(name, value, days) {
     document.cookie = name + "=" + (value || "") + expires + "; path=/";
 }
 */
-function cardAnimation(card) {
+function cardAnimation(card,callback) {
   card.classList.add("rotated");
   let timeout = setTimeout(function() {
-    
+    if (callback){
+      callback();
+    }
     card.classList.remove("rotated");
   }, 3000); //3 sec
 
@@ -301,13 +303,15 @@ window.onload = function() {
             // cleanup choice classes
             removeClassFromAllElements("my_card_choice");
             removeClassFromAllElements("card_choice_no_concent");
+            cardAnimation(cardObj,function(){
             if (data.reveal_role == 4){ // spy revealed - overwrite both classes -but not for the killer 
-              cardObj.className="card spy_opened1 spy_opened2";
-            } else { // overwrite other class
-              cardObj.classList.remove("closed"+(3-data.team));
-              cardObj.classList.add(player_class_array[data.reveal_role]+(3-data.team));
-            }
-            cardAnimation(cardObj);
+                cardObj.className="card spy_opened1 spy_opened2";
+              } else { // overwrite other class
+                cardObj.classList.remove("closed"+(3-data.team));
+                cardObj.classList.add(player_class_array[data.reveal_role]+(3-data.team));
+              }
+            } );  
+            ;
             break;
         }
         case 7: { // stop the game
