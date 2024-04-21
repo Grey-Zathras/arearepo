@@ -260,17 +260,17 @@ td.card_choice_no_concent {
 }
 #yourTurn {
     /* display: none; */
-    transition: top 1s cubic-bezier(0, 0, 1, 1) 0s;
+}
+
+#yourTurn.pop-up-banner{
+    /* display: block; */
+    transition: all 2s cubic-bezier(0, 0, 1, 1) 0s;
+    transform: translateY(-80vh);
     position: absolute;
     top: 90vh;
     width: 100%;
     text-align: center;
     z-index: 10;
-}
-
-#yourTurn.pop-up-banner{
-    /* display: block; */
-    top: 20vh;
 }
 #yourTurn .banner-text{
     display: none;

@@ -33,7 +33,7 @@ function cardAnimation(card,callback) {
 }
 function bannerAnimation (obj) {
   obj.classList.add("pop-up-banner");
-  obj.style.top="20vh";
+  //obj.style.top="20vh";
   obj.querySelector(".banner-text").style="display:block";
 }
 function addChatLine (text, msgclass=""){
