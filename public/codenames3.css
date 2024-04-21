@@ -277,6 +277,9 @@ td.card_choice_no_concent {
     font-size: xxx-large;
     font-family: fantasy;
     color: floralwhite;
+    border: 1px solid black;
+    background-color: rgb(182, 171, 117);
+    padding: 10px;
 }
 html {
     line-height: 1.5;
