@@ -31,6 +31,11 @@ function cardAnimation(card,callback) {
   }, 3000); //3 sec
 
 }
+function bannerAnimation (obj) {
+  obj.classList.add("pop-up-banner");
+  obj.style.top="20vh";
+  obj.querySelector(".banner-text").style="display:block";
+}
 function addChatLine (text, msgclass=""){
     var item = document.createElement('li');
     if (msgclass==""){
@@ -313,7 +318,12 @@ window.onload = function() {
             } );  
             ;
             break;
-        }
+          }
+          case 6: { // end turn msg
+            if (game_obj.room.active_team==my_team) {
+              bannerAnimation(yourTurn);
+            }
+          }
         case 7: { // stop the game
           // clean stats at the table
           for(var i =1; i<3; i++){ // both teams
@@ -611,4 +621,10 @@ window.onload = function() {
     modal.style.display = "none";
     socket.emit('rebuild table request', { room: room, msg: "Let's rebuild the table with the new cards:", user: userName});    
   }
+  yourTurn.addEventListener('transitionend', function() {
+    yourTurn.classList.remove("pop-up-banner");
+    yourTurn.style.top="90vh";
+    yourTurn.querySelector(".banner-text").style="display:none";
+  });
+
 };

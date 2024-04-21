@@ -315,7 +315,7 @@ exports.countHiddenSPies =  function (states) {
   return hidden_spies;
 }
 
-exports.endTurn =  function (the_room, states) {
+exports.endTurn =  function ({the_room, states,main_msg, user }) {
   if ( !the_room.step ) {  //the Challenge step
     the_room.active_team=3-the_room.active_team;
   }
@@ -328,5 +328,9 @@ exports.endTurn =  function (the_room, states) {
     the_room.active_team=3-the_room.active_team;
   } 
   exports.resetRoomCardsResponsesMap(the_room);
+  exports.roomData({room: the_room });
+  if (main_msg ) {
+    io.to(the_room.room_name).emit('system message', { msg: `${main_msg } New Turn:${the_room.turn} !`, user: user.username,team:the_room.active_team, msg_type:6}); // system message end turn
+  }
 }
 

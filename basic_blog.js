@@ -401,22 +401,23 @@ io.on('connection', (socket) => {
             // end game
             the_room.game_status=0;
             io.to(the_room.room_name).emit('system message', { msg: "You all are WINNERS - the game has finished!", user: data.user, msg_type:7 }); // system message stop game
+            gameLogic.roomData({room: the_room });
           } else if (!the_room.clicks[the_room.active_team]) {
             // change the  turn and the step, team is the same
             //the_room.turn++;
             //the_room.step = 0; //now is the Challenge step 
-            gameLogic.endTurn(the_room,states);
+            gameLogic.endTurn({the_room:the_room,states:states,user: user.username,main_msg:`${teams_list[user.team] } team run out of clicks.`});
             //the_room.active_team=3-the_room.active_team;
-            io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team run out of clicks.  New Turn:${the_room.turn} !`, user: user.username, msg_type:6}); // system message end turn
+            //io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team run out of clicks.  New Turn:${the_room.turn} !`, user: user.username, msg_type:6}); // system message end turn
           }
         } else {
             // change the  turn and the step, team is the same
             //the_room.turn++;
             //the_room.step = 0; //now is the Challenge step 
-            gameLogic.endTurn(the_room,states);
-            io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team is missed.  New Turn:${the_room.turn} !`, user: user.username, msg_type:6}); // system message end turn
+            gameLogic.endTurn({the_room:the_room,states:states,user: user.username,main_msg:`${teams_list[user.team] } team is missed.`});
+            //io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team is missed.  New Turn:${the_room.turn} !`, user: user.username, msg_type:6}); // system message end turn
         }
-        gameLogic.roomData({room: the_room });
+        //gameLogic.roomData({room: the_room });
       } else {
         // send the status update on the card selection
         io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team has no consent:`, user: user.username, msg_type:4, card_response_array:card_response_array }); // system message no_consent
@@ -453,9 +454,10 @@ io.on('connection', (socket) => {
             //the_room.step = 0; //now is the Challenge step 
             var rows = await gameLogic.readStates(the_room.id);
 
-            gameLogic.endTurn(the_room,rows[0].states);
-            io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team decided to end current turn.  New Turn:${the_room.turn} !`, user: user.username, msg_type:6}); // system message end turn
-            gameLogic.roomData({room: the_room });
+            gameLogic.endTurn({the_room:the_room,states:rows[0].states, user: user.username, main_msg:`${teams_list[user.team] } team decided to end current turn.`});
+            
+            //io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team decided to end current turn.  New Turn:${the_room.turn} !`, user: user.username, msg_type:6}); // system message end turn
+            //gameLogic.roomData({room: the_room });
        } else {
         io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team has no consent for end turn `, user: user.username, msg_type:0 }); // system message / general
        }

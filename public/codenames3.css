@@ -258,7 +258,26 @@ td.card_choice_no_concent {
     display: block;
     margin: auto;
 }
+#yourTurn {
+    /* display: none; */
+    transition: top 1s cubic-bezier(0, 0, 1, 1) 0s;
+    position: absolute;
+    top: 90vh;
+    width: 100%;
+    text-align: center;
+    z-index: 10;
+}
 
+#yourTurn.pop-up-banner{
+    /* display: block; */
+    top: 20vh;
+}
+#yourTurn .banner-text{
+    display: none;
+    font-size: xxx-large;
+    font-family: fantasy;
+    color: floralwhite;
+}
 html {
     line-height: 1.5;
     -webkit-text-size-adjust: 100%;
@@ -388,34 +407,3 @@ html {
 }
 
 /* */
-
-/* junk section */ 
-/*
-td .card {width: 20%;}
-
-div.parent {
-    display: flex;
-    height: 100%;
-}
-div.child {
-    display: inline-block;
-    align-self: flex-end;
-    width: 100%;
-}
-
-.bottom_aligner2 {
-    display: inline-block;
-    height: 100%;
-    vertical-align: bottom;
-    width: 0px;
-}
-
-div.d {
-    background-color: lightgrey;
-    width: 150px;
-    border: 15px solid green;
-    padding: 50px;
-    margin: 20px;
-}
-*/
-
