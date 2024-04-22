@@ -238,7 +238,7 @@ exports.kickUserFromTheRoom = async function ({the_room,userleft,socket}) {
         }
     } catch (err) {
         console.log(`kickUserFromTheRoom error:  the_room ${the_room}, userleft: ${userleft} `,err);
-        throw (err);
+        //throw (err);
     }
 }
 
