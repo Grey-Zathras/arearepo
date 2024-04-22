@@ -6,9 +6,11 @@
   <title><%= room.title %></title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<link rel="stylesheet"  type="text/css" href="/codenames3.css">
+  <link rel="stylesheet" type="text/css" href="/css-fireworks.css">
   <style>
 	</style>
   <script type="text/javascript"  src="/utils.js"></script>
+  <script type="text/javascript" src="/css-fireworks.js"></script>
   <script type="text/javascript"  src="/codenames3.js"></script>
   <script>
         var room = '<%= room.title %>';
@@ -16,6 +18,7 @@
   </script>
 </head>
 <body>
+  <div id="stage"><!-- the fireworks happen here --></div>
   <div class="header">
     <div class="navigation">
       <a href="/" id="homelink">Back to home</a>
@@ -58,7 +61,7 @@
       </div>
       <label for="legend">Legend: </label>
       <input type="checkbox" id="legend" name="legend"  value="Legend On" checked />
-      <table class="border1 secret_on" id="legend_table" width="100%">
+      <table class="secret_on" id="legend_table" width="100%">
           <tr>
             <td  class="card spy">
               <div class="card_text">
