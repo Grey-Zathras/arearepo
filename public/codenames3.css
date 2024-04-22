@@ -156,11 +156,13 @@ td.card {
     */
     width: 20%;
     text-align: center;
-    border: 1px solid;
+    border: 2px solid #814b25;  /* border: 1px solid; */
     background-color: rgb(182, 171, 117); /* rgb(206, 179, 26); */
     padding-bottom: 3%;
     padding-top: 3%;
     transition: transform 2s cubic-bezier(0.0, 0.5, 0.5 ,1.0);
+    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
 }
 td.my_card_choice {
     background-color: rgb(226, 101, 29); 
