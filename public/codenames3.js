@@ -295,6 +295,9 @@ window.onload = function() {
               card_table.classList.add("team"+(3-my_team)); // for hover css 
             }
             //totalclicks.innerText=data.totalclicks;
+            if (game_obj.room.active_team==my_team) {
+              bannerAnimation(yourTurn);
+            }
             break;
         }
         case 4: { // no consent
@@ -327,9 +330,11 @@ window.onload = function() {
             if (game_obj.room.active_team==my_team) {
               bannerAnimation(yourTurn);
             }
+            break;
           }
         case 7: { // stop the game
           // clean stats at the table
+          stopFireworks();
           for(var i =1; i<3; i++){ // both teams
             for(var j =0; j<6; j++) {
               removeClassFromAllElements(player_class_array[j]+i);  
@@ -338,7 +343,11 @@ window.onload = function() {
           //removeClassFromAllElements();
           break;
       }
-  }
+      case 8: { // win-win!
+        startFireworks();
+        break;
+    }
+}
     addSysMsgLine(data.user + ": " + msg,"sysmsg");
   });
 

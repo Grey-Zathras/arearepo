@@ -351,9 +351,9 @@ io.on('connection', (socket) => {
       the_room.challenge = data.challenge;
       //preparation for the cards selection by all the team members
       gameLogic.resetRoomCardsResponsesMap(the_room);
-
-      io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challenge:`, user: data.user, team: user.team, challenge: data.challenge, clicks: clicks, msg_type:3 }); // system message challenge
       gameLogic.roomData({room: the_room });
+      io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challenge:`, user: data.user, team: user.team, challenge: data.challenge, clicks: clicks, msg_type:3 }); // system message challenge
+      
     } catch (err) {
       console.log(socket.id,`challenge request error:`,err);
       socket.emit('error message',  err);
@@ -400,22 +400,15 @@ io.on('connection', (socket) => {
           if (!gameLogic.countHiddenSPies(states) ) {
             // end game
             the_room.game_status=0;
-            io.to(the_room.room_name).emit('system message', { msg: "You all are WINNERS - the game has finished!", user: data.user, msg_type:7 }); // system message stop game
+            io.to(the_room.room_name).emit('system message', { msg: "You all are WINNERS - the game has finished! <br/> Host can stop the game and regenerate the room.", user: data.user, msg_type:8 }); // system message stop game
             gameLogic.roomData({room: the_room });
           } else if (!the_room.clicks[the_room.active_team]) {
             // change the  turn and the step, team is the same
-            //the_room.turn++;
-            //the_room.step = 0; //now is the Challenge step 
             gameLogic.endTurn({the_room:the_room,states:states,user: user.username,main_msg:`${teams_list[user.team] } team run out of clicks.`});
-            //the_room.active_team=3-the_room.active_team;
-            //io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team run out of clicks.  New Turn:${the_room.turn} !`, user: user.username, msg_type:6}); // system message end turn
           }
         } else {
             // change the  turn and the step, team is the same
-            //the_room.turn++;
-            //the_room.step = 0; //now is the Challenge step 
             gameLogic.endTurn({the_room:the_room,states:states,user: user.username,main_msg:`${teams_list[user.team] } team is missed.`});
-            //io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team is missed.  New Turn:${the_room.turn} !`, user: user.username, msg_type:6}); // system message end turn
         }
         //gameLogic.roomData({room: the_room });
       } else {
