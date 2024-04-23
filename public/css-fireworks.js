@@ -1,13 +1,13 @@
 
   // Original JavaScript code by Chirp Internet: www.chirpinternet.eu
   // Please acknowledge use of this code by including this header.
-
-  function fireWorks(e) {
+  var cssIdx; 
+  function startFireWorks() {
 
     var num_launchers = 12;
     var num_flares = 20;
     var flare_colours = ['red', 'aqua', 'violet', 'yellow', 'lightgreen', 'white', 'blue'];
-    var cssIdx = document.styleSheets.length - 1;
+    cssIdx ??= document.styleSheets.length - 1;
   
     function myRandom(from, to)
     {
@@ -82,3 +82,18 @@
     }
   }
   
+  function stopFireworks(){
+    document.getElementById("stage").innerHTML="";
+    var sheet = document.styleSheets[cssIdx];
+    if (sheet.cssRules) { 
+      var re = new RegExp("launcher|flight");
+      var ee=sheet.cssRules.length-1;
+      for (var i=ee; i>=0; i--) {
+        if (sheet.cssRules[i] ) {
+          if (re.test(sheet.cssRules[i].selectorText) || re.test(sheet.cssRules[i].name)) {        
+              sheet.deleteRule (i);
+          }
+        }
+      }  
+    } 
+  }
