@@ -212,6 +212,10 @@ window.onload = function() {
     //var room = roomInput.value;
     socket.emit('join room', { room: room, user: userName, room_id: room_id, user_id: userID  });
     socket.emit('chat message', { room: room, msg: "welcome to chat" , user: userName, msgclass:"sysmsg"});
+    let timeout = setTimeout(function() {
+      socket.emit('cancel leaving room', {  msg: "user just entered the room "+room+" - on-enter setTimeout", user: userName, userid:getCookie("userid")});
+    }, 10000); //10 sec
+
   //};
 
   chatForm.addEventListener('submit', function(e) {
