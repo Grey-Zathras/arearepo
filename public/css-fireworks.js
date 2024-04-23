@@ -85,7 +85,7 @@
   function stopFireworks(){
     document.getElementById("stage").innerHTML="";
     var sheet = document.styleSheets[cssIdx];
-    if (sheet.cssRules) { 
+    if (cssIdx && sheet.cssRules) { 
       var re = new RegExp("launcher|flight");
       var ee=sheet.cssRules.length-1;
       for (var i=ee; i>=0; i--) {
