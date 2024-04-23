@@ -381,7 +381,6 @@ io.on('connection', (socket) => {
       }
       //console.log("card_choice consent", consent);
       if (consent) {
-        // send final message
         // update states in the database
         var states = await gameLogic.getStatesRevertTheCard({the_room:the_room,card_id:data.card_id});
           
@@ -393,24 +392,29 @@ io.on('connection', (socket) => {
             team: the_room.active_team,
             card_id:data.card_id,
             reveal_role:reveal_role,
-            msg_type:5}); // system message card_chosen
-        if (reveal_role==4) {
-          the_room.clicks[the_room.active_team]--;
-          //check if any spies are left?
-          if (!gameLogic.countHiddenSPies(states) ) {
-            // end game
-            the_room.game_status=0;
-            gameLogic.roomData({room: the_room });
-            io.to(the_room.room_name).emit('system message', { msg: "You all are WINNERS - the game has finished! <br/> Host can stop the game and regenerate the room.", user: data.user, msg_type:8 }); // system message stop game
-          } else if (!the_room.clicks[the_room.active_team]) {
-            // change the  turn and the step, team is the same
-            gameLogic.endTurn({the_room:the_room,states:states,user: user.username,main_msg:`${teams_list[user.team] } team run out of clicks.`});
-          }
+            msg_type:5
+        }); // system message card_chosen
+        //check if any spies are left?
+        if (!gameLogic.countHiddenSPies(states) ) {
+          // end game ?
+          //the_room.game_status=0;
+          gameLogic.roomData({room: the_room });
+          io.to(the_room.room_name).emit('system message', { msg: "You all are WINNERS - the game has finished! <br/> Host can stop the game and regenerate the room.", user: "game", msg_type:8 }); // system message win game
         } else {
-            // change the  turn and the step, team is the same
-            gameLogic.endTurn({the_room:the_room,states:states,user: user.username,main_msg:`${teams_list[user.team] } team is missed.`});
+          if (reveal_role==4) {
+            the_room.clicks[the_room.active_team]--;
+            if (!the_room.clicks[the_room.active_team]) {
+              // change the  turn and the step, team is the same
+              gameLogic.endTurn({the_room:the_room,states:states,user: user.username,main_msg:`${teams_list[user.team] } team run out of clicks.`});
+            } else {
+              gameLogic.roomData({room: the_room });
+            }
+          } else {
+              // change the  turn and the step, team is the same
+              gameLogic.endTurn({the_room:the_room,states:states,user: user.username,main_msg:`${teams_list[user.team] } team is missed.`});
+          }
+          //gameLogic.roomData({room: the_room });
         }
-        //gameLogic.roomData({room: the_room });
       } else {
         // send the status update on the card selection
         io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team has no consent:`, user: user.username, msg_type:4, card_response_array:card_response_array }); // system message no_consent

@@ -345,7 +345,7 @@ window.onload = function() {
           break;
       }
       case 8: { // win-win!
-        startFireworks();
+        startFireWorks();
         break;
     }
 }
