@@ -290,18 +290,16 @@ window.onload = function() {
           msg+=` <span class="${memberTagID[data.team]}"> ${data.challenge}</span>, clicks ${data.clicks}`;
           //msg+=" "+data.challenge+ ", clicks " + data.clicks;
             challenged_text.innerText=data.challenge;
-            if (my_team) {
-              card_event=clickTheCard;
-              card_table.classList.add("team"+(3-my_team)); // for hover css 
-            }
             //totalclicks.innerText=data.totalclicks;
             if (game_obj.room.active_team==my_team) {
+              card_event=clickTheCard;
+              card_table.classList.add("team"+(3-my_team)); // for hover css 
               bannerAnimation(yourTurn);
             }
             break;
         }
         case 4: { // no consent
-          if (my_team) {
+          if (game_obj.room.active_team==my_team) {
             card_event=clickTheCard;
             card_table.classList.add("team"+(3-my_team)); // for hover css 
           }
@@ -323,7 +321,10 @@ window.onload = function() {
                 cardObj.classList.add(player_class_array[data.reveal_role]+(3-data.team));
               }
             } );  
-            ;
+            if (game_obj.room.active_team==my_team) {
+              card_event=clickTheCard;
+              card_table.classList.add("team"+(3-my_team)); // for hover css 
+            }
             break;
           }
           case 6: { // end turn msg

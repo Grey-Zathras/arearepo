@@ -288,8 +288,8 @@ io.on('connection', (socket) => {
       the_room.game_status=0;
       // clean teams? hide states? 
 
-      io.to(the_room.room_name).emit('system message', { msg: "the game has stopped!", user: data.user, msg_type:7 }); // system message stop game
       gameLogic.roomData({room: the_room });
+      io.to(the_room.room_name).emit('system message', { msg: "the game has stopped!", user: data.user, msg_type:7 }); // system message stop game
     } catch (err) {
       console.log(socket.id,`start game  request error: User ${socket.data}, request: ${data} `,err);
       socket.emit('error message',  err);
@@ -400,8 +400,8 @@ io.on('connection', (socket) => {
           if (!gameLogic.countHiddenSPies(states) ) {
             // end game
             the_room.game_status=0;
-            io.to(the_room.room_name).emit('system message', { msg: "You all are WINNERS - the game has finished! <br/> Host can stop the game and regenerate the room.", user: data.user, msg_type:8 }); // system message stop game
             gameLogic.roomData({room: the_room });
+            io.to(the_room.room_name).emit('system message', { msg: "You all are WINNERS - the game has finished! <br/> Host can stop the game and regenerate the room.", user: data.user, msg_type:8 }); // system message stop game
           } else if (!the_room.clicks[the_room.active_team]) {
             // change the  turn and the step, team is the same
             gameLogic.endTurn({the_room:the_room,states:states,user: user.username,main_msg:`${teams_list[user.team] } team run out of clicks.`});
