@@ -399,7 +399,7 @@ io.on('connection', (socket) => {
           // end game ?
           //the_room.game_status=0;
           gameLogic.roomData({room: the_room });
-          io.to(the_room.room_name).emit('system message', { msg: "You all are WINNERS - the game has finished! <br/> Host can stop the game and regenerate the room.", user: "game", msg_type:8 }); // system message win game
+          io.to(the_room.room_name).emit('system message', { msg: "<span class=\"highlight\">You all are WINNERS - game over!</span> <br/> Host can stop the game and regenerate the room.", user: "game", msg_type:8 }); // system message win game
         } else {
           if (reveal_role==4) {
             the_room.clicks[the_room.active_team]--;
