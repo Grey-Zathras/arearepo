@@ -227,7 +227,7 @@ const io_socket_connected = (socket) => {
             msg_type:5
         }); // system message card_chosen
         //check if any spies are left?
-        if (!gameLogic.countHiddenSPies(states) ) {
+        if (!gameLogic.countHiddenSpies(states) ) {
           // end game ?
           //the_room.game_status=0;
           gameLogic.roomData({room: the_room, io:io });

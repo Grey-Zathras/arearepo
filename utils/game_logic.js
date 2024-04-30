@@ -305,7 +305,7 @@ exports.getTeamStates = async function ({room_id,team_id,states_unsecured}) {
   return states;
 }
 
-exports.countHiddenSPies =  function (states) {
+exports.countHiddenSpies =  function (states) {
   let hidden_spies=0;
   states.forEach((arr) => {
     arr.forEach((state,index) => {
