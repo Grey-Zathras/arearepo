@@ -4,7 +4,7 @@ const teams_list=["observer","Red","Blue"]; //team membership text for chat
 const step_verbs=["Challenge", "Response"]; // game status terms
 
 //global IO socket object;
-var io;
+//var io;
 
 //const express = require('express');
 //const http = require('http');
@@ -29,7 +29,7 @@ function isInt(value) {
 //const io = socketIo(server);
 
 module.exports = {
-  io,
+  //io,
   teams_list,
   step_verbs,
   log_debug_on,

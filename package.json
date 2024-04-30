@@ -1,5 +1,5 @@
 {
-  "name": "CodeNames Duet",
+  "name": "CodeNames_Duet",
   "version": "0.2.1",
   "description": "CodeNames Duet online game",
   "main": "server.js",
@@ -35,5 +35,6 @@
     "pg": "^8.11.3",
     "socket.io": "^4.7.4"
   },
+  "engines": { "node": "16.x" },
   "homepage": "https://github.com/Grey-Zathras/arearepo#readme"
 }

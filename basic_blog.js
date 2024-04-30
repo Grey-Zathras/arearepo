@@ -11,21 +11,22 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const http = require('http');
+//const http = require('http');
 const socketIo = require('socket.io');
 //const session = require('express-session');
 
 //const fsPromises = require('fs/promises')
 //const fs = require('fs');
 
-const { app, server, io, teams_list, step_verbs, wordList, log_debug_on, isInt } = require("./utils/glbl_objcts.js");
+const { io, teams_list, step_verbs, log_debug_on, isInt } = require("./utils/glbl_objcts.js");
+const wordList = require('./utils/wordlist');
 const gameLogic = require('./utils/game_logic');
 const cardGenerator = require('./utils/card_generator');
 const { addUser, removeUser, getUser, getUsersInRoom, getUserByRoomAndName, updateUser } = require("./utils/users");
 const { addRoom, removeRoom, getRoom, updateRoom, makeid } = require("./utils/rooms");
 const codenames_DB = require('./db');
 
-//const app = express();
+const app = express();
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -571,9 +572,4 @@ io.on('connection', (socket) => {
       //socket.emit('error message',  `unknown error ${err}`);
     }
   });
-});
-
-//process.env.PORT 
-server.listen(process.env.PORT || 3000, () => {
-  console.log('listening chat server on *:3000');
 });

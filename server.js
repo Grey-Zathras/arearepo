@@ -11,8 +11,8 @@ server.listen(process.env.PORT || 3000, () => {
    * Module dependencies.
    */
   
-  var { io } = require("./utils/glbl_objcts");
-  var app = require('./utils/app');
+  //var { io } = require("./utils/glbl_objcts");
+  var app = require('./app');
   var debug = require('debug')('card-names-duet:server');
   var http = require('http');
   const socketIo = require('socket.io');
@@ -32,7 +32,7 @@ server.listen(process.env.PORT || 3000, () => {
   var server = http.createServer(app);
   
   // chat server support
-  io = socketIo(server);
+  const io = socketIo(server);
   io.on('connection', io_socket_connected);
 
   /**
