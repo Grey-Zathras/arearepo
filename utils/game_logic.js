@@ -4,7 +4,7 @@ const { addUser, removeUser, getUser, getUsersInRoom,updateUser } = require("./u
 const { addRoom, removeRoom, getRoom, updateRoom } = require("./rooms");
 const codenames_DB = require('../db');
 
-exports.roomData = function ({room}) {
+exports.roomData = function ({room, io}) {
     //console.log("gamelogic roomData room:",room);
     const room_id= room.id;
     const host = getUser(room.host)
@@ -144,7 +144,7 @@ exports.readStates = async function (the_room_id) {
     //res.status(404).send('Room not found');
   }
   if (!Array.isArray(rows[0].states)  ){
-    const errmsg= `Room ${the_room.id} not found`; 
+    const errmsg= `Room ${the_room_id} not found`; 
     throw (errmsg);
     //socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
     //console.log(socket.id,` Join Team: User ${socket.data} - Room ${room_id} - game data not found`);
@@ -193,6 +193,7 @@ exports.getStatesRevertTheCard = async function ({the_room,card_id}) {
 
 exports.kickUserFromTheRoom = async function ({the_room,userleft,socket}) {
     try {
+        const io=socket.server;
         if (!userleft) {
             throw ("no user data to clean");
         }
@@ -212,11 +213,11 @@ exports.kickUserFromTheRoom = async function ({the_room,userleft,socket}) {
             console.log("kickUserFromTheRoom - reassigning host to the 'host':",new_host.username );
             updateRoom({id:the_room.id, host:new_host.id });
             //let the_room=getRoom(the_room.id);
-            exports.roomData({room: the_room , host:new_host.username});
+            exports.roomData({room: the_room , host:new_host.username, io:io});
             io.to(the_room.room_name).emit('system message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
           }
         } else {
-          exports.roomData({room: the_room });
+          exports.roomData({room: the_room, io:io });
         }
         if (socket) { //user is leaving
           socket.disconnect(true);
@@ -244,17 +245,18 @@ exports.kickUserFromTheRoom = async function ({the_room,userleft,socket}) {
 
 exports.delayedUserLeaveTheRoom =  function (the_room,user,socket) {
     try {
-            // user left ?
-            console.log("Timeout on leaving the the room - ",the_room, "user",user);
-          if(user.active) {
-            console.log("user stays in the room room - ",the_room, "user",user);
-            updateUser ( { id:user.id, active:1 });
-            exports.roomData({room: the_room });
-          }  else {
-            console.log("user left the room by timeout - ",the_room, "user",user);
-            var userleft=removeUser(user.id);
-            exports.kickUserFromTheRoom({the_room: the_room, userleft: userleft, socket: socket});
-          }
+      const io = socket.server;    
+      // user left ?
+      console.log("Timeout on leaving the the room - ",the_room, "user",user);
+      if(user.active) {
+        console.log("user stays in the room room - ",the_room, "user",user);
+        updateUser ( { id:user.id, active:1 });
+        exports.roomData({room: the_room, io:io });
+      }  else {
+        console.log("user left the room by timeout - ",the_room, "user",user);
+        var userleft=removeUser(user.id);
+        exports.kickUserFromTheRoom({the_room: the_room, userleft: userleft, socket: socket});
+      }
     } catch (err) {
         console.log(`delayedUserLeaveTheRoom :`,err,"the_room",the_room, "user",user);
         //socket.emit('error message',  err);
@@ -315,7 +317,7 @@ exports.countHiddenSPies =  function (states) {
   return hidden_spies;
 }
 
-exports.endTurn =  function ({the_room, states,main_msg, user }) {
+exports.endTurn =  function ({the_room, states,main_msg, user, io }) {
   if ( !the_room.step ) {  //the Challenge step
     the_room.active_team=3-the_room.active_team;
   }
@@ -328,7 +330,7 @@ exports.endTurn =  function ({the_room, states,main_msg, user }) {
     the_room.active_team=3-the_room.active_team;
   } 
   exports.resetRoomCardsResponsesMap(the_room);
-  exports.roomData({room: the_room });
+  exports.roomData({room: the_room, io:io });
   if (main_msg ) {
     io.to(the_room.room_name).emit('system message', { msg: `${main_msg } New Turn:${the_room.turn} !`, user: user,team:the_room.active_team, msg_type:6}); // system message end turn
   }
