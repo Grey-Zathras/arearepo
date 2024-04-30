@@ -1,5 +1,5 @@
 
-const { log_debug_on, teams_list } = require("./glbl_objcts");
+const { log_debug_on, teams_list, isInt } = require("./glbl_objcts");
 const { addUser, removeUser, getUser, getUsersInRoom,updateUser } = require("./users");
 const { addRoom, removeRoom, getRoom, updateRoom } = require("./rooms");
 const codenames_DB = require('../db');
@@ -336,3 +336,36 @@ exports.endTurn =  function ({the_room, states,main_msg, user, io }) {
   }
 }
 
+exports.joinTeam = async function ({socket,team_id, data}) { // data.room
+  try {
+    const io = socket.server; 
+    socket.data.team = team_id;
+    const room_id = socket.data.room_id;
+    // read database stats
+    if (!isInt(room_id)) {
+      console.log(` joinTeam - SQL injection attack ${socket.data.room_id}`);
+      throw(`Room ${room_id} not found`);
+    }  
+    updateUser ( { id:socket.data.user_id, active:1,team: team_id});
+    const the_room=getRoom(room_id);
+    exports.roomData({room: the_room, io:io });
+    if (team_id >0) {
+      if(the_room.game_status==1) { // if (the_room.game_status==1)
+        var states = await exports.getTeamStates({room_id:room_id, team_id:team_id});
+        //console.log(` joinTeam, states `,states);
+        socket.emit('team scheme',  { room_id: room_id,team:team_id, states: states});
+      }
+      socket.join(the_room.room_name+team_id);
+      //io.to(the_room.room_name+team_id).emit('system message', { msg: "secret team channel test!", user: data.user }); // system message 
+      //console.log(socket.id,` Join Team: User ${team_id} result socket:`,socket);
+    } else { // reconnect for observer
+      var states = await exports.getTeamStates({room_id:the_room.id, team_id:0 });
+      socket.emit('team scheme',  { room_id: room_id,team:0, states: states}); // Observer
+    }
+    io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id , msg_type:1}); // system message
+    console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
+  } catch (err){
+    console.log(socket.id,` Join Team: User ${socket.data} has got error`,err);
+    socket.emit('error message',  err);
+  }
+}

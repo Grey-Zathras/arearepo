@@ -10,39 +10,7 @@ const io_socket_connected = (socket) => {
   const io = socket.server; 
   console.log(socket.id,'a user connected');
 
-  async function joinTeam(team_id, data) { // data.room
-    try {
-      socket.data.team = team_id;
-      const room_id = socket.data.room_id;
-      // read database stats
-      if (!isInt(room_id)) {
-        console.log(` joinTeam - SQL injection attack ${socket.data.room_id}`);
-        throw(`Room ${room_id} not found`);
-      }  
-      updateUser ( { id:socket.data.user_id, active:1,team: team_id});
-      const the_room=getRoom(room_id);
-      gameLogic.roomData({room: the_room, io:io });
-      if (team_id >0) {
-        if(the_room.game_status==1) { // if (the_room.game_status==1)
-          var states = await gameLogic.getTeamStates({room_id:room_id, team_id:team_id});
-          //console.log(` joinTeam, states `,states);
-          socket.emit('team scheme',  { room_id: room_id,team:team_id, states: states});
-        }
-        socket.join(the_room.room_name+team_id);
-        //io.to(the_room.room_name+team_id).emit('system message', { msg: "secret team channel test!", user: data.user }); // system message 
-        //console.log(socket.id,` Join Team: User ${team_id} result socket:`,socket);
-      } else { // reconnect for observer
-        var states = await gameLogic.getTeamStates({room_id:the_room.id, team_id:0 });
-        socket.emit('team scheme',  { room_id: room_id,team:0, states: states}); // Observer
-      }
-      io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id , msg_type:1}); // system message
-      console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
-    } catch (err){
-      console.log(socket.id,` Join Team: User ${socket.data} has got error`,err);
-      socket.emit('error message',  err);
-    }
-  }
-  
+
     // Join a room
   socket.on('join room', async (data) => {
     
@@ -72,13 +40,13 @@ const io_socket_connected = (socket) => {
       //addUser(socket.id,data.user,data.room_id); 
       
       if (res.msg && res.user.team){
-        await joinTeam(res.user.team, data);
+        await gameLogic.joinTeam({socket: socket, team_id: res.user.team, data: data});
         console.log(socket.id,` User ${data.user}/${data.user_id} reconnected to room: ${the_room.room_name} and team ${res.user.team}`);
         //console.log(socket.id,` res.user `, res.user);
       } else {
         console.log(socket.id,` User ${data.user} joined room: ${the_room.room_name} as Observer`);
         if (the_room.game_status){
-          await joinTeam(0, data); // send schema to observer
+          await gameLogic.joinTeam({socket: socket, team_id: 0, data: data}); // send schema to observer
         }
       }
       gameLogic.roomData({room: the_room, io:io });
@@ -86,7 +54,7 @@ const io_socket_connected = (socket) => {
   });
 
   socket.on('team change', async  (data) => {
-    joinTeam(data.team, data);
+    gameLogic.joinTeam({socket: socket, team_id: data.team, data: data});
   });
 
   socket.on('rebuild table request', async  (data) => {
