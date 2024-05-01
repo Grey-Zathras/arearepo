@@ -2,6 +2,7 @@
 "use strict";
 
 const express = require('express');
+const createError = require('http-errors');
 const path = require('path');
 const bodyParser = require('body-parser');
 //const session = require('express-session');
@@ -28,53 +29,73 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Home route to list all rooms
 app.get('/', async (req, res) => {
-    const { rows } = await codenames_DB.query('SELECT id, title,code, stat  FROM rooms where priv=FALSE');
-    //res.json(rows);
-    res.render('index', { rooms: rows });
-    //console.log(`${JSON.stringify(rows)} `);
-  });
-  
-  // Route to get a specific room by id
-  app.get('/room/:id', async (req, res) => {
-      const int_id= req.params.id;
-      //const { userTeam } = req._parsedUrl.query;
-      //console.log("User team is", userTeam );
-      if (isInt(int_id)) {
-      const { rows } = await codenames_DB.query('SELECT * FROM rooms WHERE id = $1', [int_id]);
-          if (rows.length === 0) {
-              res.status(404).send('Room not found');
-              //res.status(404).json({ message: 'Post not found' });
-          } else {
-              res.render('room', { room: rows[0] });
-              //res.json(rows[0]);
-          }
-      }  else {
-          // SQL injection attack
-          console.log(`SQL injection attack ${req.params.id}`);
-          res.status(404).send('Room not found');
-      }
-  });
-  
-  // Route to display the form for creating a new room
-  app.get('/create', (req, res) => {
-      res.render('create', {code: makeid(6)});
-    });
-    
-  // Route to create a new room
-  app.post('/create', async (req, res) => {
-    const { title, code } = req.body;
-    //console.log(`creating new room  ${title}`); //{req.body}
-    var cards = cardGenerator.generateCards25(wordList);
-    var states = cardGenerator.generateSpies();
-    
-    const { rows } = await codenames_DB.query(
-      'INSERT INTO rooms(title, code, cards, states ) VALUES($1, $2, $3, $4) RETURNING *',
-      [title, code, cards, states]
-    );
-    //res.status(201).json(rows[0]);
-    console.log(`creating new room  ${title}`,JSON.stringify(rows[0])); //{req.body}
-    
-    res.status(201).render('create_confirmation', { room:  req.body , rows:rows[0]});
-  });
+  const { rows } = await codenames_DB.query('SELECT id, title,code, stat  FROM rooms where priv=FALSE');
+  //res.json(rows);
+  res.render('index', { rooms: rows });
+  //console.log(`${JSON.stringify(rows)} `);
+});
 
-  module.exports = app;
+// Route to get a specific room by id
+app.get('/room/:id', async (req, res, next) => {
+  const int_id= req.params.id;
+  //const { userTeam } = req._parsedUrl.query;
+  //console.log("User team is", userTeam );
+  if (isInt(int_id)) {
+  const { rows } = await codenames_DB.query('SELECT * FROM rooms WHERE id = $1', [int_id]);
+      if (rows.length === 0) {
+          //res.status(404).send('Room not found');
+          //res.status(404).json({ message: 'Post not found' });
+          return next(
+            createError(404, 'Room not found'));
+      } else {
+          res.render('room', { room: rows[0] });
+          //res.json(rows[0]);
+      }
+  }  else {
+      // SQL injection attack
+      console.log(`SQL injection attack, parameter: ${req.params.id}`);
+      //res.status(404).send('Room not found');
+      return next(
+        createError(404, 'Room not found'));
+  }
+  next();  
+});
+
+// Route to display the form for creating a new room
+app.get('/create', (req, res) => {
+    res.render('create', {code: makeid(6)});
+});
+  
+// Route to create a new room
+app.post('/create', async (req, res) => {
+  const { title, code } = req.body;
+  //console.log(`creating new room  ${title}`); //{req.body}
+  var cards = cardGenerator.generateCards25(wordList);
+  var states = cardGenerator.generateSpies();
+  
+  const { rows } = await codenames_DB.query(
+    'INSERT INTO rooms(title, code, cards, states ) VALUES($1, $2, $3, $4) RETURNING *',
+    [title, code, cards, states]
+  );
+  //res.status(201).json(rows[0]);
+  console.log(`creating new room  ${title}`,JSON.stringify(rows[0])); //{req.body}
+  
+  res.status(201).render('create_confirmation', { room:  req.body , rows:rows[0]});
+});
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+module.exports = app;
