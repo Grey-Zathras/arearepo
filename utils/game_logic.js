@@ -23,7 +23,6 @@ exports.checkSocketDataUserIDReady = function (socket) {
     //console.log("checkSocketDataUserIDReady socket",socket);
     if (typeof socket.data.user_id === "undefined"){
         const errmsg="socket data is corrupted. pls reconnect";
-        //socket.emit('error message',  errmsg);
         throw (errmsg);
     }
 }
@@ -31,7 +30,6 @@ exports.checkSocketDataUserIDReady = function (socket) {
 exports.checkHost = function ({user,room}) {
     if (user.id!=room.host){
       const errmsg="host role is required!";
-      //socket.emit('error message',  errmsg);
       throw (errmsg);
     }
 }
@@ -40,7 +38,6 @@ exports.getUserFromSocket = function (socket) {
     const user = getUser(socket.data.user_id);
     if ( user === undefined){
         const errmsg="user id not found in the users list";
-        //socket.emit('error message',  errmsg);
         throw (errmsg);
     }
     return user; 
@@ -50,13 +47,11 @@ exports.getRoomWithTeamsReady = function (socket) {
     let the_room=getRoom(socket.data.room_id);
     if (the_room.game_status) {
         const errmsg="wrong request - game is already started";
-        //socket.emit('error message',  errmsg);
         throw (errmsg);
       }
     let users = getUsersInRoom(the_room.id, 0);
     if (! (users.filter(user => user.team == 1).length && users.filter(user => user.team == 2).length) ) {
      const  errmsg="one of the teams is empty";
-      //socket.emit('error message',  errmsg);
       throw (errmsg);
     }
     return the_room;
@@ -66,7 +61,6 @@ exports.checkUserHasTeam = function (user) {
   //console.log("checkUserHasTeam user",user);  
   if (!user.team) {
         const errmsg="user is obsever, not allowed to play";
-        //socket.emit('error message',  errmsg);
         throw (errmsg);
       }
 }
@@ -76,7 +70,6 @@ exports.getRoomInChallengeStep = function (socket,user) {
 
     if (the_room.step) {
       const errmsg="wrong step - current step is Response:" + the_room.step;
-      //socket.emit('error message',  errmsg);
       throw (errmsg);
     }
     exports.checkUserTeamIsActive (the_room,user);
@@ -86,18 +79,15 @@ exports.getRoomInChallengeStep = function (socket,user) {
 exports.getChallengeClicks = function (data) {
     if (data.challenge=="" || data.clicks=="") {
         const errmsg="Challenge or clicks data is missing";
-        //socket.emit('error message',  errmsg);
         throw (errmsg);
       }
       var clicks=parseInt(data.clicks);
       if (!clicks || clicks < 0 ) {
         const errmsg="clicks should be integer and > 0";
-        //socket.emit('error message',  errmsg);
         throw (errmsg);
       }
       if (clicks>9) {
         const errmsg="no more than 9 clicks!";
-        //socket.emit('error message',  errmsg);
         throw (errmsg);
       }
     return clicks;
@@ -121,7 +111,6 @@ exports.getRoomInResponseStep = function (socket,user) {
 
     if (the_room.step != 1) {
       const errmsg="wrong step - current step is Challenge:" + the_room.step;
-      //socket.emit('error message',  errmsg);
       throw (errmsg);
     }
     exports.checkUserTeamIsActive (the_room,user);
@@ -131,7 +120,6 @@ exports.getRoomInResponseStep = function (socket,user) {
 exports.checkUserTeamIsActive = function (the_room,user) {
     if (the_room.active_team!= user.team) {
         const errmsg="wrong team - the other team should play this step";
-        //socket.emit('error message',  errmsg);
         throw (errmsg);
       }  
 }
@@ -140,45 +128,36 @@ exports.readStates = async function (the_room_id) {
   if (rows.length === 0) {
       const errmsg= `Room ${the_room_id} not found`;
       throw (errmsg);
-    //socket.emit('error message',  `Room ${room_id} not found`);
-    //res.status(404).send('Room not found');
   }
   if (!Array.isArray(rows[0].states)  ){
     const errmsg= `Room ${the_room_id} not found`; 
     throw (errmsg);
-    //socket.emit('error message',  `Room ${room_id} - game data not found, pls generate the table`);
-    //console.log(socket.id,` Join Team: User ${socket.data} - Room ${room_id} - game data not found`);
   }
   return rows;
 }
 exports.writeStates = async function ({the_room_id,cards,states}) {
-    try {
-        await codenames_DB.query('BEGIN');
-        if (cards) {
-          const queryText = 'UPDATE rooms SET states=$2, cards=$3 WHERE id = $1';
-          var { rows } = await codenames_DB.query(queryText, [the_room_id,states,cards]);
-        } else {
-          const queryText = 'UPDATE rooms SET states=$2 WHERE id = $1';
-          var { rows } = await codenames_DB.query(queryText, [the_room_id,states]);
-        }
-       
-        await codenames_DB.query('COMMIT');
-      } catch (e) {
-        await codenames_DB.query('ROLLBACK');
-        throw e;
-      } finally {
-        //codenames_DB.release()
-      }
-
-    //var { rows } = await codenames_DB.query('UPDATE rooms SET states=\'$2\' WHERE id = $1', [the_room_id]);
-
-    return rows;
+  try {
+    await codenames_DB.query('BEGIN');
+    if (cards) {
+      const queryText = 'UPDATE rooms SET states=$2, cards=$3 WHERE id = $1';
+      var { rows } = await codenames_DB.query(queryText, [the_room_id,states,cards]);
+    } else {
+      const queryText = 'UPDATE rooms SET states=$2 WHERE id = $1';
+      var { rows } = await codenames_DB.query(queryText, [the_room_id,states]);
+    }
+    
+    await codenames_DB.query('COMMIT');
+  } catch (e) {
+    await codenames_DB.query('ROLLBACK');
+    throw e;
+  } finally {
+    //codenames_DB.release()
+  }
+  return rows;
 }
 
 exports.getStatesRevertTheCard = async function ({the_room,card_id}) {
-
   var rows = await exports.readStates(the_room.id);
-
   if (rows[0].states[2-the_room.active_team][card_id] >2 ) {
       const errmsg= `Card ${the_room.id} is already opened`;
       throw (errmsg);
@@ -191,9 +170,11 @@ exports.getStatesRevertTheCard = async function ({the_room,card_id}) {
   return rows[0].states;      
 }
 
-exports.kickUserFromTheRoom = async function ({the_room,userleft,socket}) {
+exports.kickUserFromTheRoom = async function ({the_room,userleft,socket,io}) {
     try {
-        const io=socket.server;
+        if (!io){
+          io=socket.server;
+        } 
         if (!userleft) {
             throw ("no user data to clean");
         }
@@ -259,7 +240,6 @@ exports.delayedUserLeaveTheRoom =  function (the_room,user,socket) {
       }
     } catch (err) {
         console.log(`delayedUserLeaveTheRoom :`,err,"the_room",the_room, "user",user);
-        //socket.emit('error message',  err);
     }
 }
 
@@ -323,7 +303,6 @@ exports.endTurn =  function ({the_room, states,main_msg, user, io }) {
   }
   the_room.turn++;
   the_room.step = 0; //now is the Challenge step
-  //states[the_room.active_team-1].filter 
   let count = states[the_room.active_team-1].reduce((total,x) => total+(x==1), 0);
   if (!count){
     io.to(the_room.room_name).emit('system message', { msg: `${teams_list[the_room.active_team] } team has no more spies!`, user: "game", msg_type:0 }); // system message / general
@@ -356,7 +335,6 @@ exports.joinTeam = async function ({socket,team_id, data}) { // data.room
         socket.emit('team scheme',  { room_id: room_id,team:team_id, states: states});
       }
       socket.join(the_room.room_name+team_id);
-      //io.to(the_room.room_name+team_id).emit('system message', { msg: "secret team channel test!", user: data.user }); // system message 
       //console.log(socket.id,` Join Team: User ${team_id} result socket:`,socket);
     } else { // reconnect for observer
       var states = await exports.getTeamStates({room_id:the_room.id, team_id:0 });
@@ -368,4 +346,18 @@ exports.joinTeam = async function ({socket,team_id, data}) { // data.room
     console.log(socket.id,` Join Team: User ${socket.data} has got error`,err);
     socket.emit('error message',  err);
   }
+}
+
+exports.destroyRoom = function ({io, the_room}){
+  const users = getUsersInRoom(the_room.id, 1);
+  users.forEach(userleft => {
+    removeUser(userleft.id);
+    exports.kickUserFromTheRoom({the_room: the_room,userleft: userleft, io:io});  // await ?
+  });      
+
+  io.socketsLeave(the_room.room_name);
+  const { rows } =  codenames_DB.query(
+    'DELETE FROM rooms WHERE id = $1 RETURNING *',
+    [the_room.id]
+  ); //no await
 }

@@ -62,7 +62,6 @@ const io_socket_connected = (socket) => {
       console.log("rebuild table request", "socket.data",socket.data, "data",data);
       gameLogic.checkSocketDataUserIDReady(socket);
       const user = gameLogic.getUserFromSocket(socket);
-      //let the_room=gameLogic.getRoomWithTeamsReady(socket);
       let the_room=getRoom(socket.data.room_id);
       gameLogic.checkHost({user:user, room:the_room });
       if (the_room.game_status) {
@@ -84,12 +83,12 @@ const io_socket_connected = (socket) => {
     try {    
       gameLogic.checkSocketDataUserIDReady(socket);
       const user = gameLogic.getUserFromSocket(socket);
-      //let the_room=gameLogic.getRoomWithTeamsReady(socket);
       let the_room=getRoom(socket.data.room_id);
       gameLogic.checkHost({user:user, room:the_room });
       if (the_room.game_status) {
         throw "Cannot delete room, game is still in progress!";
       }
+      /*
       const users = getUsersInRoom(the_room.id, 1);
       users.forEach(userleft => {
         removeUser(userleft.id);
@@ -101,6 +100,8 @@ const io_socket_connected = (socket) => {
         'DELETE FROM rooms WHERE id = $1 RETURNING *',
         [the_room.id]
       ); //no await
+      */
+      gameLogic.destroyRoom({io:io, the_room:the_room});
     } catch (err) {
       console.log(socket.id,`delete room request error: User ${socket.data}, request: ${data} `,err);
       socket.emit('error message',  err);
@@ -112,7 +113,6 @@ const io_socket_connected = (socket) => {
       console.log("stop game request", "socket.data",socket.data, "data",data);
       gameLogic.checkSocketDataUserIDReady(socket);
       const user = gameLogic.getUserFromSocket(socket);
-      //let the_room=gameLogic.getRoomWithTeamsReady(socket);
       let the_room=getRoom(socket.data.room_id);
       gameLogic.checkHost({user:user, room:the_room });
 
@@ -129,7 +129,6 @@ const io_socket_connected = (socket) => {
   });
 
   socket.on('start game', async  (data) => {
-    //var errmsg="";
     try {
       console.log("start game request", "socket.data",socket.data, "data",data);
 
@@ -168,7 +167,6 @@ const io_socket_connected = (socket) => {
   });
 
   socket.on('challenge', async  (data) => { // emit the challenge so  players of other team will agree with the cards
-    //var errmsg="";
     try {
       console.log("challenge request", "socket.data",socket.data, "data",data);
       gameLogic.checkSocketDataUserIDReady(socket);
@@ -189,7 +187,6 @@ const io_socket_connected = (socket) => {
     } catch (err) {
       console.log(socket.id,`challenge request error:`,err);
       socket.emit('error message',  err);
-      //socket.emit('error message',  `unknown error ${err}`);
     }
   });
 
@@ -255,7 +252,6 @@ const io_socket_connected = (socket) => {
     } catch (err) {
       console.log(socket.id,`card_choice error:`,err);
       socket.emit('error message',  err);
-      //socket.emit('error message',  `unknown error ${err}`);
     }
   });
 
@@ -265,7 +261,6 @@ const io_socket_connected = (socket) => {
       gameLogic.checkSocketDataUserIDReady(socket);
       const user = gameLogic.getUserFromSocket(socket);
       gameLogic.checkUserHasTeam(user);
-      //let the_room=gameLogic.getRoomInResponseStep(socket,user);
       let the_room=getRoom(user.room);
       
       the_room.end_turn_map.set(user.username,"end_turn"); 
@@ -279,14 +274,8 @@ const io_socket_connected = (socket) => {
       }
         if (consent) {
             // change the  turn and the step, team is the same
-            //the_room.turn++;
-            //the_room.step = 0; //now is the Challenge step 
             var rows = await gameLogic.readStates(the_room.id);
-
-            gameLogic.endTurn({io:io, the_room:the_room,states:rows[0].states, user: user.username, main_msg:`${teams_list[user.team] } team decided to end current turn.`});
-            
-            //io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team decided to end current turn.  New Turn:${the_room.turn} !`, user: user.username, msg_type:6}); // system message end turn
-            //gameLogic.roomData({room: the_room, io:io});
+            gameLogic.endTurn({io:io, the_room:the_room,states:rows[0].states, user: user.username, main_msg:`${teams_list[user.team] } team decided to end current turn.`});            
         } else {
         io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team has no consent for end turn `, user: user.username, msg_type:0 }); // system message / general
         }
@@ -325,7 +314,6 @@ const io_socket_connected = (socket) => {
     } catch (err) {
       console.log(socket.id,`challenge request error:`,err);
       socket.emit('error message',  err);
-      //socket.emit('error message',  `unknown error ${err}`);
     }
   });
     
@@ -362,7 +350,7 @@ const io_socket_connected = (socket) => {
       //const users = gameLogic.getUsersInRoom(the_room.id, 0);
       var userleft = getUserByRoomAndName({room:the_room.id, username:data.user, strict:1});
       userleft=removeUser(userleft.id);
-      gameLogic.kickUserFromTheRoom({the_room,userleft});
+      gameLogic.kickUserFromTheRoom({the_room: the_room, userleft: userleft, io:io});
 
     } catch (err) {
       console.log(socket.id,`challenge request error:`,err);
@@ -400,7 +388,6 @@ const io_socket_connected = (socket) => {
       }
     } catch (err) {
       console.log(socket.id,`disconnect error: User ${socket.data}, reason ${reason}, `,err);
-      //socket.emit('error message',  `unknown error ${err}`);
     }
   });
 }
