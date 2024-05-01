@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 //const session = require('express-session');
 
 
-const { log_debug_on, isInt } = require("./utils/glbl_objcts.js");
+const { log_debug_on, isInt, makeid } = require("./utils/glbl_objcts.js");
 const wordList = require('./utils/wordlist.js');
 const cardGenerator = require('./utils/card_generator.js');
 const codenames_DB = require('./db.js');
