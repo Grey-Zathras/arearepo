@@ -1,17 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Create New Room</title>
-  <link rel="stylesheet"  type="text/css" href="/codenames3.css">
+  <%- include('../templates/partials/head', {title: 'Error '+error.status}); %>
 </head>
 <body>
-  <div class="header">
-    <div class="navigation">
-      <a href="/" id="homelink">Back to home</a>
-    </div>
-    <h1><%= message %></h1>
-  </div>
+  <%- include('../templates/partials/header', {headline: message}); %>
   <div class="body-main">
     <h2>Error Code: <%= error.status %></h2>
     <pre><%= error.stack %></pre>

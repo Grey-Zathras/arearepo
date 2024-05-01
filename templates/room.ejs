@@ -1,14 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <script src="/socket.io/socket.io.js"></script>
-  <meta charset="UTF-8">
-  <title><%= room.title %></title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<link rel="stylesheet"  type="text/css" href="/codenames3.css">
+  <%- include('../templates/partials/head', {title: room.title}); %>
+  <script src="/socket.io/socket.io.js"></script>
   <link rel="stylesheet" type="text/css" href="/css-fireworks.css">
-  <style>
-	</style>
   <script type="text/javascript"  src="/utils.js"></script>
   <script type="text/javascript" src="/css-fireworks.js"></script>
   <script type="text/javascript"  src="/codenames3.js"></script>
@@ -19,12 +15,7 @@
 </head>
 <body>
   <div id="stage"><!-- the fireworks happen here --></div>
-  <div class="header">
-    <div class="navigation">
-      <a href="/" id="homelink">Back to home</a>
-    </div>
-    <h1>Room name: <%= room.title %></h1>
-  </div>
+  <%- include('../templates/partials/header', {headline: room.title}); %>
   <div>
     <div class="cardspace border1">
       <div class="game_head">

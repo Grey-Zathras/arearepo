@@ -5,14 +5,14 @@
   <title>Room created</title>
   <link rel="stylesheet"  type="text/css" href="/codenames3.css">
   <script>
-    window.onload = function() {
+    window.onload = setTimeout(function() {
       newRoomLink.click();
-    }
+    }, 5000);
   </script>
-  <!-- Link to your stylesheet here -->
 </head>
 <body>
-  <p>Room <strong><%= room.title %> created</strong></p>
+  <%- include('../templates/partials/header', {headline: 'Success!'}); %>
+  <p>Room <strong><%= room.title %></strong> created</p>
   <a href="/room/<%= rows.id %>" id="newRoomLink"><%= room.title %></a><br>
   <a href="/">Back to home</a>
 </body>
