@@ -58,7 +58,7 @@ app.get('/room/:id', async (req, res, next) => {
       return next(
         createError(404, 'Room not found'));
   }
-  next();  
+  //next();  
 });
 
 // Route to display the form for creating a new room
