@@ -1,6 +1,6 @@
 {
-  "name": "CodeNames Duet",
-  "version": "0.2.1",
+  "name": "codenames_duet",
+  "version": "0.4.1",
   "description": "CodeNames Duet online game",
   "main": "basic_blog.js",
   "scripts": {
