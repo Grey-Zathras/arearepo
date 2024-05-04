@@ -2,6 +2,7 @@ const log_debug_on=1;
 
 const teams_list=["observer","Red","Blue"]; //team membership text for chat
 const step_verbs=["Challenge", "Response"]; // game status terms
+const supported_languages = ['en', 'ru', 'bg'];
 
 // Short-circuiting, and saving a parse operation
 function isInt(value) {
@@ -28,6 +29,7 @@ function makeid(length) {
 module.exports = {
   teams_list,
   step_verbs,
+  supported_languages,
   log_debug_on,
   isInt,
   makeid

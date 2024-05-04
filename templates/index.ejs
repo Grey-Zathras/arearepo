@@ -1,28 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <%- include('../templates/partials/head', {title: 'CodeNames Duet Board Game'}); %>
+  <%- include('../templates/partials/head', {title: t('home.title')}); %>
   <script type="text/javascript"  src="/utils.js"></script>
   <script>
     window.onload = function() {
       userNameBox.value = getCookie("username");
+      lang.addEventListener('change', function() {
+        setCookie("i18next", lang.value, 7);
+        location.reload();
+      })
     }
   </script>
 </head>
 <body>
-  <%- include('../templates/partials/header', {headline: 'Welcome to the CodeNames Duet'}); %>
+  <%- include('../templates/partials/header', {headline:  t('home.welcome')}); %>
   <div class="body-main">
-    Your name: <input type="text" id="userNameBox" name="userNameBox"  />
-            <button  onclick="setCookie('username', userNameBox.value, 7);">Change</button>
-            <br/><br/>
-    <!-- Link to your stylesheet here -->
+    <div class="form_outer">
+      <div class="form_field">
+        <%= t('Your name'); %>: <input type="text" id="userNameBox" name="userNameBox"  />
+        <button  onclick="setCookie('username', userNameBox.value, 7);"><%= t("home.change") %></button>
+        <br/><br/>
+      </div>
+      <div class="form_field">
+        <label for="lang"><%= t("language")%>:</label>
+        <select name="lang" id="lang" width="4" >
+          <% for (const value of languages) { 
+            var selected=(value==lang) ? "selected" : "" ;
+          %>
+            <option value="<%= value %>" <%= selected %>><%= t(value) %></option>
+          <% } %>
+        </select><br><br>
+      </div>
+    </div>
     <a href="/create">
-      <button>Create a Game Room</button>
+      <button><%= t('home.create'); %></button>
     </a>
     <ul>
       <% 
       rooms.forEach(function(room) { %>
-        <li><a href="/room/<%= room.id %>"><%= room.title %></a></li>
+        <li><a href="/room/<%= room.id %>"><%= room.title %></a> - <%= t("room language")%>: <%= t(room.lang.toLowerCase())%></li>
       <% }) %>
     </ul>
   </div>

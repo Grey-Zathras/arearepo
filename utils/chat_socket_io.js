@@ -1,13 +1,24 @@
-var {  teams_list, step_verbs, log_debug_on, isInt } = require("./glbl_objcts");
+var {  teams_list, step_verbs,supported_languages, log_debug_on, isInt } = require("./glbl_objcts");
 const wordList = require('./wordlist');
 const gameLogic = require('./game_logic');
 const cardGenerator = require('./card_generator');
 const { addUser, removeUser, getUser, getUsersInRoom, getUserByRoomAndName, updateUser } = require("./users");
 const { addRoom, removeRoom, getRoom, updateRoom, makeid } = require("./rooms");
-const codenames_DB = require('../db');
+//const codenames_DB = require('../db');
 
 const io_socket_connected = (socket) => {
   const io = socket.server; 
+  //const req = socket.request;
+  //i18next.init(req);
+  //const sessionId = socket.request.session.id;
+  try {
+    socket.request.i18n.changeLanguage(socket.request.session.room_lang);
+  } catch (err){
+    socket.emit('error message',  err.message);
+    console.log("io_socket_connected: session data not ready - hack? :", socket.id, err);
+    return ;
+  }
+  
   console.log(socket.id,'a user connected');
 
 
@@ -18,8 +29,11 @@ const io_socket_connected = (socket) => {
       data.user_id = socket.id;
       socket.emit('userID',  "User ID assigned: "+data.user_id);
     }
-    const res= addUser({id: data.user_id,username: data.user,room: data.room_id}); 
-    const res1 = addRoom({id: data.room_id, room_name: data.room, host: data.user_id}); 
+    const room_id = (socket.request.session ? socket.request.session.room_id: data.room_id);
+    const room_name = (socket.request.session ? socket.request.session.room_name: data.room);
+    const room_lang = (socket.request.session ? socket.request.session.lang: "ru");
+    const res= addUser({id: data.user_id,username: data.user,room: room_id}); 
+    const res1 = addRoom({id: room_id, room_name: room_name, host: data.user_id}); 
     const the_room = res1.room; 
     //console.log("Add Room - the_room object", the_room);
     if (res.error || res1.error) {
@@ -32,7 +46,7 @@ const io_socket_connected = (socket) => {
         socket.emit('error message',  "Cannot join the room: "+res.error);
       // }
     } else {
-      socket.join(data.room);
+      socket.join(room_name);
       socket.data.username = data.user;
       socket.data.user_id = data.user_id;
       socket.data.room_id = the_room.id;
@@ -40,13 +54,13 @@ const io_socket_connected = (socket) => {
       //addUser(socket.id,data.user,data.room_id); 
       
       if (res.msg && res.user.team){
-        await gameLogic.joinTeam({socket: socket, team_id: res.user.team, data: data});
+        await gameLogic.joinTeam({socket: socket, team_id: res.user.team}); //, data: data
         console.log(socket.id,` User ${data.user}/${data.user_id} reconnected to room: ${the_room.room_name} and team ${res.user.team}`);
         //console.log(socket.id,` res.user `, res.user);
       } else {
         console.log(socket.id,` User ${data.user} joined room: ${the_room.room_name} as Observer`);
         if (the_room.game_status){
-          await gameLogic.joinTeam({socket: socket, team_id: 0, data: data}); // send schema to observer
+          await gameLogic.joinTeam({socket: socket, team_id: 0}); // , data: data // send schema to observer
         }
       }
       gameLogic.roomData({room: the_room, io:io });
@@ -54,7 +68,7 @@ const io_socket_connected = (socket) => {
   });
 
   socket.on('team change', async  (data) => {
-    gameLogic.joinTeam({socket: socket, team_id: data.team, data: data});
+    gameLogic.joinTeam({socket: socket, team_id: data.team}); //, data: data
   });
 
   socket.on('rebuild table request', async  (data) => {
@@ -67,8 +81,8 @@ const io_socket_connected = (socket) => {
       if (the_room.game_status) {
         throw "Cannot generate new cards and spies, game is still in progress!";
       }
-
-      var cards = cardGenerator.generateCards25(wordList);
+      const lang = socket.request.session.room_lang;
+      var cards = cardGenerator.generateCards25(wordList[lang]);
       var states = cardGenerator.generateSpies();
       gameLogic.writeStates({the_room_id: the_room.id, states: states, cards: cards});
       io.to(the_room.room_name).emit('new table',  { room_id: the_room.id, cards: cards}); // no team!

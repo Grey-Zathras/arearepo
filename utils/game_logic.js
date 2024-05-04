@@ -315,7 +315,7 @@ exports.endTurn =  function ({the_room, states,main_msg, user, io }) {
   }
 }
 
-exports.joinTeam = async function ({socket,team_id, data}) { // data.room
+exports.joinTeam = async function ({socket,team_id}) { // data.room
   try {
     const io = socket.server; 
     socket.data.team = team_id;
@@ -340,7 +340,7 @@ exports.joinTeam = async function ({socket,team_id, data}) { // data.room
       var states = await exports.getTeamStates({room_id:the_room.id, team_id:0 });
       socket.emit('team scheme',  { room_id: room_id,team:0, states: states}); // Observer
     }
-    io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: data.user,team:team_id , msg_type:1}); // system message
+    io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: socket.data.username,team:team_id , msg_type:1}); // system message
     console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
   } catch (err){
     console.log(socket.id,` Join Team: User ${socket.data} has got error`,err);

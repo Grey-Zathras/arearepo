@@ -1,23 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <%- include('../templates/partials/head', {title: 'Create New Game Room'}); %>
+  <%- include('../templates/partials/head', {title: t("create.title")}); %>
 </head>
 <body>
-  <%- include('../templates/partials/header', {headline: 'Create a New Game Room'}); %>
+  <%- include('../templates/partials/header', {headline: t("create.headline")}); %>
   <div class="body-main">
     <form action="/create" method="POST">
-      <div>
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title" required><br><br>
+      <div class="form_outer">
+        <div class="form_field">
+          <label for="title"><%= t("create.room_name")%>:</label>
+          <input type="text" id="title" name="title" required><br><br>
+        </div>
+        <div class="form_field">
+          <label for="lang"><%= t("language")%>:</label>
+          <select name="lang" id="lang" width="4" >
+            <% for (const value of languages) { 
+              var selected=(value==lang) ? "selected" : "" ;
+            %>
+              <option value="<%= value %>" <%= selected %>><%= t(value) %></option>
+            <% } %>
+          </select><br><br>
+        </div>
       </div>
       <div style="display: none;">
-        <label for="code">Code:</label>
+        <label for="code"><%= t("create.code")%>:</label>
         <input id="code" name="code" required value="<%= code %>" maxlength="8" size="8"><br><br>
       </div>
-      <button type="submit">Create Room</button><br><br>
+      <button type="submit"><%= t("create.create")%></button><br><br>
     </form>
-    <a href="/">Back to home</a>
+    <a href="/"><%= t("Back to home")%></a>
   </div>
 </body>
 </html>

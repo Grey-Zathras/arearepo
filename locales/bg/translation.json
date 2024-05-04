@@ -1,0 +1,26 @@
+{
+    "home": {
+        "welcome": "Добре дошли",
+        "title": "CodeNames Duet - настолна игра онлайн",
+        "create" : "Създайте нова игра",
+        "change": "Промяна"
+    },
+    "create": {
+        "title": "Нова зала за игри",
+        "room_name": "Име на залата",
+        "headline" : "Създайте нова зала за игри",
+        "code" : "Код на връзката",
+        "create" : "Създайте залата"
+    },
+    "create_confirmation": {
+        "Room created": "Залата е създадена",
+        "Success" : "Успях"
+    },
+    "ru" : "Руски",
+    "en" : "Английски",
+    "bg" : "Български",  
+    "language" : "Език",
+    "room language" : "език на стаята",
+    "Back to home": "Начало",
+    "Your name": "Вашето имя"
+}

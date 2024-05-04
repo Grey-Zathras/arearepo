@@ -1,0 +1,28 @@
+{
+    "home": {
+        "welcome": "Добро пожаловать в игру",
+        "title": "CodeNames Duet - настольная игра онлайн",
+        "create" : "Создать новую Игровую",
+        "change": "Поменять",
+        "total1": "Всего в списке {{counter}} книг",
+        "buttonHTML1": "<button onClick='window.location.reload();'>$t(buttonText)</button>"
+    },
+    "create": {
+        "title": "Новая Игровая Комната",
+        "room_name": "Название комнаты",
+        "headline" : "Создать новую Игровую Комнату",
+        "code" : "Код ссылки",
+        "create" : "Создать Комнату"
+    },
+    "create_confirmation": {
+        "Room created": "Комната создана",
+        "Success" : "Успех"
+    },
+    "ru" : "Русский",
+    "en" : "Английский",
+    "bg" : "Болгарский",  
+    "language" : "Язык",
+    "room language" : "язык комнаты",
+    "Back to home": "На главную",
+    "Your name": "Ваше имя"
+}

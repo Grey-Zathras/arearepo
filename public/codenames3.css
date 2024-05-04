@@ -13,6 +13,14 @@ body  {
     padding: 2vh 1vw;
     border-top: 1px solid black;
 }
+.form_outer{
+    width: 100%;
+    display: inline-block;
+}
+.form_field{
+float: left;
+padding-right: 10px;
+}
 .card_text {
     background-color: rgb(182, 171, 117); /* white; */
     text-transform: uppercase;

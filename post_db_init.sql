@@ -21,10 +21,14 @@ INSERT INTO posts (title, content) VALUES ('Sample Post', 'This is a sample blog
 CREATE TABLE rooms (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    code VARCHAR(255) NOT NULL, 
+    code VARCHAR(255) NOT NULL,
+    lang VARCHAR(10) DEFAULT 'RU', 
     priv boolean DEFAULT 0,
     stat integer DEFAULT 0,
     cards VARCHAR(30) [25],
     states integer[2][25],
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+-- unique value for code + index
+--ALTER TABLE rooms ADD CONSTRAINT code_key UNIQUE (code);
+CREATE UNIQUE INDEX room_code_idx ON rooms (code) ;

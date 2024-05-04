@@ -1,0 +1,22 @@
+{
+  "home": {
+    "welcome": "Welcome to the",
+    "title": "CodeNames Duet Board Game",
+    "create" : "Create a Game Room",
+    "change": "Change",
+    "total": "There are {{counter}} books in the list",
+    "buttonText": "Refresh button",
+    "buttonHTML": "<button onClick='window.location.reload();'>$t(buttonText)</button>"
+  },
+  "create": {
+    "title": "Create New Game Room",
+    "room_name" : "Title",
+    "headline" : "Create a New Game Room",
+    "code" : "Code",
+    "create" : "Create Room"
+  },
+  "ru" : "Russian",
+  "en" : "English",
+  "bg" : "Bulgarian",  
+  "language" : "Language"
+}

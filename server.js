@@ -1,30 +1,30 @@
 // Whole-script strict mode syntax
 "use strict";
 
-/*
-//process.env.PORT 
-server.listen(process.env.PORT || 3000, () => {
-    console.log('listening chat server on *:3000');
-  });
-*/
   /**
    * Module dependencies.
    */
   
-  //var { io } = require("./utils/glbl_objcts");
-  var app = require('./app');
   var debug = require('debug')('card-names-duet:server');
   var http = require('http');
   const socketIo = require('socket.io');
   const io_socket_connected = require('./utils/chat_socket_io');
-  
+  const i18next = require('i18next');
+  //const i18nextMiddleware = require('i18next-http-middleware');
+  const session = require('express-session');
+  const sessionMiddleware = session({
+    secret: "Wonka-Willi",
+    resave: true,
+    saveUninitialized: true,
+  });
+  var app = require('./app')(sessionMiddleware);
   /**
    * Get port from environment and store in Express.
    */
   
   var port = normalizePort(process.env.PORT || '3000');
   app.set('port', port);
-  
+  //app.use(sessionMiddleware);
   /**
    * Create HTTP server.
    */
@@ -33,6 +33,27 @@ server.listen(process.env.PORT || 3000, () => {
   
   // chat server support
   const io = socketIo(server);
+  io.engine.use(sessionMiddleware);
+  io.use(function(socket, next){
+    const req=socket.request;
+    socket.request.i18n=i18next;
+    /*
+    i18nextMiddleware.handle(i18next, {
+      //getPath: (req) => req.path,
+      getUrl: (req) => req.url,
+      setUrl: (req, url) => (req.url = url),
+      getQuery: (req) => req._query,
+      //getParams: (req) => req.params,
+      //getBody: (req) => req.body,
+      //setHeader: (res, name, value) => res.setHeader(name, value),
+      //setContentType: (res, type) => res.contentType(type),
+      //setStatus: (res, code) => res.status(code),
+      //send: (res, body) => res.send(body)
+    }); */
+    //(socket.request);
+    next();
+  });
+  
   io.on('connection', io_socket_connected);
 
   /**
