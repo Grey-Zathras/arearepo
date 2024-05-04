@@ -43,7 +43,7 @@ const io_socket_connected = (socket) => {
       } else {
       */
         console.log(res.error);
-        socket.emit('error message',  "Cannot join the room: "+res.error);
+        socket.emit('error message',  socket.request.i18n.t("Cannot join the room")+": "+res.error);
       // }
     } else {
       socket.join(room_name);
@@ -86,10 +86,10 @@ const io_socket_connected = (socket) => {
       var states = cardGenerator.generateSpies();
       gameLogic.writeStates({the_room_id: the_room.id, states: states, cards: cards});
       io.to(the_room.room_name).emit('new table',  { room_id: the_room.id, cards: cards}); // no team!
-      io.to(the_room.room_name).emit('system message', { msg: "Table recreated!", user: data.user, msg_type:0}); // general system message
+      io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("Table recreated")+"!", user: data.user, msg_type:0}); // general system message
     } catch (err) {
       console.log(socket.id,`rebuild table request error: User ${socket.data}, request: ${data} `,err);
-      socket.emit('error message',  err);
+      socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
 
@@ -118,7 +118,7 @@ const io_socket_connected = (socket) => {
       gameLogic.destroyRoom({io:io, the_room:the_room});
     } catch (err) {
       console.log(socket.id,`delete room request error: User ${socket.data}, request: ${data} `,err);
-      socket.emit('error message',  err);
+      socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
 
@@ -135,10 +135,10 @@ const io_socket_connected = (socket) => {
       // clean teams? hide states? 
 
       gameLogic.roomData({room: the_room, io:io });
-      io.to(the_room.room_name).emit('system message', { msg: "the game has stopped!", user: data.user, msg_type:7 }); // system message stop game
+      io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("the game has stopped")+"!", user: data.user, msg_type:7 }); // system message stop game
     } catch (err) {
       console.log(socket.id,`start game  request error: User ${socket.data}, request: ${data} `,err);
-      socket.emit('error message',  err);
+      socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
 
@@ -169,13 +169,13 @@ const io_socket_connected = (socket) => {
       var states = await gameLogic.getTeamStates({room_id:the_room.id, team_id:0, states_unsecured: states_unsecured });
       console.log(`start game - observer schema: `,states);
       io.to(the_room.room_name).emit('team scheme',  { room_id: the_room.id, states: states}); // no team!
-      io.to(the_room.room_name).emit('system message', { msg: "Let's start the game!", user: data.user, msg_type:2 }); // system message start game
+      io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("Let's start the game")+"!", user: data.user, msg_type:2 }); // system message start game
       gameLogic.roomData({room: the_room, io:io });
       //const { rows } = await codenames_DB.query('UPDATE rooms SET stat=$2 WHERE id = $1', [room_id],[0]);  
       console.log("start game success, room:",the_room);
     } catch (err) {
       console.log(socket.id,`start game  request error: User ${socket.data}, request: ${data} `,err);
-      socket.emit('error message',  err);
+      socket.emit('error message',  socket.request.i18n.t(err));
       //socket.emit('error message',  `unknown error ${err}`);
     }
   });
@@ -196,11 +196,11 @@ const io_socket_connected = (socket) => {
       //preparation for the cards selection by all the team members
       gameLogic.resetRoomCardsResponsesMap(the_room);
       gameLogic.roomData({room: the_room, io:io });
-      io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team sends the challenge:`, user: data.user, team: user.team, challenge: data.challenge, clicks: clicks, msg_type:3 }); // system message challenge
+      io.to(the_room.room_name).emit('system message', { msg: `${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team sends the challenge")}:`, user: data.user, team: user.team, challenge: data.challenge, clicks: clicks, msg_type:3 }); // system message challenge
       
     } catch (err) {
       console.log(socket.id,`challenge request error:`,err);
-      socket.emit('error message',  err);
+      socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
 
@@ -230,7 +230,7 @@ const io_socket_connected = (socket) => {
         // broadcast new states to all users
         const reveal_role= states[2-the_room.active_team][data.card_id];
         io.to(the_room.room_name).emit('system message', { 
-            msg: `${teams_list[user.team] } team has chosen the card: {card_text}, which is {reveal_role}`, 
+            msg: `${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team has chosen the card: {card_text}, which is {reveal_role}")}`, 
             user: user.username,
             team: the_room.active_team,
             card_id:data.card_id,
@@ -242,30 +242,30 @@ const io_socket_connected = (socket) => {
           // end game ?
           //the_room.game_status=0;
           gameLogic.roomData({room: the_room, io:io });
-          io.to(the_room.room_name).emit('system message', { msg: "<span class=\"highlight\">You all are WINNERS - game over!</span> <br/> Host can stop the game and regenerate the room.", user: "game", msg_type:8 }); // system message win game
+          io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("<span class=\"highlight\">You all are WINNERS - game over!</span> <br/> Host can stop the game and regenerate the room."), user: "game", msg_type:8 }); // system message win game
         } else {
           if (reveal_role==4) {
             the_room.clicks[the_room.active_team]--;
             if (!the_room.clicks[the_room.active_team]) {
               // change the  turn and the step, team is the same
-              gameLogic.endTurn({io:io,the_room:the_room,states:states,user: user.username,main_msg:`${teams_list[user.team] } team run out of clicks.`});
+              gameLogic.endTurn({io:io, i18n:socket.request.i18n, the_room:the_room,states:states,user: user.username,main_msg:`${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team run out of clicks")}.`});
             } else {
               gameLogic.roomData({room: the_room, io:io });
             }
           } else {
               // change the  turn and the step, team is the same
-              gameLogic.endTurn({io:io, the_room:the_room,states:states,user: user.username,main_msg:`${teams_list[user.team] } team is missed.`});
+              gameLogic.endTurn({io:io, i18n:socket.request.i18n, the_room:the_room,states:states,user: user.username,main_msg:`${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team is missed")}.`});
           }
           //gameLogic.roomData({room: the_room, io:io });
         }
       } else {
         // send the status update on the card selection
-        io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team has no consent:`, user: user.username, msg_type:4, card_response_array:card_response_array }); // system message no_consent
+        io.to(the_room.room_name).emit('system message', { msg: `${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team has no consent")}:`, user: user.username, msg_type:4, card_response_array:card_response_array }); // system message no_consent
       }
 
     } catch (err) {
       console.log(socket.id,`card_choice error:`,err);
-      socket.emit('error message',  err);
+      socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
 
@@ -289,13 +289,13 @@ const io_socket_connected = (socket) => {
         if (consent) {
             // change the  turn and the step, team is the same
             var rows = await gameLogic.readStates(the_room.id);
-            gameLogic.endTurn({io:io, the_room:the_room,states:rows[0].states, user: user.username, main_msg:`${teams_list[user.team] } team decided to end current turn.`});            
+            gameLogic.endTurn({io:io, i18n:socket.request.i18n, the_room:the_room,states:rows[0].states, user: user.username, main_msg:`${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team decided to end current turn")}.`});            
         } else {
-        io.to(the_room.room_name).emit('system message', { msg: `${teams_list[user.team] } team has no consent for end turn `, user: user.username, msg_type:0 }); // system message / general
+        io.to(the_room.room_name).emit('system message', { msg: `${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team has no consent for end turn")} `, user: user.username, msg_type:0 }); // system message / general
         }
     } catch (err) {
       console.log(socket.id,`end_turn error:`,err);
-      socket.emit('error message',  err);      
+      socket.emit('error message',  socket.request.i18n.t(err));      
     }
   });
   
@@ -309,7 +309,7 @@ const io_socket_connected = (socket) => {
       gameLogic.roomData({room: the_room, io:io });
     } catch (err) {
       console.log(socket.id,`card_choice error:`,err);
-      socket.emit('error message',  err);
+      socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
   
@@ -327,7 +327,7 @@ const io_socket_connected = (socket) => {
       
     } catch (err) {
       console.log(socket.id,`challenge request error:`,err);
-      socket.emit('error message',  err);
+      socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
     
@@ -368,7 +368,7 @@ const io_socket_connected = (socket) => {
 
     } catch (err) {
       console.log(socket.id,`challenge request error:`,err);
-      socket.emit('error message',  err);
+      socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
 
@@ -394,7 +394,7 @@ const io_socket_connected = (socket) => {
             const the_room = getRoom(socket.data.room_id);
             updateUser ( { id:user.id, active:0 });
             gameLogic.roomData({room: the_room, io:io });
-            io.to(the_room.room_name).emit('system message', { msg: `I am disconnected, ${reason}`, user: user.username });
+            io.to(the_room.room_name).emit('system message', { msg: `${socket.request.i18n.t("I am disconnected")}, ${reason}`, user: user.username });
             let timeout = setTimeout(function() {
               gameLogic.delayedUserLeaveTheRoom(the_room,user,socket);
             }, 120000); // 2 min

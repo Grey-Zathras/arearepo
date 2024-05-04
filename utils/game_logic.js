@@ -180,14 +180,14 @@ exports.kickUserFromTheRoom = async function ({the_room,userleft,socket,io}) {
         }
         if (!the_room) 
             throw ("no room found to disconnect");
-        io.to(the_room.room_name).emit('system message', { msg: "user left the room", user: userleft.username, msgclass:"sysmsg" });
+        io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("user left the room"), user: userleft.username, msgclass:"sysmsg" });
         if (the_room.host == userleft.id) {
           const users= getUsersInRoom(the_room.id, 1).filter(user => user.active == 1);
           const res1=users.length;
           console.log('kickUserFromTheRoom - getUsersInRoom:',users,res1);
           if (!users.length) {
-            console.log("last active user left the room - room will be destroyed");
-            io.to(the_room.room_name).emit('system message', { msg: "last active user left the room - room will be destroyed", user: userleft.username });
+            console.log("last active user left the room - room will be closed");
+            io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("last active user left the room - room will be destroyed"), user: userleft.username });
             removeRoom(the_room.id);
           } else {
             const new_host = users[0];
@@ -195,7 +195,7 @@ exports.kickUserFromTheRoom = async function ({the_room,userleft,socket,io}) {
             updateRoom({id:the_room.id, host:new_host.id });
             //let the_room=getRoom(the_room.id);
             exports.roomData({room: the_room , host:new_host.username, io:io});
-            io.to(the_room.room_name).emit('system message', { msg: "host "+ userleft.username +" left the room, I am the new host", user: new_host.username });
+            io.to(the_room.room_name).emit('system message', { msg: `${socket.request.i18n.t("Room host")}  ${userleft.username}  ${socket.request.i18n.t("left the room, I am the new host")}`, user: new_host.username });
           }
         } else {
           exports.roomData({room: the_room, io:io });
@@ -214,7 +214,7 @@ exports.kickUserFromTheRoom = async function ({the_room,userleft,socket,io}) {
           const userSocket = userSockets.find(the_socket => the_socket.data.user_id.toString() === userleft.id);
           //console.log(`kickUserFromTheRoom debug: the_room ${the_room}, userleft: ${userleft} `,"userSocket",userSocket);
           if (userSocket) {
-            userSocket.emit('go away', { msg: "host kicked you from the room" });
+            userSocket.emit('go away', { msg: userSocket.request.i18n.t("host kicked you from the room") });
             userSocket.disconnect(true);
           }
         }
@@ -297,7 +297,7 @@ exports.countHiddenSpies =  function (states) {
   return hidden_spies;
 }
 
-exports.endTurn =  function ({the_room, states,main_msg, user, io }) {
+exports.endTurn =  function ({the_room, states,main_msg, user, io, i18n }) {
   if ( !the_room.step ) {  //the Challenge step
     the_room.active_team=3-the_room.active_team;
   }
@@ -305,13 +305,13 @@ exports.endTurn =  function ({the_room, states,main_msg, user, io }) {
   the_room.step = 0; //now is the Challenge step
   let count = states[the_room.active_team-1].reduce((total,x) => total+(x==1), 0);
   if (!count){
-    io.to(the_room.room_name).emit('system message', { msg: `${teams_list[the_room.active_team] } team has no more spies!`, user: "game", msg_type:0 }); // system message / general
+    io.to(the_room.room_name).emit('system message', { msg: `${i18n.t(teams_list[the_room.active_team]) } ${i18n.t("team has no more spies")}!`, user: "game", msg_type:0 }); // system message / general
     the_room.active_team=3-the_room.active_team;
   } 
   exports.resetRoomCardsResponsesMap(the_room);
   exports.roomData({room: the_room, io:io });
   if (main_msg ) {
-    io.to(the_room.room_name).emit('system message', { msg: `${main_msg } New Turn:${the_room.turn} !`, user: user,team:the_room.active_team, msg_type:6}); // system message end turn
+    io.to(the_room.room_name).emit('system message', { msg: `${main_msg } ${i18n.t("New Turn")}: ${the_room.turn} !`, user: user,team:the_room.active_team, msg_type:6}); // system message end turn
   }
 }
 
@@ -340,7 +340,7 @@ exports.joinTeam = async function ({socket,team_id}) { // data.room
       var states = await exports.getTeamStates({room_id:the_room.id, team_id:0 });
       socket.emit('team scheme',  { room_id: room_id,team:0, states: states}); // Observer
     }
-    io.to(the_room.room_name).emit('system message', { msg: "User joined the team", user: socket.data.username,team:team_id , msg_type:1}); // system message
+    io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("User joined the team"), user: socket.data.username,team:team_id , msg_type:1}); // system message
     console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
   } catch (err){
     console.log(socket.id,` Join Team: User ${socket.data} has got error`,err);
