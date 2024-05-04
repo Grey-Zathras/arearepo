@@ -9,8 +9,33 @@
   <script type="text/javascript" src="/css-fireworks.js"></script>
   <script type="text/javascript"  src="/codenames3.js"></script>
   <script>
-        var room = '<%= room.title %>';
-        var room_id= <%= room.id %>;
+    var room = '<%= room.title %>';
+    var room_id= <%= room.id %>;
+    var card_verbs=[
+      '<%= t("closed")%>', 
+      '<%= t("spy")%>', 
+      '<%= t("killer")%>',
+      '<%= t("Civilian")%>', 
+      '<%= t("Spy")%>',
+      '<%= t("Killer")%>' 
+    ]; // cards on the table - text for chat
+    var teams_list=[
+      "<%= t("Observers")%>",
+      "<%= t("Red Team")%>",
+      "<%= t("Blue Team")%>"
+    ]; //team membership text for chat
+    var step_verbs=["<%= t("Challenge")%>", "<%= t("Response")%>"]; // game status terms
+    var i18n_text= {
+      "Please enter your name": "<%= t("Please enter your name")%>",
+      "Your turn!": "<%= t("Your turn!")%>",
+      "Game Started": "<%= t("Game Started")%>",
+      "Team": "<%= t("Team")%>",
+      "Are you sure you want to kick yourself?": "<%= t("Are you sure you want to kick yourself?")%>",
+      "Are you sure you want to leave the room?": "<%= t("Are you sure you want to leave the room?")%>",
+      "Game Not Started": "<%= t("Game Not Started")%>",
+      "Click start!": "<%= t("Click start!")%>",
+      "one of the teams is empty": "<%= t("one of the teams is empty")%>"
+    };
   </script>
 </head>
 <body>
@@ -19,15 +44,15 @@
   <div>
     <div class="cardspace border1">
       <div class="game_head">
-        <span id="gamestat">Game Not Started</span> &nbsp;&nbsp;&nbsp;
+        <span id="gamestat"><%= t("Game Not Started")%></span> &nbsp;&nbsp;&nbsp;
         <span class="game_progress" id="game_progress">
-          Turn:&nbsp;<span id="turn">0</span>  &nbsp;&nbsp;&nbsp;
-          Spies&nbsp;left:&nbsp;<span id="spies_left"></span>  &nbsp;&nbsp;&nbsp;
-          <span id="yourteamContainer">Your&nbsp;team:&nbsp;<span id="yourteam"></span>  &nbsp;&nbsp;&nbsp;</span>
-          Active&nbsp;team:&nbsp;<span id="activeteam"></span>  &nbsp;&nbsp;&nbsp;
-          Step:&nbsp;<span id="activestep"></span>  &nbsp;&nbsp;&nbsp;
-          Clicks:&nbsp;<span id="totalclicks"></span>  &nbsp;&nbsp;&nbsp;
-          Current&nbsp;challenge:&nbsp;<span id="challenged_text"></span> &nbsp;&nbsp;&nbsp;
+        <span class="nowrap"><%= t("Turn")%></span>&nbsp;<span id="turn">0</span>  &nbsp;&nbsp;&nbsp;
+        <span class="nowrap"><%= t("Spies left")%></span>&nbsp;<span id="spies_left"></span>  &nbsp;&nbsp;&nbsp;
+          <span id="yourteamContainer" class="nowrap"><%= t("Your team")%>:&nbsp;<span id="yourteam"></span>  &nbsp;&nbsp;&nbsp;</span>
+          <span class="nowrap"><%= t("Active team")%></span>:&nbsp;<span id="activeteam"></span>  &nbsp;&nbsp;&nbsp;
+          <span class="nowrap"><%= t("Step")%>:&nbsp;<span id="activestep"></span>  &nbsp;&nbsp;&nbsp;
+          <span class="nowrap"><%= t("Clicks")%>:&nbsp;<span id="totalclicks"></span>  &nbsp;&nbsp;&nbsp;
+          <span class="nowrap"><%= t("Current challenge")%>:&nbsp;<span id="challenged_text"></span> &nbsp;&nbsp;&nbsp;
         </span>
       </div>
   
@@ -47,58 +72,58 @@
         <% } %>
       </table>
       <div id="secretCheckbox" style="display:none;">
-        <label for="secretOn">secret cards On</label>
+        <label for="secretOn"><%= t("secret cards On")%></label>
         <input type="checkbox" id="secretOn" name="secretOn"  value="secret cards On" checked />
       </div>
-      <label for="legend">Legend: </label>
+      <label for="legend"><%= t("Legend")%>: </label>
       <input type="checkbox" id="legend" name="legend"  value="Legend On" checked />
       <table class="secret_on" id="legend_table" width="100%">
           <tr>
             <td  class="card spy">
               <div class="card_text">
-                hidden spy
+                <%= t("hidden spy")%>
               </div> 
             </td>
             <td  class="card closed">
               <div class="card_text">
-                hidden civilian
+                <%= t("hidden civilian")%>
               </div> 
             </td>
             <td  class="card killer">
               <div class="card_text">
-                hidden killer
+                <%= t("hidden killer")%>
               </div> 
             </td>
           </tr><tr>
             <td  class="card spy_opened">
               <div class="card_text">
-                Opened Spy
+                <%= t("Opened Spy")%>
               </div> 
             </td>
             <td  class="card ">
               <div class="card_text">
-                closed card
+                <%= t("closed card")%>
               </div> 
             </td>
             <td  class="card killer_opened">
               <div class="card_text">
-                Opened Killer
+                <%= t("Opened Killer")%>
               </div> 
             </td>
           </tr><tr>
             <td  class="card civilian1">
               <div class="card_text">
-                Blue Team missed
+                <%= t("Blue Team missed")%>
               </div> 
             </td>
             <td  class="card civilian1 civilian2">
               <div class="card_text">
-                civilian both Teams
+                <%= t("civilian both Teams")%>
               </div> 
             </td>
             <td  class="card civilian2">
               <div class="card_text">
-                Red Team missed
+                <%= t("Red Team missed")%>
               </div> 
             </td>
           </tr>
@@ -107,23 +132,23 @@
     <div class="log_area" >
       <div class="chat_header">
         <div class="host">
-          Room host:  <span id="host"></span> <button id="startButton" disabled>Start game</button> <button id="stopButton" disabled style="display:none;">Stop game</button> 
-          <button id="manageUsersButton" disabled>Manage Room</button>
+          <%= t("Room host")%>:  <span id="host"></span> <button id="startButton" disabled><%= t("Start game")%></button> <button id="stopButton" disabled style="display:none;"><%= t("Stop game")%></button> 
+          <button id="manageUsersButton" disabled><%= t("Manage Room")%></button>
         </div>
           <div class="div-table teams" >
           <div class="div-table-row" >
             <div class="div-table-col Observers">
-              Observers
+              <%= t("Observers")%>
               <div class="members" id="Observers">
               </div>
             </div>
             <div class="div-table-col Red_team" >
-              Red&nbsp;Team
+              <span class="nowrap"><%= t("Red Team")%></span>
               <div class="members" id="Red_team">
               </div>
             </div>
             <div class="div-table-col Blue_team">
-              Blue&nbsp;Team
+              <span class="nowrap"><%= t("Blue Team")%></span>
               <div class="members" id="Blue_team">
               </div>
             </div>
@@ -131,38 +156,38 @@
         </div>
         <div class="userControl"  >
           <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
-          <button id="reconnectButton">Reconnect</button>
-          <button id="endTurnButton"  disabled>End Turn</button>
+          <button id="reconnectButton"><%= t("Reconnect")%></button>
+          <button id="endTurnButton"  disabled><%= t("End Turn")%></button>
 
           <form id="userForm" action="">
             <div id="chooseTeamBlock" >
-              <div>Choose&nbsp;team: </div>
+              <div><span class="nowrap"><%= t("Choose team")%>:</span> </div>
               <div>
                 <select  id="userTeam" name="userTeam">
-                  <option value="0">Observer, no team</option>
-                  <option value="1" style="color: red;">Red team</option>
-                  <option value="2" style="color: blue;">Blue team</option>
+                  <option value="0"><%= t("Observer, no team")%></option>
+                  <option value="1" style="color: red;"><%= t("Red Team")%></option>
+                  <option value="2" style="color: blue;"><%= t("Blue Team")%></option>
                 </select>
-                <button>Join</button>
+                <button><%= t("Join")%></button>
               </div>
             </div>
             <div id="challengeBlock" style="display:none;">
-              Challenge: <input type="text" id="challenge" name="challenge" disabled /> <br/> 
-              Attempts:&nbsp;<input type="text" id="clicks" name="clicks" maxlength="2" size="2" disabled /><button>Send</button>
+              <%= t("Challenge")%>: <input type="text" id="challenge" name="challenge" disabled /> <br/> 
+              <%= t("Attempts")%>:&nbsp;<input type="text" id="clicks" name="clicks" maxlength="2" size="2" disabled /><button><%= t("Send")%></button>
             </div>
           </form>
         </div>
-        System Log:<br/>
+        <%= t("System Log")%>:<br/>
         <div class="chat_msg">
           <ul id="system_messages"></ul>
         </div>
       </div>
         <div class="user_chat">
           <form id="chatForm" action="">
-            Your name: <input type="text" id="userNameBox" name="userNameBox" disabled />
-            <input id="input" autocomplete="off" /><button>Send</button>
+            <%= t("Your name")%>: <input type="text" id="userNameBox" name="userNameBox" disabled />
+            <input id="input" autocomplete="off" /><button><%= t("Send")%></button>
           </form>
-          User Chat:<br/>
+          <%= t("User Chat")%>:<br/>
           <div class="chat_msg">
             <ul id="chat_messages"></ul>
           </div>
@@ -175,25 +200,25 @@
     <!-- Modal content -->
     <div class="modal-content">
       <span class="close">&times;</span>
-      <div class="game_head"><h3>Manage room</h3></div>
+      <div class="game_head"><h3><%= t("Manage room")%></h3></div>
       <hr/>
-      Select user to expel from room: 
+      <%= t("Select user to expel from room")%>: 
       <select id="modalUserList">
         
       </select> 
-      <button id="kickUserButton">Kick User</button> 
+      <button id="kickUserButton"><%= t("Kick User")%></button> 
       <br />
       <hr/>
-      <button id="rebuildTableButton">Rebuild Table</button> &nbsp;&nbsp;&nbsp; <button id="deleteRoomButton">Delete Room</button> 
+      <button id="rebuildTableButton"><%= t("Rebuild Table")%></button> &nbsp;&nbsp;&nbsp; <button id="deleteRoomButton"><%= t("Delete Room")%></button> 
       <br />
       <hr/>
-      <button id="modalCloseButton">Close</button> 
+      <button id="modalCloseButton"><%= t("Close")%></button> 
     </div>
 
   </div>
   <div id="yourTurn" >
     <div class="banner-text">
-      Your Turn!      
+      <%= t("Your Turn")%>!      
     </div>
   </div>
 </body>

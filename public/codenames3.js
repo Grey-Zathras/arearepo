@@ -105,10 +105,8 @@ const removeClassFromAllElements = (className) => {
 const activeClass=["inactive","active"]; // member chat status
 const memberTagID = ["Observers","Red_team", "Blue_team"]; // team membership 
 const player_class_array=['closed', 'spy', 'killer','civilian', 'spy_opened','killer_opened' ]; // cards on the table
-const card_verbs=['closed', 'spy', 'killer','Мирный житель', 'Шпион','Киллер' ]; // cards on the table - text for chat
 //var observer_class_array=[ 'spy_opened','civilian','killer_opened' ]; // cards on the table
-const teams_list=["observer","Red","Blue"]; //team membership text for chat
-const step_verbs=["Challenge", "Response"]; // game status terms
+
 
 var socket = io();
 
@@ -186,7 +184,7 @@ window.onload = function() {
     var userName = getCookie("username");
     var userID = getCookie("userid");
     if (!userName) {
-      userName = prompt("Please enter your name:");
+      userName = prompt(i18n_text["Please enter your name"]+':');
       setCookie("username", userName, 7);
       userID = 0;
       //userID = socket.id;
@@ -416,12 +414,12 @@ window.onload = function() {
       chooseTeamBlock.style.display = "none";
       game_progress.style.display = "contents";
       if (game_obj.room.active_team==my_team) {
-        gamestat.innerHTML="Game Started:&nbsp;<b>Your turn!</b>";
+        gamestat.innerHTML=`${i18n_text["Game Started"]}: <b>${i18n_text["Your turn!"]}</b>`;
       } else {
-        gamestat.innerText = "Game Started";
+        gamestat.innerText = i18n_text["Game Started"];
       }
       spies_left.innerText = 15 - countSpies();       
-      activeteam.innerHTML = `<span class="${memberTagID[data.room.active_team]}">${teams_list[data.room.active_team]}&nbsp;Team</span>`;  //teams_list[data.room.active_team];
+      activeteam.innerHTML = `<span class="${memberTagID[data.room.active_team]} nowrap">${teams_list[data.room.active_team]}</span>`;  //teams_list[data.room.active_team];
       activestep.innerText =  step_verbs[data.room.step];
       turn.innerText =  data.room.turn;
       if (data.room.step ) { // Response step
@@ -453,7 +451,7 @@ window.onload = function() {
         totalclicks.innerText=data.room.clicks[my_team];
         secretCheckbox.style.display = "block";
         yourteamContainer.style.display = "contents";
-        yourteam.innerHTML=`<span class="${memberTagID[my_team]}">${teams_list[my_team]}&nbsp;Team</span>`;
+        yourteam.innerHTML=`<span class="${memberTagID[my_team]} nowrap">${teams_list[my_team]}</span>`;
         if (data.room.active_team==my_team && !data.room.step) { // challedge phase
             challengeBlock.querySelector("button").disabled=false;
             challenge.disabled=false;
@@ -492,12 +490,12 @@ window.onload = function() {
         let game_str="";
         if (game_obj.host == userName) {
           if (! (game_obj.users.filter(user => user.team == 1).length && game_obj.users.filter(user => user.team == 2).length) ) {
-              game_str = "one of the teams is empty";
+              game_str = i18n_text["one of the teams is empty"];
           } else {
-              game_str = "<b>Click start!</b>";
+              game_str = `<b>${i18n_text["Click start!"]}</b>`;
           }
         }
-        gamestat.innerHTML = `Game Not Started ${(game_str ? `: ${game_str}` : "" )}`;
+        gamestat.innerHTML = `${i18n_text["Game Not Started"]} ${(game_str ? `: ${game_str}` : "" )}`;
       }
     
     //
@@ -522,7 +520,7 @@ window.onload = function() {
         }, 20000); //20 sec
     
         // You can customize the message, but modern browsers often display their own default message for security reasons.
-        var confirmationMessage = 'Are you sure you want to leave the room?';
+        var confirmationMessage = i18n_text['Are you sure you want to leave the room?'];
         //const res = window.confirm(confirmationMessage);
         socket.emit('request to leave room', {  msg: "user leaving the room "+room+" - window beforeunload", user: userName, userid:getCookie("userid")});
     
@@ -541,7 +539,7 @@ window.onload = function() {
   });
   */
   homelink.addEventListener('click', function(e) {
-    var confirmationMessage = 'Are you sure you want to leave the room?';
+    var confirmationMessage = i18n_text['Are you sure you want to leave the room?'];
     const res = window.confirm(confirmationMessage);
     if (res) {
         socket.emit('leave room', { room: room, msg: "user left the room", user: userName, });
@@ -613,7 +611,7 @@ window.onload = function() {
     //modal.style.display = "none";
     let userleft =modalUserList.value;
     if (userleft==game_obj.host) {
-      var confirmationMessage = 'Are you sure you want to kick yourself?';
+      var confirmationMessage = i18n_text['Are you sure you want to kick yourself?'];
       const res = window.confirm(confirmationMessage);
         if (!res) {
           userleft="";
