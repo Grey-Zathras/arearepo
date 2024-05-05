@@ -85,7 +85,7 @@ const getUser = id => {
 const getUsersInRoom = (room, keepID) => {
   //room = room.trim().toLowerCase();
   let uu1=users.filter(user => user.room === room);
-  console.log("users.getUsersInRoom, keepID:",keepID,"room:",room);
+  //console.log("users.getUsersInRoom, keepID:",keepID,"room:",room);
   if (keepID)
     return uu1;
   else {

@@ -387,7 +387,8 @@ window.onload = function() {
 
   socket.on('userID', function(data) {
     console.log('userID data',data,"socket.id",socket.id );
-    userID = socket.id;
+    //userID = socket.id;
+    userID = data;
     setCookie("userid", userID, 7);
   });
   

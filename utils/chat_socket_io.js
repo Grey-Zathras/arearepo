@@ -14,22 +14,37 @@ const io_socket_connected = (socket) => {
   //const req = socket.request;
   //i18next.init(req);
   //const sessionId = socket.request.session.id;
+  if (!socket.request.session.room_lang || !socket.request.session.room_id) {
+    debug("session data is corrupted/missing - orphan after server restart?", socket.id, socket.request.session);
+    socket.emit('error message', socket.request.i18n.t("your session is corrupted. pls reload the page"));
+    //socket.emit('system message', { msg: socket.request.i18n.t("your session is corrupted. pls reload the page"), msg_type:10}); // warning system message
+    return ;
+  }
+
   try {
     socket.request.i18n.changeLanguage(socket.request.session.room_lang);
   } catch (err){
     socket.emit('error message',  err.message);
-    debug("io_socket_connected: session data not ready - hack? :", socket.id, err);
+    debug("i18n unknown error:", socket.id, err);
     return ;
   }
   
-  debug(socket.id,'a user connected');
+  debug(socket.id," - ",socket.request.sessionID,'a user connected');
+  if (!socket.data) {
+    debug("socket data not ready - new user?", socket.id, err);
+  }
 
 
     // Join a room
   socket.on('join room', async (data) => {
     
     if (data.user_id == 0) {
-      data.user_id = socket.id;
+      //data.user_id = socket.id;
+      data.user_id = socket.request.sessionID;
+      socket.emit('userID',  "User ID assigned: "+data.user_id);
+    } else if (data.user_id !== socket.request.sessionID ) {
+      debug(socket.id," - ",socket.request.sessionID,` User with user_id ${data.user_id} has ambiquity with his Session ID. Suspicious?`);
+      data.user_id = socket.request.sessionID;
       socket.emit('userID',  "User ID assigned: "+data.user_id);
     }
     const room_id = (socket.request.session ? socket.request.session.room_id: data.room_id);
@@ -58,10 +73,10 @@ const io_socket_connected = (socket) => {
       
       if (res.msg && res.user.team){
         await gameLogic.joinTeam({socket: socket, team_id: res.user.team}); //, data: data
-        debug(socket.id,` User ${data.user}/${data.user_id} reconnected to room: ${the_room.room_name} and team ${res.user.team}`);
+        debug(socket.id," - ",socket.request.sessionID,` User ${data.user}/${data.user_id} reconnected to room: ${the_room.room_name} and team ${res.user.team}`);
         //debug(socket.id,` res.user `, res.user);
       } else {
-        debug(socket.id,` User ${data.user} joined room: ${the_room.room_name} as Observer`);
+        debug(socket.id," - ",socket.request.sessionID,` User ${data.user} joined room: ${the_room.room_name} as Observer`);
         if (the_room.game_status){
           await gameLogic.joinTeam({socket: socket, team_id: 0}); // , data: data // send schema to observer
         }
@@ -91,7 +106,7 @@ const io_socket_connected = (socket) => {
       io.to(the_room.room_name).emit('new table',  { room_id: the_room.id, cards: cards}); // no team!
       io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("Table recreated")+"!", user: data.user, msg_type:0}); // general system message
     } catch (err) {
-      debug(socket.id,`rebuild table request error: User ${socket.data}, request: ${data} `,err);
+      debug(socket.id," - ",socket.request.sessionID,`rebuild table request error: User ${socket.data}, request: ${data} `,err);
       socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
@@ -120,7 +135,7 @@ const io_socket_connected = (socket) => {
       */
       gameLogic.destroyRoom({io:io, the_room:the_room});
     } catch (err) {
-      debug(socket.id,`delete room request error: User ${socket.data}, request: ${data} `,err);
+      debug(socket.id," - ",socket.request.sessionID,`delete room request error: User ${socket.data}, request: ${data} `,err);
       socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
@@ -140,7 +155,7 @@ const io_socket_connected = (socket) => {
       gameLogic.roomData({room: the_room, io:io });
       io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("the game has stopped")+"!", user: data.user, msg_type:7 }); // system message stop game
     } catch (err) {
-      debug(socket.id,`start game  request error: User ${socket.data}, request: ${data} `,err);
+      debug(socket.id," - ",socket.request.sessionID,`stop game  request error: User ${socket.data}, request: ${data} `,err);
       socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
@@ -177,7 +192,7 @@ const io_socket_connected = (socket) => {
       //const { rows } = await codenames_DB.query('UPDATE rooms SET stat=$2 WHERE id = $1', [room_id],[0]);  
       debug("start game success, room:",the_room);
     } catch (err) {
-      debug(socket.id,`start game  request error: User ${socket.data}, request: ${data} `,err);
+      debug(socket.id," - ",socket.request.sessionID,`start game  request error: User ${socket.data}, request: ${data} `,err);
       socket.emit('error message',  socket.request.i18n.t(err));
       //socket.emit('error message',  `unknown error ${err}`);
     }
@@ -202,7 +217,7 @@ const io_socket_connected = (socket) => {
       io.to(the_room.room_name).emit('system message', { msg: `${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team sends the challenge")}:`, user: data.user, team: user.team, challenge: data.challenge, clicks: clicks, msg_type:3 }); // system message challenge
       
     } catch (err) {
-      debug(socket.id,`challenge request error:`,err);
+      debug(socket.id," - ",socket.request.sessionID,`challenge request error:`,err);
       socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
@@ -267,7 +282,7 @@ const io_socket_connected = (socket) => {
       }
 
     } catch (err) {
-      debug(socket.id,`card_choice error:`,err);
+      debug(socket.id," - ",socket.request.sessionID,`card_choice error:`,err);
       socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
@@ -297,7 +312,7 @@ const io_socket_connected = (socket) => {
         io.to(the_room.room_name).emit('system message', { msg: `${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team has no consent for end turn")} `, user: user.username, msg_type:0 }); // system message / general
         }
     } catch (err) {
-      debug(socket.id,`end_turn error:`,err);
+      debug(socket.id," - ",socket.request.sessionID,`end_turn error:`,err);
       socket.emit('error message',  socket.request.i18n.t(err));      
     }
   });
@@ -329,18 +344,20 @@ const io_socket_connected = (socket) => {
         }, 30000); //0.5 min
       
     } catch (err) {
-      debug(socket.id,`challenge request error:`,err);
+      debug(socket.id," - ",socket.request.sessionID,`challenge request error:`,err);
       socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
     
   socket.on('leave room', async  (data) => {
     var userleft;
-    if (data.userid) {
-      userleft=removeUser(data.userid);
+    if (socket.request.sessionID){
+      userleft=removeUser(socket.request.sessionID);
     } else if (socket.data.user_id){
       userleft=removeUser(socket.data.user_id);
-    } 
+    } else if (data.userid) {
+      userleft=removeUser(data.userid);
+    }
     if (typeof userleft === "undefined" ) {
       userleft="undefined";
     }
@@ -352,7 +369,7 @@ const io_socket_connected = (socket) => {
       //socket.leave(userleft.room);
     } 
     catch (err) {
-      debug("no room found to leave for 'userleft'",userleft, "socket.data",socket.data, "data",data,err);
+      debug("no room found to leave for 'userleft'",userleft,", sessionID: ",socket.request.sessionID, "socket.data",socket.data, "data",data,err);
     }
   });
     
@@ -370,7 +387,7 @@ const io_socket_connected = (socket) => {
       gameLogic.kickUserFromTheRoom({the_room: the_room, userleft: userleft, io:io});
 
     } catch (err) {
-      debug(socket.id,`challenge request error:`,err);
+      debug(socket.id," - ",socket.request.sessionID,`kick user request error:`,err);
       socket.emit('error message',  socket.request.i18n.t(err));
     }
   });
@@ -378,21 +395,30 @@ const io_socket_connected = (socket) => {
   // Listen for chat messages and emit to the room
   socket.on('chat message', (data) => {
     io.to(data.room).emit('chat message', { msg: data.msg, user: data.user, msgclass: data.msgclass });
-    debug(socket.id,'chat message', socket.data, data.user, data.msg);
+    debug(socket.id," - ",socket.request.sessionID,'chat message', socket.data, `, user:${data.user}, room:${data.room}, msg:${data.msg}`);
   });
   
   socket.on('disconnect', (reason) => {
     try {
       let user = getUser(socket.id);
       if (user === undefined){
+        user = getUser(socket.request.sessionID);
+      }
+      if (user === undefined){
         user = getUser(socket.data.user_id);
       }
       if (user === undefined){
         debug("disconnect - socket_data",socket.data);
-        debug(socket.id,`disconnect - unknown user ${socket.data.user_id} disconnected`, reason);
+        debug(socket.id," - ",socket.request.sessionID,`, disconnect - unknown user ${socket.data.user_id} disconnected`, reason);
       } else  {
-          if ( !socket.data.room_id ) {
-            throw "no room in socket";
+          var room_id="";
+          if ( socket.data.room_id ) {
+            room_id = socket.data.room_id;
+          } else if ( socket.request.session.room_id) {
+            room_id = socket.request.session.room_id;
+          }
+          if ( !room_id ) {
+            throw "no room in socket or session found";
           }
             const the_room = getRoom(socket.data.room_id);
             updateUser ( { id:user.id, active:0 });
@@ -401,10 +427,10 @@ const io_socket_connected = (socket) => {
             let timeout = setTimeout(function() {
               gameLogic.delayedUserLeaveTheRoom(the_room,user,socket);
             }, 120000); // 2 min
-            debug(socket.id,`user ${user.username} disconnected`, reason);
+            debug(socket.id," - ",socket.request.sessionID,`, user ${user.username} to be removed by disconnect in 2 min`, reason);
       }
     } catch (err) {
-      debug(socket.id,`disconnect error: User ${socket.data}, reason ${reason}, `,err);
+      debug(socket.id," - ",socket.request.sessionID,` disconnect error: User ${socket.data}, reason ${reason}, `,err);
     }
   });
 }

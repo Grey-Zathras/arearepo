@@ -108,7 +108,8 @@
     "left the room, I am the new host": "напусна стаята, сега съм новият Домакин",
     "Challenge or clicks data is missing": "пропуснати данни - текст на подкана или брой на опити",
     "no more than 9 clicks!": "броят на опитите е не повече от 9!",    
-
     "Room not found":"Няма такава зала",
+    "socket data is corrupted. pls reconnect":"грешка на сокет, моля свържете се отново",
+    "your session is corrupted. pls reload the page":"грешка на сесия, моля презаредете страницата",
     "Your name": "Вашето имя"
 }
