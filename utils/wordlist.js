@@ -1,6 +1,6 @@
 const fs = require('fs');
-var debug = require('debug')('wordlist');
-debug.log = console.log.bind(console); // don't forget to bind to console!
+var debug_mdl = require('debug')('wordlist');
+debug_mdl.log = console.log.bind(console); // don't forget to bind to console!
 
 //const fullWordList = fs.readFileSync('./wordlist.txt', 'utf-8');
 //const wordList = fullWordList.split(/\r?\n/);
@@ -12,7 +12,7 @@ const wordList = {
             var path= loadPath.replace("{{lng}}",value);
             const fullWordList = fs.readFileSync(path, 'utf-8');
             this[value] = fullWordList.split(/\r?\n/);
-            debug("wordList.init: Word List loaded for lang ",value,", ", this[value].length ," words" );  
+            debug_mdl("wordList.init: Word List loaded for lang ",value,", ", this[value].length ," words" );  
         }
     }
 };
