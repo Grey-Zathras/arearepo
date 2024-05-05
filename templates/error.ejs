@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <%- include('../templates/partials/head', {title: 'Error '+error.status}); %>
+  <%- include('../templates/partials/head',{
+    title: t("error_route.title",{code: error.status} )
+  }); %>
 </head>
 <body>
-  <%- include('../templates/partials/header', {headline: message}); %>
+  <%- include('../templates/partials/header', {headline: t(message)}); %>
   <div class="body-main">
-    <h2>Error Code: <%= error.status %></h2>
+    <h2><%= t("error_route.Error_Code") %>: <%= error.status %></h2>
     <pre><%= error.stack %></pre>
-    <a href="/">Back to home</a>
+    <a href="/"><%= t("Back to home") %></a>
   </div>
 </body>
 </html>

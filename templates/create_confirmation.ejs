@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Room created</title>
+  <title><%= t("create_confirmation.Room_created") %></title>
   <link rel="stylesheet"  type="text/css" href="/codenames3.css">
   <script>
     window.onload = setTimeout(function() {
@@ -11,9 +11,9 @@
   </script>
 </head>
 <body>
-  <%- include('../templates/partials/header', {headline: 'Success!'}); %>
-  <p>Room <strong><%= room.title %></strong> created</p>
+  <%- include('../templates/partials/header', {headline: t("create_confirmation.Success")}); %>
+  <p><%- t("create_confirmation.title_created",{room: room.title}) %></p>
   <a href="/room/<%= rows.id %>" id="newRoomLink"><%= room.title %></a><br>
-  <a href="/">Back to home</a>
+  <a href="/"><%= t("Back to home") %></a>
 </body>
 </html>

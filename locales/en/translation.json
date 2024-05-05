@@ -15,6 +15,15 @@
     "code" : "Code",
     "create" : "Create Room"
   },
+  "create_confirmation": {
+    "Room_created": "Room created",
+    "title_created": "Room <strong>{{room}}</strong> created",
+    "Success" : "Success"
+  },
+  "error_route": {
+    "title":"Error {{code}}",
+    "Error_Code" : "Error Code"
+  },
   "ru" : "Russian",
   "en" : "English",
   "bg" : "Bulgarian",  

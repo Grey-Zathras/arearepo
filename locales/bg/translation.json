@@ -13,8 +13,13 @@
         "create" : "Създайте залата"
     },
     "create_confirmation": {
-        "Room created": "Залата е създадена",
+        "Room_created": "Залата е създадена",
+        "title_created": "Залата <strong>{{room}}</strong> е създадена",
         "Success" : "Успях"
+    },
+    "error_route": {
+        "title":"Грешка {{code}}",
+        "Error_Code" : "Код на грешката"
     },
     "ru" : "Руски",
     "en" : "Английски",
@@ -81,6 +86,7 @@
     "Are you sure you want to kick yourself?": "Сигурни ли сте, че искате да се премахнете?",
     "civilian both Teams": "граждански, двата екипа пропусна",
     "Spies left": "Остават шпиони",
+    "Room not found":"Няма такава зала",
 
     "Your name": "Вашето имя"
 }

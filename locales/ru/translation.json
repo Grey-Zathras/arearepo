@@ -15,8 +15,13 @@
         "create" : "Создать Комнату"
     },
     "create_confirmation": {
-        "Room created": "Комната создана",
+        "Room_created": "Комната создана",
+        "title_created": "Комната <strong>{{room}}</strong> создана",
         "Success" : "Успех"
+    },
+    "error_route": {
+        "title":"Ошибка {{code}}",
+        "Error_Code" : "Код ошибки"
     },
     "ru" : "Русский",
     "en" : "Английский",
@@ -106,9 +111,9 @@
     "New Turn": "Новый Ход",
     "User joined the team": "Игрок присоединяется к",
     "left the room, I am the new host": "покинул комнату, теперь я новый мастер",
-    
     "Challenge or clicks data is missing": "пропущены данные - текст подсказки или количество попыток",
-    "no more than 9 clicks!": "число попыток не больше 9!",
+    "no more than 9 clicks!": "число попыток не больше 9!",    
+    "Room not found":"Нет такой комнаты",
 
     "Your name": "Ваше имя"
 }
