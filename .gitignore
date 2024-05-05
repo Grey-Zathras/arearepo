@@ -132,6 +132,7 @@ dist
 # my config files
 db.js
 package-lock.json
+.vscode/launch.json
 
 # random files
 codenames03.html

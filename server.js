@@ -5,7 +5,9 @@
    * Module dependencies.
    */
   
-  var debug = require('debug')('card-names-duet:server');
+  var debug = require('debug')('server');
+  debug.log = console.log.bind(console); // don't forget to bind to console!
+
   var http = require('http');
   const socketIo = require('socket.io');
   const io_socket_connected = require('./utils/chat_socket_io');

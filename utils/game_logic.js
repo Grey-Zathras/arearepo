@@ -1,3 +1,5 @@
+var debug = require('debug')('game_logic');
+debug.log = console.log.bind(console); // don't forget to bind to console!
 
 const { log_debug_on, teams_list, isInt } = require("./glbl_objcts");
 const { addUser, removeUser, getUser, getUsersInRoom,updateUser } = require("./users");
@@ -5,7 +7,7 @@ const { addRoom, removeRoom, getRoom, updateRoom } = require("./rooms");
 const codenames_DB = require('../db');
 
 exports.roomData = function ({room, io}) {
-    //console.log("gamelogic roomData room:",room);
+    //debug("gamelogic roomData room:",room);
     const room_id= room.id;
     const host = getUser(room.host)
     const hostname = getUser(room.host).username; 
@@ -20,7 +22,7 @@ exports.roomData = function ({room, io}) {
 }
 
 exports.checkSocketDataUserIDReady = function (socket) {
-    //console.log("checkSocketDataUserIDReady socket",socket);
+    //debug("checkSocketDataUserIDReady socket",socket);
     if (typeof socket.data.user_id === "undefined"){
         const errmsg="socket data is corrupted. pls reconnect";
         throw (errmsg);
@@ -58,7 +60,7 @@ exports.getRoomWithTeamsReady = function (socket) {
 }
 
 exports.checkUserHasTeam = function (user) {
-  //console.log("checkUserHasTeam user",user);  
+  //debug("checkUserHasTeam user",user);  
   if (!user.team) {
         const errmsg="user is obsever, not allowed to play";
         throw (errmsg);
@@ -184,14 +186,14 @@ exports.kickUserFromTheRoom = async function ({the_room,userleft,socket,io}) {
         if (the_room.host == userleft.id) {
           const users= getUsersInRoom(the_room.id, 1).filter(user => user.active == 1);
           const res1=users.length;
-          console.log('kickUserFromTheRoom - getUsersInRoom:',users,res1);
+          debug('kickUserFromTheRoom - getUsersInRoom:',users,res1);
           if (!users.length) {
-            console.log("last active user left the room - room will be closed");
+            debug("last active user left the room - room will be closed");
             io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("last active user left the room - room will be destroyed"), user: userleft.username });
             removeRoom(the_room.id);
           } else {
             const new_host = users[0];
-            console.log("kickUserFromTheRoom - reassigning host to the 'host':",new_host.username );
+            debug("kickUserFromTheRoom - reassigning host to the 'host':",new_host.username );
             updateRoom({id:the_room.id, host:new_host.id });
             //let the_room=getRoom(the_room.id);
             exports.roomData({room: the_room , host:new_host.username, io:io});
@@ -210,16 +212,16 @@ exports.kickUserFromTheRoom = async function ({the_room,userleft,socket,io}) {
           */
         } else {  // owner is kicking the user
           const userSockets = await io.of('/').in(the_room.room_name).fetchSockets(); // await ?
-          //console.log(`kickUserFromTheRoom debug: the_room ${the_room}, userleft: ${userleft} `,"userSockets",userSockets);
+          //debug(`kickUserFromTheRoom debug: the_room ${the_room}, userleft: ${userleft} `,"userSockets",userSockets);
           const userSocket = userSockets.find(the_socket => the_socket.data.user_id.toString() === userleft.id);
-          //console.log(`kickUserFromTheRoom debug: the_room ${the_room}, userleft: ${userleft} `,"userSocket",userSocket);
+          //debug(`kickUserFromTheRoom debug: the_room ${the_room}, userleft: ${userleft} `,"userSocket",userSocket);
           if (userSocket) {
             userSocket.emit('go away', { msg: userSocket.request.i18n.t("host kicked you from the room") });
             userSocket.disconnect(true);
           }
         }
     } catch (err) {
-        console.log(`kickUserFromTheRoom error:  the_room ${the_room}, userleft: ${userleft} `,err);
+        debug(`kickUserFromTheRoom error:  the_room ${the_room}, userleft: ${userleft} `,err);
         //throw (err);
     }
 }
@@ -228,18 +230,18 @@ exports.delayedUserLeaveTheRoom =  function (the_room,user,socket) {
     try {
       const io = socket.server;    
       // user left ?
-      console.log("Timeout on leaving the the room - ",the_room, "user",user);
+      debug("Timeout on leaving the the room - ",the_room, "user",user);
       if(user.active) {
-        console.log("user stays in the room room - ",the_room, "user",user);
+        debug("user stays in the room room - ",the_room, "user",user);
         updateUser ( { id:user.id, active:1 });
         exports.roomData({room: the_room, io:io });
       }  else {
-        console.log("user left the room by timeout - ",the_room, "user",user);
+        debug("user left the room by timeout - ",the_room, "user",user);
         var userleft=removeUser(user.id);
         exports.kickUserFromTheRoom({the_room: the_room, userleft: userleft, socket: socket});
       }
     } catch (err) {
-        console.log(`delayedUserLeaveTheRoom :`,err,"the_room",the_room, "user",user);
+        debug(`delayedUserLeaveTheRoom :`,err,"the_room",the_room, "user",user);
     }
 }
 
@@ -258,7 +260,7 @@ exports.getTeamStates = async function ({room_id,team_id,states_unsecured}) {
   if (!Array.isArray(states_unsecured)) {
       states_unsecured = await exports.getRoomStates(room_id); 
   }
-  //console.log("getTeamStates, states_unsecured:", states_unsecured);     
+  //debug("getTeamStates, states_unsecured:", states_unsecured);     
   var states = [];
   states[0]=states_unsecured[0].slice();
   states[1]=states_unsecured[1].slice();
@@ -281,7 +283,7 @@ exports.getTeamStates = async function ({room_id,team_id,states_unsecured}) {
       });
     });
   }
-  //console.log(`getTeamStates,team_id, ${team_id}, states:`, states);     
+  //debug(`getTeamStates,team_id, ${team_id}, states:`, states);     
   return states;
 }
 
@@ -322,7 +324,7 @@ exports.joinTeam = async function ({socket,team_id}) { // data.room
     const room_id = socket.data.room_id;
     // read database stats
     if (!isInt(room_id)) {
-      console.log(` joinTeam - SQL injection attack ${socket.data.room_id}`);
+      debug(` joinTeam - SQL injection attack ${socket.data.room_id}`);
       throw(`Room ${room_id} not found`);
     }  
     updateUser ( { id:socket.data.user_id, active:1,team: team_id});
@@ -331,19 +333,19 @@ exports.joinTeam = async function ({socket,team_id}) { // data.room
     if (team_id >0) {
       if(the_room.game_status==1) { // if (the_room.game_status==1)
         var states = await exports.getTeamStates({room_id:room_id, team_id:team_id});
-        //console.log(` joinTeam, states `,states);
+        //debug(` joinTeam, states `,states);
         socket.emit('team scheme',  { room_id: room_id,team:team_id, states: states});
       }
       socket.join(the_room.room_name+team_id);
-      //console.log(socket.id,` Join Team: User ${team_id} result socket:`,socket);
+      //debug(socket.id,` Join Team: User ${team_id} result socket:`,socket);
     } else { // reconnect for observer
       var states = await exports.getTeamStates({room_id:the_room.id, team_id:0 });
       socket.emit('team scheme',  { room_id: room_id,team:0, states: states}); // Observer
     }
     io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("User joined the team"), user: socket.data.username,team:team_id , msg_type:1}); // system message
-    console.log(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
+    debug(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
   } catch (err){
-    console.log(socket.id,` Join Team: User ${socket.data} has got error`,err);
+    debug(socket.id,` Join Team: User ${socket.data} has got error`,err);
     socket.emit('error message',  err);
   }
 }

@@ -6,6 +6,11 @@ const createError = require('http-errors');
 const path = require('path');
 const bodyParser = require('body-parser');
 //const session = require('express-session');
+var debug_app = require('debug')('app:app');
+var debug_i18n = require('debug')('app:i18n');
+debug_i18n.log = console.log.bind(console); // don't forget to bind to console!
+debug_app.log = console.log.bind(console); // don't forget to bind to console!
+
 // i18n
 const i18next = require('i18next');
 const i18nextMiddleware = require('i18next-http-middleware');
@@ -110,7 +115,8 @@ function app_init (sessionMiddleware){
           }
       }  else {
           // SQL injection attack
-          console.log(`SQL injection attack, parameter: ${req.params.id}`);
+          debug_app(`SQL injection attack, parameter: ${req.params.id}`);
+          //console.log(`SQL injection attack, parameter: ${req.params.id}`);
           //res.status(404).send('Room not found');
           return next(
             createError(404, 'Room not found'));
@@ -120,12 +126,12 @@ function app_init (sessionMiddleware){
 
     // Route to display the form for creating a new room
     app.get('/create', (req, res) => {
-        res.render('create', {
-          code: makeid(6),
-          lang: req.language,
-          languages: req.i18n.translator.backendConnector.options.preload
-          //languages: req.languages
-        });
+      res.render('create', {
+        code: makeid(6),
+        lang: req.language,
+        languages: req.i18n.translator.backendConnector.options.preload
+        //languages: req.languages
+      });
     });
       
     // Route to create a new room
@@ -140,7 +146,8 @@ function app_init (sessionMiddleware){
         [title, code, cards, states, lang]
       );
       //res.status(201).json(rows[0]);
-      console.log(`creating new room  ${title}`,JSON.stringify(rows[0])); //{req.body}
+      debug_app(`creating new room  ${title}`,JSON.stringify(rows[0]));
+      //console.log(`creating new room  ${title}`,JSON.stringify(rows[0])); //{req.body}
       
       res.status(201).render('create_confirmation', { room:  req.body , rows:rows[0]});
     });
