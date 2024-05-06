@@ -126,7 +126,7 @@ exports.checkUserTeamIsActive = function (the_room,user) {
       }  
 }
 exports.readStates = async function (the_room_id) {
-  var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [the_room_id]);
+  var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE code = $1', [the_room_id]);
   if (rows.length === 0) {
       const errmsg= `Room ${the_room_id} not found`;
       throw (errmsg);
@@ -141,10 +141,10 @@ exports.writeStates = async function ({the_room_id,cards,states}) {
   try {
     await codenames_DB.query('BEGIN');
     if (cards) {
-      const queryText = 'UPDATE rooms SET states=$2, cards=$3 WHERE id = $1';
+      const queryText = 'UPDATE rooms SET states=$2, cards=$3 WHERE code = $1';
       var { rows } = await codenames_DB.query(queryText, [the_room_id,states,cards]);
     } else {
-      const queryText = 'UPDATE rooms SET states=$2 WHERE id = $1';
+      const queryText = 'UPDATE rooms SET states=$2 WHERE code = $1';
       var { rows } = await codenames_DB.query(queryText, [the_room_id,states]);
     }
     
@@ -246,7 +246,7 @@ exports.delayedUserLeaveTheRoom =  function (the_room,user,socket) {
 }
 
 exports.getRoomStates = async function (room_id) {
-    var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE id = $1', [room_id]);
+    var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE code = $1', [room_id]);
     if (rows.length === 0) {
       throw(`Room ${room_id} not found`);
     } 
@@ -359,7 +359,7 @@ exports.destroyRoom = function ({io, the_room}){
 
   io.socketsLeave(the_room.room_name);
   const { rows } =  codenames_DB.query(
-    'DELETE FROM rooms WHERE id = $1 RETURNING *',
+    'DELETE FROM rooms WHERE code = $1 RETURNING *',
     [the_room.id]
   ); //no await
 }
