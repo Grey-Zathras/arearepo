@@ -28,31 +28,43 @@ const addUser = ({ id, username, room }) => {
 
   // Validate the data
   if (!username || !room) {
+    throw {
+      error: "Username and room are required!"
+    };
+
+    /*
     return {
       error: "Username and room are required!"
     };
+    */
   }
 
   // Check for existing user 
-  const existingUser = getUserByRoomAndName({room:room, username:username, strict:0});
+  var user = getUser(id);
+  if (user !== undefined ) {
+    console.log(`addUser - user `,user,` already exists`);
+    return { 
+      user,
+      msg: "reconnect" 
+    };
+  }
   
   // Validate username
+  const existingUser = getUserByRoomAndName({room:room, username:username, strict:0});
+  
   if (existingUser) {
-    const user = getUser(id);
-    if (user === undefined ) {
-       return {
-        error: "Username is in use!"
-        }
-    } else  {
-      return { 
-        user,
-        msg: "reconnect" 
-      };
+    throw {
+      error: "Username is in use!"
+    };
+    /*
+    return {
+      error: "Username is in use!"
     }
+    */
   }
 
   // Store user { id, username, room , team 0|1|2 , active 0|1};
-  const user = { id, username, room ,team:0, active:1};
+  user = { id, username, room ,team:0, active:1};
   users.push(user);
   return { user };
 };

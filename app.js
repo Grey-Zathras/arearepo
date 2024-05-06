@@ -6,6 +6,7 @@ const createError = require('http-errors');
 const path = require('path');
 const bodyParser = require('body-parser');
 //const session = require('express-session');
+var cookieParser = require('cookie-parser')
 var debug_app = require('debug')('app:app');
 var debug_i18n = require('debug')('app:i18n');
 debug_i18n.log = console.log.bind(console); // don't forget to bind to console!
@@ -66,7 +67,7 @@ function app_init (sessionMiddleware){
         removeLngFromUrl: false
       })
     );
-
+    app.use(cookieParser());
     app.use(express.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -109,6 +110,7 @@ function app_init (sessionMiddleware){
             session.room_name = rows[0].title;
             session.room_lang =  rows[0].lang.toLowerCase(); 
             session.user_old_lang =  req.i18n.language;
+            session.username = req.cookies.username;
             req.i18n.changeLanguage(session.room_lang); 
             res.render('room', { room: rows[0] });
               //res.json(rows[0]);

@@ -34,7 +34,8 @@ const io_socket_connected = (socket) => {
     debug("socket data not ready - new user?", socket.id, err);
   }
 
-
+  gameLogic.joinRoom({socket});
+  /*
     // Join a room
   socket.on('join room', async (data) => {
     
@@ -55,11 +56,7 @@ const io_socket_connected = (socket) => {
     const the_room = res1.room; 
     //debug("Add Room - the_room object", the_room);
     if (res.error || res1.error) {
-      /*
-      if (res.error=="Username is in use!") {
-        // socket.emit('team scheme',  { room_id: int_id,team:data.team, states: rows[0].states[data.team-1]});
-      } else {
-      */
+
         debug(res.error);
         socket.emit('error message',  socket.request.i18n.t("Cannot join the room")+": "+res.error);
       // }
@@ -84,6 +81,7 @@ const io_socket_connected = (socket) => {
       gameLogic.roomData({room: the_room, io:io });
     } 
   });
+  */
 
   socket.on('team change', async  (data) => {
     gameLogic.joinTeam({socket: socket, team_id: data.team}); //, data: data

@@ -343,9 +343,9 @@ exports.joinTeam = async function ({socket,team_id}) { // data.room
       socket.emit('team scheme',  { room_id: room_id,team:0, states: states}); // Observer
     }
     io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("User joined the team"), user: socket.data.username,team:team_id , msg_type:1}); // system message
-    debug(socket.id,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
+    debug(socket.id," - ",socket.request.sessionID,` User ${socket.data.username}/${socket.data.user_id} changed team to ${team_id} in room: ${the_room.room_name}`);
   } catch (err){
-    debug(socket.id,` Join Team: User ${socket.data} has got error`,err);
+    debug(socket.id," - ",socket.request.sessionID,` Join Team: User ${socket.data} has got error`,err);
     socket.emit('error message',  err);
   }
 }
@@ -363,3 +363,44 @@ exports.destroyRoom = function ({io, the_room}){
     [the_room.id]
   ); //no await
 }
+
+exports.joinRoom = async function ({socket}) { 
+  const io = socket.server; 
+  try {
+    const user_id = socket.request.sessionID;
+    socket.emit('userID',  "User ID assigned: "+user_id);
+    
+    const room_id = socket.request.session.room_id;
+    const room_name = socket.request.session.room_name;
+    //const room_lang = socket.request.session.lang;
+    const username = socket.request.session.username;
+
+    const res= addUser({id: user_id, username: username, room: room_id});
+
+    const res1 = addRoom({id: room_id, room_name: room_name, host: user_id}); 
+    const the_room = res1.room; 
+    
+    socket.join(room_name);
+    socket.data.username = username;
+    socket.data.user_id = user_id;
+    socket.data.room_id = the_room.id;
+
+      
+    if (res.msg=="reconnect" && res.user.team){
+      await exports.joinTeam({socket: socket, team_id: res.user.team}); 
+      debug(socket.id," - ",socket.request.sessionID,` User ${username} reconnected to room: ${the_room.room_name} and team ${res.user.team}`);
+      //debug(socket.id,` res.user `, res.user);
+    } else {
+      debug(socket.id," - ",socket.request.sessionID,` User ${username} joined room: ${the_room.room_name} as Observer`);
+      if (the_room.game_status){
+        await exports.joinTeam({socket: socket, team_id: 0}); // send schema to observer
+      }
+    }
+    exports.roomData({room: the_room, io:io });
+  } catch (err) {
+    debug(socket.id," - ",socket.request.sessionID,` Join Room: User ${socket.request.session.username} has got error`,err);
+    socket.emit('error message',socket.request.i18n.t("Cannot join the room")+": "+ (err.error ? err.error : err)  );
+    return;
+  }
+}
+

@@ -8,9 +8,13 @@ const addRoom = ({ id, room_name, lang, host /*, room_socket_id, room_code */}) 
 
   // Validate the data
   if (!room_name || !id ||!host) {
-    return {
+    throw {
       error: "Username and room are required!"
     };
+    /* return {
+      error: "Username and room are required!"
+    };
+    */
   }
 
   // Check for existing room
@@ -18,15 +22,21 @@ const addRoom = ({ id, room_name, lang, host /*, room_socket_id, room_code */}) 
     return room.id === id || room.room_name === room_name;
   });
 
-  // Validate room_name
   if (existingRoom) {
     const room = getRoom(id);  
     return {
-        room: room,
-        msg: "Room name is in use!"
+      room: room,
+      msg: "existing room"
     }
+  } 
+  
+  // Validate room_name
+  if (findRoomByName(room_name) ){
+    throw {
+      error: "Room name is in use!"
+    };
   }
-
+ 
   // Store room { id, room_name, lang, host , game_status 0|1|2 , active_team 1|2, turn, step 0|1, challenge, clicks[3], card_response_map  };
   const room = { id, room_name, lang, host ,game_status :0, active_team:1, step:0, turn:0, challenge:"", clicks:[0,0,0], card_response_map:{}, end_turn_map:{}};
   rooms.push(room);
@@ -73,10 +83,15 @@ const getRoom = id => {
   return rooms.find(room => room.id === id);
 };
 
+const findRoomByName = room_name => {
+  return rooms.find(room => room.room_name === room_name);
+};
+
 module.exports = {
   addRoom,
   removeRoom,
   getRoom,
+  findRoomByName,
   updateRoom
 };
 
