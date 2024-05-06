@@ -376,6 +376,9 @@ exports.joinRoom = async function ({socket}) {
     const username = socket.request.session.username;
 
     const res= addUser({id: user_id, username: username, room: room_id});
+    if (res.msg=="reconnect" ){
+      updateUser ( { id:user_id, active:1 });
+    }
 
     const res1 = addRoom({id: room_id, room_name: room_name, host: user_id}); 
     const the_room = res1.room; 
