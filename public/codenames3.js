@@ -563,7 +563,7 @@ window.onload = function() {
           } else {
             console.log("reconnect is succsessfull");
           }
-      }, 20000); //20 sec
+      }, 5000); //5 sec
   });
  
   // card click event listener
