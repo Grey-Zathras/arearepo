@@ -39,7 +39,7 @@
     <ul>
       <% 
       rooms.forEach(function(room) { %>
-        <li><a href="/room/<%= room.id %>"><%= room.title %></a> - <%= t("room language")%>: <%= t(room.lang.toLowerCase())%></li>
+        <li><a href="/room/<%= room.code %>"><%= room.title %></a> - <%= t("room language")%>: <%= t(room.lang.toLowerCase())%></li>
       <% }) %>
     </ul>
   </div>

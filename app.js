@@ -97,8 +97,8 @@ function app_init (sessionMiddleware){
       const int_id= req.params.id;
       //const { userTeam } = req._parsedUrl.query;
       //console.log("User team is", userTeam );
-      if (isInt(int_id)) {
-      const { rows } = await codenames_DB.query('SELECT * FROM rooms WHERE id = $1', [int_id]);
+      //if (isInt(int_id)) {
+      const { rows } = await codenames_DB.query('SELECT * FROM rooms WHERE code = $1', [int_id]);
           if (rows.length === 0) {
               //res.status(404).send('Room not found');
               //res.status(404).json({ message: 'Post not found' });
@@ -115,14 +115,14 @@ function app_init (sessionMiddleware){
             res.render('room', { room: rows[0] });
               //res.json(rows[0]);
           }
-      }  else {
+      //}  else {
           // SQL injection attack
-          debug_app(`SQL injection attack, parameter: ${req.params.id}`);
+      //    debug_app(`SQL injection attack, parameter: ${req.params.id}`);
           //console.log(`SQL injection attack, parameter: ${req.params.id}`);
           //res.status(404).send('Room not found');
-          return next(
-            createError(404, 'Room not found'));
-      }
+      //    return next(
+      //      createError(404, 'Room not found'));
+      //}
       //next();  
     });
 

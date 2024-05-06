@@ -323,10 +323,10 @@ exports.joinTeam = async function ({socket,team_id}) { // data.room
     socket.data.team = team_id;
     const room_id = socket.data.room_id;
     // read database stats
-    if (!isInt(room_id)) {
-      debug(` joinTeam - SQL injection attack ${socket.data.room_id}`);
-      throw(`Room ${room_id} not found`);
-    }  
+    //if (!isInt(room_id)) {
+    //  debug(` joinTeam - SQL injection attack ${socket.data.room_id}`);
+    //  throw(`Room ${room_id} not found`);
+    //}  
     updateUser ( { id:socket.data.user_id, active:1,team: team_id});
     const the_room=getRoom(room_id);
     exports.roomData({room: the_room, io:io });
