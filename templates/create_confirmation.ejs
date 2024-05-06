@@ -13,7 +13,7 @@
 <body>
   <%- include('../templates/partials/header', {headline: t("create_confirmation.Success")}); %>
   <p><%- t("create_confirmation.title_created",{room: room.title}) %></p>
-  <a href="/room/<%= rows.id %>" id="newRoomLink"><%= room.title %></a><br>
+  <a href="/room/<%= rows.code %>" id="newRoomLink"><%= room.title %></a><br>
   <a href="/"><%= t("Back to home") %></a>
 </body>
 </html>
