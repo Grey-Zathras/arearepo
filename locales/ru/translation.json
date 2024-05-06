@@ -114,8 +114,10 @@
     "Challenge or clicks data is missing": "пропущены данные - текст подсказки или количество попыток",
     "no more than 9 clicks!": "число попыток не больше 9!",    
     "Room not found":"Нет такой комнаты",
+    
     "socket data is corrupted. pls reconnect":"ошибка данных сокета, требуется переподключение",
     "your session is corrupted. pls reload the page":"сессия испорчена, перезагрузите страницу",
+    "Cannot join the room": "Ошибка подключения к комнате",
 
     "Your name": "Ваше имя"
 }

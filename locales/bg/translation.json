@@ -111,5 +111,7 @@
     "Room not found":"Няма такава зала",
     "socket data is corrupted. pls reconnect":"грешка на сокет, моля свържете се отново",
     "your session is corrupted. pls reload the page":"грешка на сесия, моля презаредете страницата",
+    "Cannot join the room": "Ошибка на свързване към залата",
+
     "Your name": "Вашето имя"
 }
