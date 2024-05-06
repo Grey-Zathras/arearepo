@@ -209,7 +209,7 @@ window.onload = function() {
     //document.getElementById('joinRoom').onclick = function() {
     //var room = roomInput.value;
     //socket.emit('join room', { room: room, user: userName, room_id: room_id, user_id: userID  });
-    
+
     socket.emit('chat message', { room: room, msg: "Hi" , user: userName, msgclass:"sysmsg"});
     let timeout = setTimeout(function() {
       socket.emit('cancel leaving room', {  msg: "user just entered the room "+room+" - on-enter setTimeout", user: userName, userid:getCookie("userid")});
@@ -390,6 +390,7 @@ window.onload = function() {
     console.log('userID data',data,"socket.id",socket.id );
     //userID = socket.id;
     userID = data;
+    ok_to_leave=0;
     setCookie("userid", userID, 7);
   });
   
@@ -553,9 +554,16 @@ window.onload = function() {
   });
   reconnectButton.addEventListener('click', function(e) {
         //socket.emit('leave room', { room: room, msg: "user left the room", user: userName, });
-        window.onbeforeunload = undefined;
+        socket.connect();
         ok_to_leave=1;
-        location.reload();
+        let timeout = setTimeout(function() {
+          if (ok_to_leave){
+            window.onbeforeunload = undefined;
+            location.reload();
+          } else {
+            console.log("reconnect is succsessfull");
+          }
+      }, 20000); //20 sec
   });
  
   // card click event listener
