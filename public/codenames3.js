@@ -345,6 +345,7 @@ window.onload = function() {
       }
       case 8: { // win-win!
         startFireWorks();
+        card_event=""; 
         break;
     }
 }
