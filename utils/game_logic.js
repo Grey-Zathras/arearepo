@@ -299,21 +299,46 @@ exports.countHiddenSpies =  function (states) {
   return hidden_spies;
 }
 
-exports.endTurn =  function ({the_room, states,main_msg, user, io, i18n }) {
-  if ( !the_room.step ) {  //the Challenge step
-    the_room.active_team=3-the_room.active_team;
+exports.check4Win =  function ({the_room, states, io, i18n }) {
+  //check if any spies are left?
+  const win_win=!exports.countHiddenSpies(states);
+  if (win_win ) {
+    // end game ?
+    //the_room.game_status=0;
+    gameLogic.roomData({room: the_room, io:io });
+    io.to(the_room.room_name).emit(
+      'system message', 
+      { 
+        msg: `<span class=\"highlight\">${
+         i18n.t("You all are WINNERS - game over!")
+        }</span> <br/> ${
+          i18n.t("Host can stop the game and regenerate the room.")
+        }`,
+        user: "game", 
+        msg_type:8
+      }, 
+    ); // system message win game
   }
-  the_room.turn++;
-  the_room.step = 0; //now is the Challenge step
-  let count = states[the_room.active_team-1].reduce((total,x) => total+(x==1), 0);
-  if (!count){
-    io.to(the_room.room_name).emit('system message', { msg: `${i18n.t(teams_list[the_room.active_team]) } ${i18n.t("team has no more spies")}!`, user: "game", msg_type:0 }); // system message / general
-    the_room.active_team=3-the_room.active_team;
-  } 
-  exports.resetRoomCardsResponsesMap(the_room);
-  exports.roomData({room: the_room, io:io });
-  if (main_msg ) {
-    io.to(the_room.room_name).emit('system message', { msg: `${main_msg } ${i18n.t("New Turn")}: ${the_room.turn} !`, user: user,team:the_room.active_team, msg_type:6}); // system message end turn
+  return win_win;
+}
+
+exports.endTurn =  function ({the_room, states,main_msg, user, io, i18n }) {
+  if (!exports.check4Win({the_room: the_room, states: states, io: io, i18n: i18n }) ) {
+    if ( !the_room.step ) {  //the Challenge step
+      the_room.active_team=3-the_room.active_team;
+    }
+    the_room.turn++;
+    the_room.step = 0; //now is the Challenge step
+    let count = states[the_room.active_team-1].reduce((total,x) => total+(x==1), 0);
+    if (!count){
+      io.to(the_room.room_name).emit('system message', { msg: `${i18n.t(teams_list[the_room.active_team]) } ${i18n.t("team has no more spies")}!`, user: "game", msg_type:0 }); // system message / general
+      the_room.active_team=3-the_room.active_team;
+    } 
+    exports.resetRoomCardsResponsesMap(the_room);
+    exports.roomData({room: the_room, io:io });
+    if (main_msg ) {
+      io.to(the_room.room_name).emit('system message', { msg: `${main_msg } ${i18n.t("New Turn")}: ${the_room.turn} !`, user: user,team:the_room.active_team, msg_type:6}); // system message end turn
+    }
   }
 }
 

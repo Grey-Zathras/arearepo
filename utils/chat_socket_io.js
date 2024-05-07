@@ -35,53 +35,6 @@ const io_socket_connected = (socket) => {
   }
 
   gameLogic.joinRoom({socket});
-  /*
-    // Join a room
-  socket.on('join room', async (data) => {
-    
-    if (data.user_id == 0) {
-      //data.user_id = socket.id;
-      data.user_id = socket.request.sessionID;
-      socket.emit('userID',  "User ID assigned: "+data.user_id);
-    } else if (data.user_id !== socket.request.sessionID ) {
-      debug(socket.id," - ",socket.request.sessionID,` User with user_id ${data.user_id} has ambiquity with his Session ID. Suspicious?`);
-      data.user_id = socket.request.sessionID;
-      socket.emit('userID',  "User ID assigned: "+data.user_id);
-    }
-    const room_id = (socket.request.session ? socket.request.session.room_id: data.room_id);
-    const room_name = (socket.request.session ? socket.request.session.room_name: data.room);
-    const room_lang = (socket.request.session ? socket.request.session.lang: "ru");
-    const res= addUser({id: data.user_id,username: data.user,room: room_id}); 
-    const res1 = addRoom({id: room_id, room_name: room_name, host: data.user_id}); 
-    const the_room = res1.room; 
-    //debug("Add Room - the_room object", the_room);
-    if (res.error || res1.error) {
-
-        debug(res.error);
-        socket.emit('error message',  socket.request.i18n.t("Cannot join the room")+": "+res.error);
-      // }
-    } else {
-      socket.join(room_name);
-      socket.data.username = data.user;
-      socket.data.user_id = data.user_id;
-      socket.data.room_id = the_room.id;
-      
-      //addUser(socket.id,data.user,data.room_id); 
-      
-      if (res.msg && res.user.team){
-        await gameLogic.joinTeam({socket: socket, team_id: res.user.team}); //, data: data
-        debug(socket.id," - ",socket.request.sessionID,` User ${data.user}/${data.user_id} reconnected to room: ${the_room.room_name} and team ${res.user.team}`);
-        //debug(socket.id,` res.user `, res.user);
-      } else {
-        debug(socket.id," - ",socket.request.sessionID,` User ${data.user} joined room: ${the_room.room_name} as Observer`);
-        if (the_room.game_status){
-          await gameLogic.joinTeam({socket: socket, team_id: 0}); // , data: data // send schema to observer
-        }
-      }
-      gameLogic.roomData({room: the_room, io:io });
-    } 
-  });
-  */
 
   socket.on('team change', async  (data) => {
     gameLogic.joinTeam({socket: socket, team_id: data.team}); //, data: data
@@ -132,7 +85,6 @@ const io_socket_connected = (socket) => {
       const user = gameLogic.getUserFromSocket(socket);
       let the_room=getRoom(socket.data.room_id);
       gameLogic.checkHost({user:user, room:the_room });
-
 
       the_room.game_status=0;
       // clean teams? hide states? 
@@ -240,45 +192,28 @@ const io_socket_connected = (socket) => {
             reveal_role:reveal_role,
             msg_type:5
         }); // system message card_chosen
-        //check if any spies are left?
-        if (!gameLogic.countHiddenSpies(states) ) {
-          // end game ?
-          //the_room.game_status=0;
-          gameLogic.roomData({room: the_room, io:io });
-          io.to(the_room.room_name).emit(
-            'system message', 
-            { 
-              msg: `<span class=\"highlight\">${
-               socket.request.i18n.t("You all are WINNERS - game over!")
-              }</span> <br/> ${
-                socket.request.i18n.t("Host can stop the game and regenerate the room.")
-              }`,
-              user: "game", 
-              msg_type:8
-            }, 
-          ); // system message win game
-        } else {
-          if (reveal_role==4) {
-            the_room.clicks[the_room.active_team]--;
-            if (!the_room.clicks[the_room.active_team]) {
-              // change the  turn and the step, team is the same
-              gameLogic.endTurn({
-                io:io, 
-                i18n:socket.request.i18n, 
-                the_room:the_room,
-                states:states,
-                user: user.username,
-                main_msg:`${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team run out of clicks")}.`
-              });
-            } else {
+        if (reveal_role==4) {
+          the_room.clicks[the_room.active_team]--;
+          if (!the_room.clicks[the_room.active_team]) {
+            // change the  turn and the step, team is the same
+            gameLogic.endTurn({
+              io:io, 
+              i18n:socket.request.i18n, 
+              the_room:the_room,
+              states:states,
+              user: user.username,
+              main_msg:`${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team run out of clicks")}.`
+            });
+          } else {
+            if (!gameLogic.check4Win({io:io, i18n:socket.request.i18n, the_room:the_room, states:states}) ){
               gameLogic.roomData({room: the_room, io:io });
             }
-          } else {
-              // change the  turn and the step, team is the same
-              gameLogic.endTurn({io:io, i18n:socket.request.i18n, the_room:the_room,states:states,user: user.username,main_msg:`${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team is missed")}.`});
           }
-          //gameLogic.roomData({room: the_room, io:io });
+        } else {
+            // change the  turn and the step, team is the same
+            gameLogic.endTurn({io:io, i18n:socket.request.i18n, the_room:the_room,states:states,user: user.username,main_msg:`${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team is missed")}.`});
         }
+        //gameLogic.roomData({room: the_room, io:io });
       } else {
         // send the status update on the card selection
         io.to(the_room.room_name).emit('system message', { msg: `${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team has no consent")}:`, user: user.username, msg_type:4, card_response_array:card_response_array }); // system message no_consent
