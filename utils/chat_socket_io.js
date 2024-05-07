@@ -1,7 +1,7 @@
 var debug = require('debug')('socket_IO');
 debug.log = console.log.bind(console); // don't forget to bind to console!
 
-  var {  teams_list, step_verbs,supported_languages, log_debug_on, isInt } = require("./glbl_objcts");
+  var {  teams_list, step_verbs,supported_languages, log_debug_on, isInt, getRandomValue } = require("./glbl_objcts");
 const wordList = require('./wordlist');
 const gameLogic = require('./game_logic');
 const cardGenerator = require('./card_generator');
@@ -109,7 +109,7 @@ const io_socket_connected = (socket) => {
       the_room.game_status=1;
       the_room.step=0;
       the_room.turn=1;
-      the_room.active_team=1;
+      the_room.active_team=getRandomValue(1,2);
       gameLogic.resetRoomCardsResponsesMap(the_room);
 
       const states_unsecured = await gameLogic.getRoomStates(the_room.id);

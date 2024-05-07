@@ -26,11 +26,16 @@ function makeid(length) {
   return result;
 }
 
+function getRandomValue(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 module.exports = {
   teams_list,
   step_verbs,
   supported_languages,
   log_debug_on,
+  getRandomValue,
   isInt,
   makeid
 }
