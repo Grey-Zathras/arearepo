@@ -94,11 +94,11 @@ function app_init (sessionMiddleware){
 
     // Route to get a specific room by id
     app.get('/room/:id', async (req, res, next) => {
-      const int_id= req.params.id;
+      const code= req.params.id;
       //const { userTeam } = req._parsedUrl.query;
       //console.log("User team is", userTeam );
       //if (isInt(int_id)) {
-      const { rows } = await codenames_DB.query("SELECT * FROM rooms WHERE code = $1", [int_id]);
+      const { rows } = await codenames_DB.query("SELECT * FROM rooms WHERE code = $1", [code]);
           if (rows.length === 0) {
               //res.status(404).send('Room not found');
               //res.status(404).json({ message: 'Post not found' });
@@ -106,7 +106,7 @@ function app_init (sessionMiddleware){
                 createError(404, 'Room not found'));
           } else {
             const session = req.session;
-            session.room_id = int_id;
+            session.room_id = code;
             session.room_name = rows[0].title;
             session.room_lang =  rows[0].lang.toLowerCase(); 
             session.user_old_lang =  req.i18n.language;

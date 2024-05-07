@@ -305,7 +305,7 @@ exports.check4Win =  function ({the_room, states, io, i18n }) {
   if (win_win ) {
     // end game ?
     //the_room.game_status=0;
-    gameLogic.roomData({room: the_room, io:io });
+    exports.roomData({room: the_room, io:io });
     io.to(the_room.room_name).emit(
       'system message', 
       { 
