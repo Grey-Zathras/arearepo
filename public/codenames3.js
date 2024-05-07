@@ -315,6 +315,7 @@ window.onload = function() {
             cardAnimation(cardObj,function(){
             if (data.reveal_role == 4){ // spy revealed - overwrite both classes -but not for the killer 
                 cardObj.className="card spy_opened1 spy_opened2";
+                spies_left.innerText = 15 - countSpies();
               } else { // overwrite other class
                 cardObj.classList.remove("closed"+(3-data.team));
                 cardObj.classList.add(player_class_array[data.reveal_role]+(3-data.team));
