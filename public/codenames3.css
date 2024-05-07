@@ -136,6 +136,11 @@ padding: 10px;
 #system_messages.team2 .Blue_team, #system_messages.team1 .Red_team, .highlight{
     background-color: yellow;
 }
+.timestamp {
+    color: grey;
+    font-size: small;
+    text-decoration: underline;
+}
 @media (min-width: 640px) {
 
 /* responsive table (left area) */

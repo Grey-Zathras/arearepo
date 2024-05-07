@@ -29,24 +29,39 @@ function cardAnimation(card,callback) {
     }
     card.classList.remove("rotated");
   }, 3000); //3 sec
-
 }
+
 function bannerAnimation (obj) {
   obj.classList.add("pop-up-banner");
   //obj.style.top="20vh";
   obj.querySelector(".banner-text").style="display:inline-block";
 }
+
+function currentTime(){
+  const date = new Date();
+  const options = {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  };
+  return new Intl.DateTimeFormat('en-GB', options).format(date);
+}
+
 function addChatLine (text, msgclass=""){
     var item = document.createElement('li');
-    if (msgclass==""){
-      item.textContent = text;
-    } else{
+    //if (msgclass==""){
+    //  item.textContent = text;
+    //} else{
       var item1 = document.createElement('span');
-      item1.className=msgclass;
+      item1.className="timestamp";
+      item1.textContent = currentTime();
       item.appendChild(item1);
-      item1.textContent = text;
+      item1 = document.createElement('span');
+      item1.className=msgclass;
+      item1.textContent = " "+ text;
+      item.appendChild(item1);
       //console.log(item.outerHTML, text);
-    }
+    //}
     chat_messages.insertBefore(item, chat_messages.firstChild);
       //messages.appendChild(item);
       //window.scrollTo(0, document.body.scrollHeight);
@@ -56,12 +71,16 @@ function addChatLine (text, msgclass=""){
 function addSysMsgLine (text, msgclass=""){
   var item = document.createElement('li');
   if (msgclass==""){
-    item.textContent = text;
+    item.textContent = currentTime()+" "+text;
   } else{
     var item1 = document.createElement('span');
+    item1.className="timestamp";
+    item1.textContent = currentTime();
+    item.appendChild(item1);
+    item1 = document.createElement('span');
     item1.className=msgclass;
     item.appendChild(item1);
-    item1.innerHTML = text;
+    item1.innerHTML = " "+text;
     //item1.textContent = text;
     //console.log(item.outerHTML, text);
   }
