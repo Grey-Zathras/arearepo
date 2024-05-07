@@ -252,10 +252,10 @@ const io_socket_connected = (socket) => {
                socket.request.i18n.t("You all are WINNERS - game over!")
               }</span> <br/> ${
                 socket.request.i18n.t("Host can stop the game and regenerate the room.")
-              }`
+              }`,
+              user: "game", 
+              msg_type:8
             }, 
-            user: "game", 
-            msg_type:8
           ); // system message win game
         } else {
           if (reveal_role==4) {
