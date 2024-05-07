@@ -356,6 +356,10 @@ window.onload = function() {
   socket.on('error message', function(data) {
     console.log('error message data', data);
     addSysMsgLine(data,"errormsg");
+    if (ok_to_leave) {
+      window.onbeforeunload = undefined;
+      location.reload();
+    }
   });
 
   socket.on('go away', function(data) {
@@ -398,6 +402,7 @@ window.onload = function() {
   
   socket.on('roomData', function(data) { // general refresh page / status event
     console.log('roomData',data);
+    ok_to_leave =0;
     // check for host and start button
     game_obj=data;
     document.getElementById('host').innerText = data.host;
