@@ -95,7 +95,8 @@
     "the game has stopped":"Игра остановлена",
     "Let's start the game":"Да начнется игра",
     "team sends the challenge":"дают подсказку",
-    "<span class='highlight'>You all are WINNERS - game over!</span> <br/> Host can stop the game and regenerate the room.":"<span class='highlight'>Мы все победили - игра окончена!</span> <br/> Мастер может остановить игру и обновить карточки.",
+    "You all are WINNERS - game over!":"Мы все победили - игра окончена!",
+    "Host can stop the game and regenerate the room.":"Мастер может остановить игру и обновить карточки.",
     "team has chosen the card: {card_text}, which is {reveal_role}":"выбрали карточку: {card_text}, которая оказалась {reveal_role}",
     
     "team run out of clicks":"- все попытки исчерпаны",

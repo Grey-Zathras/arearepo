@@ -246,7 +246,7 @@ exports.delayedUserLeaveTheRoom =  function (the_room,user,socket) {
 }
 
 exports.getRoomStates = async function (room_id) {
-    var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE code = $1', [room_id]);
+    var { rows } = await codenames_DB.query("SELECT states FROM rooms WHERE code = $1", [room_id]);
     if (rows.length === 0) {
       throw(`Room ${room_id} not found`);
     } 

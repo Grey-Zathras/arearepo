@@ -98,7 +98,7 @@ function app_init (sessionMiddleware){
       //const { userTeam } = req._parsedUrl.query;
       //console.log("User team is", userTeam );
       //if (isInt(int_id)) {
-      const { rows } = await codenames_DB.query('SELECT * FROM rooms WHERE code = $1', [int_id]);
+      const { rows } = await codenames_DB.query("SELECT * FROM rooms WHERE code = $1", [int_id]);
           if (rows.length === 0) {
               //res.status(404).send('Room not found');
               //res.status(404).json({ message: 'Post not found' });

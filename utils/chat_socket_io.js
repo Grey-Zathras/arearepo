@@ -118,19 +118,6 @@ const io_socket_connected = (socket) => {
       if (the_room.game_status) {
         throw "Cannot delete room, game is still in progress!";
       }
-      /*
-      const users = getUsersInRoom(the_room.id, 1);
-      users.forEach(userleft => {
-        removeUser(userleft.id);
-          gameLogic.kickUserFromTheRoom({the_room,userleft});  // await ?
-      });      
-
-      io.socketsLeave(the_room.room_name);
-      const { rows } =  codenames_DB.query(
-        'DELETE FROM rooms WHERE id = $1 RETURNING *',
-        [the_room.id]
-      ); //no await
-      */
       gameLogic.destroyRoom({io:io, the_room:the_room});
     } catch (err) {
       debug(socket.id," - ",socket.request.sessionID,`delete room request error: User ${socket.data}, request: ${data} `,err);
@@ -258,13 +245,31 @@ const io_socket_connected = (socket) => {
           // end game ?
           //the_room.game_status=0;
           gameLogic.roomData({room: the_room, io:io });
-          io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("<span class=\"highlight\">You all are WINNERS - game over!</span> <br/> Host can stop the game and regenerate the room."), user: "game", msg_type:8 }); // system message win game
+          io.to(the_room.room_name).emit(
+            'system message', 
+            { 
+              msg: `<span class=\"highlight\">${
+               socket.request.i18n.t("You all are WINNERS - game over!")
+              }</span> <br/> ${
+                socket.request.i18n.t("Host can stop the game and regenerate the room.")
+              }`
+            }, 
+            user: "game", 
+            msg_type:8
+          ); // system message win game
         } else {
           if (reveal_role==4) {
             the_room.clicks[the_room.active_team]--;
             if (!the_room.clicks[the_room.active_team]) {
               // change the  turn and the step, team is the same
-              gameLogic.endTurn({io:io, i18n:socket.request.i18n, the_room:the_room,states:states,user: user.username,main_msg:`${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team run out of clicks")}.`});
+              gameLogic.endTurn({
+                io:io, 
+                i18n:socket.request.i18n, 
+                the_room:the_room,
+                states:states,
+                user: user.username,
+                main_msg:`${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team run out of clicks")}.`
+              });
             } else {
               gameLogic.roomData({room: the_room, io:io });
             }

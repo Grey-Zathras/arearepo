@@ -90,7 +90,8 @@
     "the game has stopped":"Играта е спряна",
     "Let's start the game":"Играта започне",
     "team sends the challenge":"екип изпраща предизвикателството",
-    "<span class='highlight'>You all are WINNERS - game over!</span> <br/> Host can stop the game and regenerate the room.":"<span class='highlight'>Всички спечелихме-играта свърши!</span> <br/>Домакинът може да спре играта и да актуализира картите.",
+    "You all are WINNERS - game over!":"Всички спечелихме-играта свърши!",
+    "Host can stop the game and regenerate the room.":"Домакинът може да спре играта и да актуализира картите.",
     "team has chosen the card: {card_text}, which is {reveal_role}":"избрали карта: {card_text}, която се оказа {reveal_role}",
     
     "team run out of clicks":"- всички опити са изчерпани",
