@@ -127,11 +127,10 @@ const player_class_array=['closed', 'spy', 'killer','civilian', 'spy_opened','ki
 //var observer_class_array=[ 'spy_opened','civilian','killer_opened' ]; // cards on the table
 
 
-var socket = io();
 
 function ResetMembers(){
   for(var i =0; i<3; i++)
-    document.getElementById(memberTagID[i]).innerHTML="";
+  document.getElementById(memberTagID[i]).innerHTML="";
 }
 function AddMemberLine ({username, team, active}) {
   var item = document.createElement('li');
@@ -152,10 +151,10 @@ function rebuildTable(new_cards){
 
 function refreshStates(states, role,team){
   if (typeof states === "undefined") {
-      for (var i=0;i<25;i++){
-          var card = document.getElementById('card['+i+']');
-          card.className="card ";
-        }
+    for (var i=0;i<25;i++){
+      var card = document.getElementById('card['+i+']');
+      card.className="card ";
+    }
   } else if (role=="player") {
     for (var i=0;i<25;i++){
       var card = document.getElementById('card['+i+']');
@@ -163,60 +162,62 @@ function refreshStates(states, role,team){
       //card.className=card.className +" " + player_class_array[states[i] ];
     }
   } else {
-      for (var i=0;i<25;i++){
-          var card = document.getElementById('card['+i+']');
-          card.className=card.className + " " +player_class_array[states[i] ]+team;
-        }
-  
+    for (var i=0;i<25;i++){
+      var card = document.getElementById('card['+i+']');
+      card.className=card.className + " " +player_class_array[states[i] ]+team;
+    }
+    
   }
 }
+var socket = "";
 
 window.onload = function() {
-    /*
-    var chat_messages ??= document.getElementById('chat_messages');
-    var system_messages ??= document.getElementById('system_messages');
-    var card_table ??= document.getElementById('card_table');
-    var challenge ??= document.getElementById('challenge');
-    var room ??= "";
-    var room_id ??= "";
-    var clicks ??= document.getElementById('clicks');
-    var userTeam ??= document.getElementById('userTeam');
-    var startButton ??= document.getElementById('startButton');
-    var challenged_text ??= document.getElementById('challenged_text');
-    var startButton ??= document.getElementById('startButton');
-    var chooseTeamBlock ??= document.getElementById('chooseTeamBlock');
-    var game_progress ??= document.getElementById('game_progress');
-    var gamestat ??= document.getElementById('gamestat');
-    var activeteam ??= document.getElementById('activeteam');
-    var activestep ??= document.getElementById('activestep');
-    var turn ??= document.getElementById('turn');
-    */
-    // Get the modal
-    var modal = document.getElementById("myModal");
-
-    // Get the button that opens the modal
-    var btn = document.getElementById("manageUsersButton");
-
-    // Get the <span> element that closes the modal
-    var span_x = document.getElementsByClassName("close")[0];
-
-    var userName = getCookie("username");
-    var userID = getCookie("userid");
-    if (!userName) {
-      userName = prompt(i18n_text["Please enter your name"]+':');
-      setCookie("username", userName, 7);
+  /*
+  var chat_messages ??= document.getElementById('chat_messages');
+  var system_messages ??= document.getElementById('system_messages');
+  var card_table ??= document.getElementById('card_table');
+  var challenge ??= document.getElementById('challenge');
+  var room ??= "";
+  var room_id ??= "";
+  var clicks ??= document.getElementById('clicks');
+  var userTeam ??= document.getElementById('userTeam');
+  var startButton ??= document.getElementById('startButton');
+  var challenged_text ??= document.getElementById('challenged_text');
+  var startButton ??= document.getElementById('startButton');
+  var chooseTeamBlock ??= document.getElementById('chooseTeamBlock');
+  var game_progress ??= document.getElementById('game_progress');
+  var gamestat ??= document.getElementById('gamestat');
+  var activeteam ??= document.getElementById('activeteam');
+  var activestep ??= document.getElementById('activestep');
+  var turn ??= document.getElementById('turn');
+  */
+ // Get the modal
+ var modal = document.getElementById("myModal");
+ 
+ // Get the button that opens the modal
+ var btn = document.getElementById("manageUsersButton");
+ 
+ // Get the <span> element that closes the modal
+ var span_x = document.getElementsByClassName("close")[0];
+ 
+ var userName = getCookie("username");
+ var userID = getCookie("userid");
+ if (!userName) {
+   userName = prompt(i18n_text["Please enter your name"]+':');
+   setCookie("username", userName, 7);
+   userID = 0;
+   //userID = socket.id;
+   //setCookie("userid", userID, 7);
+  }   else {
+    if (!userID) {
       userID = 0;
       //userID = socket.id;
       //setCookie("userid", userID, 7);
-    }   else {
-      if (!userID) {
-        userID = 0;
-        //userID = socket.id;
-        //setCookie("userid", userID, 7);
-      }
-    } 
-
-    //var chatForm = document.getElementById('chatForm');
+    }
+  } 
+  socket = io();
+  
+  //var chatForm = document.getElementById('chatForm');
     //var userForm = document.getElementById('userForm');
     //var input = document.getElementById('input');
     

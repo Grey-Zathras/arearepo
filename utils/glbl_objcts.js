@@ -1,3 +1,5 @@
+const cookie = require("cookie"); // Import the 'cookie' module
+
 const log_debug_on=1;
 
 const teams_list=["observer","Red","Blue"]; //team membership text for chat
@@ -30,6 +32,15 @@ function getRandomValue(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function getOneCookie(rawCookie, cokkieName){
+  // Parse the raw cookie string into an object
+  const parsedCookies = cookie.parse(rawCookie);
+
+  // Now you can access individual cookies
+  const myCookieValue = parsedCookies[cokkieName]; // Replace with your actual cookie name
+  return myCookieValue;
+}
+
 module.exports = {
   teams_list,
   step_verbs,
@@ -37,5 +48,6 @@ module.exports = {
   log_debug_on,
   getRandomValue,
   isInt,
+  getOneCookie,
   makeid
 }

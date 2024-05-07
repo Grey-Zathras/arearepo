@@ -1,7 +1,7 @@
 var debug = require('debug')('game_logic');
 debug.log = console.log.bind(console); // don't forget to bind to console!
 
-const { log_debug_on, teams_list, isInt } = require("./glbl_objcts");
+const { log_debug_on, teams_list, isInt, getOneCookie } = require("./glbl_objcts");
 const { addUser, removeUser, getUser, getUsersInRoom,updateUser } = require("./users");
 const { addRoom, removeRoom, getRoom, updateRoom } = require("./rooms");
 const codenames_DB = require('../db');
@@ -398,8 +398,10 @@ exports.joinRoom = async function ({socket}) {
     const room_id = socket.request.session.room_id;
     const room_name = socket.request.session.room_name;
     //const room_lang = socket.request.session.lang;
-    const username = socket.request.session.username;
-
+    var username = String(socket.request.session.username).trim();
+    if (!username || username == "undefined"){
+      username=getOneCookie (socket.handshake.headers.cookie,"username");
+    }
     const res= addUser({id: user_id, username: username, room: room_id});
     if (res.msg=="reconnect" ){
       updateUser ( { id:user_id, active:1 });
