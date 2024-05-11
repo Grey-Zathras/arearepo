@@ -355,6 +355,7 @@ window.onload = function() {
           }
         case 7: { // stop the game
           // clean stats at the table
+          card_event=""; 
           stopFireworks();
           for(var i =1; i<3; i++){ // both teams
             for(var j =0; j<6; j++) {
@@ -368,7 +369,11 @@ window.onload = function() {
         startFireWorks();
         card_event=""; 
         break;
-    }
+      }
+      case 9: { // game reset
+        system_messages.innerHTML="";
+        break;
+      }
 }
     addSysMsgLine(data.user + ": " + msg,"sysmsg");
   });

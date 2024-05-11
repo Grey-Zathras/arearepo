@@ -54,8 +54,10 @@ const io_socket_connected = (socket) => {
       var cards = cardGenerator.generateCards25(wordList[lang]);
       var states = cardGenerator.generateSpies();
       gameLogic.writeStates({the_room_id: the_room.id, states: states, cards: cards});
+      // reset game stats
+
       io.to(the_room.room_name).emit('new table',  { room_id: the_room.id, cards: cards}); // no team!
-      io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("Table recreated")+"!", user: data.user, msg_type:0}); // general system message
+      io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("Table recreated")+"!", user: data.user, msg_type:9}); // game reset
     } catch (err) {
       debug(socket.id," - ",socket.request.sessionID,`rebuild table request error: User ${socket.data}, request: ${data} `,err);
       socket.emit('error message',  socket.request.i18n.t(err));
@@ -111,7 +113,7 @@ const io_socket_connected = (socket) => {
       the_room.turn=1;
       the_room.active_team=getRandomValue(1,2);
       gameLogic.resetRoomCardsResponsesMap(the_room);
-
+      the_room.clicks.forEach( (item, i, self) => self[i] = 0 ); 
       const states_unsecured = await gameLogic.getRoomStates(the_room.id);
 
         //send team sheme to the team
