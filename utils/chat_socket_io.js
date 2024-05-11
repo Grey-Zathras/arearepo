@@ -126,8 +126,8 @@ const io_socket_connected = (socket) => {
       var states = await gameLogic.getTeamStates({room_id:the_room.id, team_id:0, states_unsecured: states_unsecured });
       debug(`start game - observer schema: `,states);
       io.to(the_room.room_name).emit('team scheme',  { room_id: the_room.id, states: states}); // no team!
-      io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("Let's start the game")+"!", user: data.user, msg_type:2 }); // system message start game
       gameLogic.roomData({room: the_room, io:io });
+      io.to(the_room.room_name).emit('system message', { msg: socket.request.i18n.t("Let's start the game")+"!", user: data.user, msg_type:2 }); // system message start game
       //const { rows } = await codenames_DB.query('UPDATE rooms SET stat=$2 WHERE id = $1', [room_id],[0]);  
       debug("start game success, room:",the_room);
     } catch (err) {

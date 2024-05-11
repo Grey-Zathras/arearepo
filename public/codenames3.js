@@ -303,6 +303,9 @@ window.onload = function() {
             //startButton.style.display = "none";
             //chooseTeamBlock.style.display = "none";
             //challengeBlock.style.display = "contents";
+            if (game_obj.room.active_team==my_team) {
+              bannerAnimation(yourTurn);
+            }
             break;
         }
         case 3: { // challenge -> card choice
