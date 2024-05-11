@@ -24,6 +24,7 @@
     "title":"Error {{code}}",
     "Error_Code" : "Error Code"
   },
+  "Killer": "Assassin",
   "ru" : "Russian",
   "en" : "English",
   "bg" : "Bulgarian",  
