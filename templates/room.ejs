@@ -132,8 +132,11 @@
     <div class="log_area" >
       <div class="chat_header">
         <div class="host">
-          <%= t("Room host")%>:  <span id="host"></span> <button id="startButton" disabled><%= t("Start game")%></button> <button id="stopButton" disabled style="display:none;"><%= t("Stop game")%></button> 
+          <button id="endTurnButton"  disabled><%= t("End Turn")%></button>
+          <%= t("Room host")%>:  <span id="host"></span> 
+          <button id="startButton" disabled><%= t("Start game")%></button> <button id="stopButton" disabled style="display:none;"><%= t("Stop game")%></button> 
           <button id="manageUsersButton" disabled><%= t("Manage Room")%></button>
+          <button id="reconnectButton"><%= t("Reconnect")%></button>
         </div>
           <div class="div-table teams" >
           <div class="div-table-row" >
@@ -156,8 +159,6 @@
         </div>
         <div class="userControl"  >
           <!--  <input id="room" autocomplete="off" placeholder="Room name <%= room.title %>"/>  -->
-          <button id="reconnectButton"><%= t("Reconnect")%></button>
-          <button id="endTurnButton"  disabled><%= t("End Turn")%></button>
 
           <form id="userForm" action="">
             <div id="chooseTeamBlock" >
