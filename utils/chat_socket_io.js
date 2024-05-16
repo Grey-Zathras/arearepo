@@ -196,6 +196,11 @@ const io_socket_connected = (socket) => {
         }); // system message card_chosen
         if (reveal_role==4) {
           the_room.clicks[the_room.active_team]--;
+          //check if spies left for that team?
+          let other_team_spies=states[2-the_room.active_team].reduce((total,state) => total+(state==1), 0); // states[2-the_room.active_team].filter(state => state==1 ).length;
+          if( !other_team_spies ) {
+            the_room.clicks[the_room.active_team]=0;
+          }
           if (!the_room.clicks[the_room.active_team]) {
             // change the  turn and the step, team is the same
             gameLogic.endTurn({
@@ -204,7 +209,11 @@ const io_socket_connected = (socket) => {
               the_room:the_room,
               states:states,
               user: user.username,
-              main_msg:`${socket.request.i18n.t(teams_list[user.team]) } ${socket.request.i18n.t("team run out of clicks")}.`
+              main_msg:`${
+                socket.request.i18n.t(teams_list[other_team_spies? user.team : 2-user.team ]) 
+              } ${
+                socket.request.i18n.t(other_team_spies? "team run out of clicks" : "team has no more spies")
+              }.`
             });
           } else {
             if (!gameLogic.check4Win({io:io, i18n:socket.request.i18n, the_room:the_room, states:states}) ){

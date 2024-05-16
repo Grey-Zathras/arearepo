@@ -331,7 +331,8 @@ exports.endTurn =  function ({the_room, states,main_msg, user, io, i18n }) {
     the_room.step = 0; //now is the Challenge step
     let count = states[the_room.active_team-1].reduce((total,x) => total+(x==1), 0);
     if (!count){
-      io.to(the_room.room_name).emit('system message', { msg: `${i18n.t(teams_list[the_room.active_team]) } ${i18n.t("team has no more spies")}!`, user: "game", msg_type:0 }); // system message / general
+      //io.to(the_room.room_name).emit('system message', { msg: `${i18n.t(teams_list[the_room.active_team]) } ${i18n.t("team has no more spies")}!`, user: "game", msg_type:0 }); // system message / general
+      main_msg+= ` ${i18n.t(teams_list[the_room.active_team]) } ${i18n.t("team has no more spies")}!`;
       the_room.active_team=3-the_room.active_team;
     } 
     exports.resetRoomCardsResponsesMap(the_room);
