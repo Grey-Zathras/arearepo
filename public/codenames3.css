@@ -141,24 +141,6 @@ padding: 10px;
     font-size: small;
     text-decoration: underline;
 }
-@media (min-width: 640px) {
-
-/* responsive table (left area) */
-    .cardspace {
-        /* font-size: x-small; */
-        float: left;
-    padding: 10px; 
-        /* padding-right: 10px; */
-        width: max(300px, 68%);
-        height: max(200px, 100%); 
-    }
-    /* responsive right area(game log)) */
-    .log_area {
-        float: left;
-        /* padding: 15px; */
-        width: max(160px, 27%);
-    }
-}
 
 td.card {
     /* width: 208px; height: 134px; */
@@ -264,8 +246,8 @@ td.card_choice_no_concent {
 
 .close:hover,
 .close:focus {
-  color: black;
-  text-decoration: none;
+    color: black;
+    text-decoration: none;
   cursor: pointer;
 }
 
@@ -307,7 +289,34 @@ html {
     font-feature-settings: normal;
     font-variation-settings: normal
 }
+@media (max-width: 640px) {
+    .card_text {
+        font-size: 1.15rem;
+        line-height: 1.25rem
+    }
+}
+@media (min-width: 640px) {
+/* responsive table (left area) */
+    .cardspace {
+        /* font-size: x-small; */
+        float: left;
+    padding: 10px; 
+        /* padding-right: 10px; */
+        width: max(300px, 68%);
+        height: max(200px, 100%); 
+    }
+    /* responsive right area(game log)) */
+    .log_area {
+        float: left;
+        /* padding: 15px; */
+        width: max(160px, 27%);
+    }
+}
 @media (min-width: 640px) and (max-width: 800px) {
+    .card_text {
+        /* font-size: 1.275rem; */
+        line-height: 1.25rem
+    }
     .log_area .teams{
         font-size: .675rem;
       }
