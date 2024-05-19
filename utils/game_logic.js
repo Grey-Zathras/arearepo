@@ -165,7 +165,7 @@ exports.getStatesRevertTheCard = async function ({the_room,card_id}) {
       throw (errmsg);
   }
   rows[0].states[2-the_room.active_team][card_id]+=3;
-  if (rows[0].states[2-the_room.active_team][card_id] >3 ) { //4 = spy, 5 = killer
+  if (rows[0].states[2-the_room.active_team][card_id] ==4 ) { // >3  , 4 = spy, 5 = killer
       rows[0].states[the_room.active_team-1][card_id]=rows[0].states[2-the_room.active_team][card_id];
   }
   exports.writeStates({the_room_id: the_room.id, states: rows[0].states}); //await not needed ?
