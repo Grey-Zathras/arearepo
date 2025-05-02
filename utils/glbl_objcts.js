@@ -1,6 +1,6 @@
 const cookie = require("cookie"); // Import the 'cookie' module
 
-const log_debug_on=1;
+const log_debug_on=0;
 
 const teams_list=["observer","Red","Blue"]; //team membership text for chat
 const step_verbs=["Challenge", "Response"]; // game status terms

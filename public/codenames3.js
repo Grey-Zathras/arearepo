@@ -80,7 +80,7 @@ function addSysMsgLine (text, msgclass=""){
     item1 = document.createElement('span');
     item1.className=msgclass;
     item.appendChild(item1);
-    item1.innerHTML = " "+text;
+    item1.innerHTML = " "+JSON.stringify(text);
     //item1.textContent = text;
     //console.log(item.outerHTML, text);
   }

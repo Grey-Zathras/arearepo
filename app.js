@@ -22,7 +22,8 @@ const Backend = require('i18next-fs-backend');
 const { log_debug_on, supported_languages, isInt, makeid } = require("./utils/glbl_objcts.js");
 const wordList = require('./utils/wordlist.js');
 const cardGenerator = require('./utils/card_generator.js');
-const codenames_DB = require('./db.js');
+//const codenames_DB = require('./db.js');
+const roomModel = require("./models/rooms_model.js");
 
 
 
@@ -82,48 +83,76 @@ function app_init (sessionMiddleware){
 
     // Home route to list all rooms
     app.get('/', async (req, res) => {
-      const { rows } = await codenames_DB.query('SELECT *  FROM rooms where priv=FALSE'); //id, title,code, stat, lang
+      
+      var msg = new Object();
+      var room_list="";
+      try {
+        //const parsed_qs = querystring.parse(req.query);
+        var paging = Object();
+        //paging.current_page = 1;
+        paging.current_page_rec = Math.max(parseInt(req.query.offset) || req.session.current_page_rec || 1 , 1);
+        paging.size = Math.max(parseInt(req.query.limit) || req.session.paging_size || 10 , 3);
+        req.session.current_page_rec = paging.current_page_rec;
+        req.session.paging_size = paging.size;
+        //paging.count_pages = 1; 
+        //const { rows } = await codenames_DB.query('SELECT *  FROM rooms where priv=FALSE'); //id, title,code, stat, lang
+        room_list= await roomModel.getRoomList({req:req,paging:paging});
+        //debug_app("QS object:",JSON.stringify(parsed_qs), "querystring: ",req.query);
+        debug_app("get list",room_list);
+        res.render('index', { 
+          rooms: room_list,
+          lang: req.language,
+          qs_params: req.query,
+          languages: req.i18n.translator.backendConnector.options.preload
+      });
+      } catch (error) {
+        debug_app("Error in indexRoutes!",error);
+        next(createError(error));
+      }
       //res.json(rows);
-      res.render('index', { 
-        rooms: rows,
-        lang: req.language,
-        languages: req.i18n.translator.backendConnector.options.preload
-    });
       //console.log(`${JSON.stringify(rows)} `);
     });
 
     // Route to get a specific room by id
     app.get('/room/:id', async (req, res, next) => {
       const code= req.params.id;
-      //const { userTeam } = req._parsedUrl.query;
-      //console.log("User team is", userTeam );
-      //if (isInt(int_id)) {
-      const { rows } = await codenames_DB.query("SELECT * FROM rooms WHERE code = $1", [code]);
-          if (rows.length === 0) {
-              //res.status(404).send('Room not found');
-              //res.status(404).json({ message: 'Post not found' });
-              return next(
-                createError(404, 'Room not found'));
-          } else {
-            const session = req.session;
-            session.room_id = code;
-            session.room_name = rows[0].title;
-            session.room_lang =  rows[0].lang.toLowerCase(); 
-            session.user_old_lang =  req.i18n.language;
-            session.username = req.cookies.username;
-            req.i18n.changeLanguage(session.room_lang); 
-            res.render('room', { room: rows[0] });
-              //res.json(rows[0]);
-          }
-      //}  else {
-          // SQL injection attack
-      //    debug_app(`SQL injection attack, parameter: ${req.params.id}`);
-          //console.log(`SQL injection attack, parameter: ${req.params.id}`);
-          //res.status(404).send('Room not found');
-      //    return next(
-      //      createError(404, 'Room not found'));
-      //}
-      //next();  
+      try {
+        //const { userTeam } = req._parsedUrl.query;
+        //console.log("User team is", userTeam );
+        //if (isInt(int_id)) {
+        //const { rows } = await codenames_DB.query("SELECT * FROM rooms WHERE code = $1", [code]);
+        const room = await roomModel.getRoomByCode(code);
+            if (typeof(room)==="undefined") {
+                ////res.status(404).send('Room not found');
+                ////res.status(404).json({ message: 'Post not found' });
+                return next(
+                  createError(404, 'Room not found'));
+            } else 
+            {
+              const session = req.session;
+              session.room_id = code;
+              session.room_name = room.title;
+              session.room_lang =  room.lang.toLowerCase(); 
+              session.user_old_lang =  req.i18n.language;
+              session.username = req.cookies.username;
+              req.i18n.changeLanguage(session.room_lang); 
+              res.render('room', { room: room });
+                //res.json(room);
+            }
+        //}  else {
+            // SQL injection attack
+        //    debug_app(`SQL injection attack, parameter: ${req.params.id}`);
+            //console.log(`SQL injection attack, parameter: ${req.params.id}`);
+            //res.status(404).send('Room not found');
+        //    return next(
+        //      createError(404, 'Room not found'));
+        //}
+        //next();  
+        
+      } catch (error) {
+        debug_app("Error getting the room:",code, error);
+        next(createError(error));
+      }
     });
 
     // Route to display the form for creating a new room
@@ -138,20 +167,27 @@ function app_init (sessionMiddleware){
       
     // Route to create a new room
     app.post('/create', async (req, res) => {
-      const { title, code, lang } = req.body;
-      //console.log(`creating new room  ${title}`); //{req.body}
-      var cards = cardGenerator.generateCards25(wordList[lang] );
-      var states = cardGenerator.generateSpies();
-      
-      const { rows } = await codenames_DB.query(
-        'INSERT INTO rooms(title, code, cards, states, lang ) VALUES($1, $2, $3, $4, $5) RETURNING *',
-        [title, code, cards, states, lang]
-      );
-      //res.status(201).json(rows[0]);
-      debug_app(`creating new room  ${title}`,JSON.stringify(rows[0]));
-      //console.log(`creating new room  ${title}`,JSON.stringify(rows[0])); //{req.body}
-      
-      res.status(201).render('create_confirmation', { room:  req.body , rows:rows[0]});
+      try {
+        const { title, code, lang } = req.body;
+        //console.log(`creating new room  ${title}`); //{req.body}
+        var cards = cardGenerator.generateCards25(wordList[lang] );
+        var states = cardGenerator.generateSpies();
+        /*
+        const { rows } = await codenames_DB.query(
+          'INSERT INTO rooms(title, code, cards, states, lang ) VALUES($1, $2, $3, $4, $5) RETURNING *',
+          [title, code, cards, states, lang]
+        );
+        // */
+        const  room  = await roomModel.createRoom({title:title, code: code, cards: cards, states:states, lang: lang });
+        //res.status(201).json(rows[0]);
+        debug_app(`creating new room  ${title}`,JSON.stringify(room));
+        //console.log(`creating new room  ${title}`,JSON.stringify(rows[0])); //{req.body}
+        
+        res.status(201).render('create_confirmation', { room:  req.body , rows:room});
+      } catch (error) {
+        debug_app("Error creating new room!",error);
+        next(createError(error));
+      }
     });
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {

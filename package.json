@@ -1,6 +1,6 @@
 {
   "name": "codenames_duet",
-  "version": "0.6.8",
+  "version": "0.7.1",
   "description": "CodeNames Duet online game",
   "main": "server.js",
   "scripts": {
@@ -23,6 +23,7 @@
     "url": "https://github.com/Grey-Zathras/arearepo/issues"
   },
   "dependencies": {
+    "better-sqlite3": "^11.9.1",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "debug": "^4.3.4",
@@ -42,7 +43,7 @@
     "supports-color": "^9.4.0"
   },
   "engines": {
-    "node": "^16.x"
+    "node": ">=16.x"
   },
   "homepage": "https://github.com/Grey-Zathras/arearepo#readme"
 }

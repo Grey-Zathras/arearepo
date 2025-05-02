@@ -134,6 +134,9 @@ db.js
 package-lock.json
 .vscode/launch.json
 
+# databases folder
+databases/
+
 # random files
 codenames03.html
 codenames04.html
