@@ -1,5 +1,17 @@
 'use strict';
 const database = require  ('./../db_sqlite.js');
+const {isEmpty} = require  ('./../utils/glbl_objcts.js');
+const room_field_list = [
+  'title',
+  'code' ,
+  'lang' , 
+  'priv' ,
+  'stat' ,
+  'cards' ,
+  'states',
+  'created_at'
+];
+
 
 const countRooms2 = async function (keys,values) {
     var SQLStr=`SELECT COUNT(ROWID) as count FROM rooms`;
@@ -91,8 +103,65 @@ const createRoom = async function({title, code, cards, states, lang}){
     return link_record;
 }
 
+/*
+  try {
+    await codenames_DB.query('BEGIN');
+    if (cards) {
+      const queryText = 'UPDATE rooms SET states=$2, cards=$3 WHERE code = $1';
+      var { rows } = await codenames_DB.query(queryText, [the_room_id,states,cards]);
+    } else {
+      const queryText = 'UPDATE rooms SET states=$2 WHERE code = $1';
+      var { rows } = await codenames_DB.query(queryText, [the_room_id,states]);
+    }
+    
+    await codenames_DB.query('COMMIT');
+  } catch (e) {
+    await codenames_DB.query('ROLLBACK');
+    throw e;
+  } finally {
+    //codenames_DB.release()
+  }
+  //  */
+const updateRoom = async function(params, code){
+  const keys = Object.keys(params).filter( (key) => {
+    return room_field_list.includes(key) && !isEmpty(params[key]);
+  });
+  if (keys.length > 0){
+    if (params.states){
+      params.states=JSON.stringify(params.states);
+    }
+    if (params.cards){
+      params.cards=JSON.stringify(params.cards);
+    }
+    const values = keys.map(key => params[key] );
+    const SQLStr="UPDATE rooms SET " + keys.join(' = ?, ') + '=?  WHERE code = ? RETURNING *'; 
+    const updateRoomQuery = database.prepare(SQLStr);
+    const result = await updateRoomQuery.run(values,code);
+  }
+  const link_record = await getRoomByCodeQuery.get(code );
+  return link_record;
+}
+
+/*
+const { rows } =  codenames_DB.query(
+  'DELETE FROM rooms WHERE code = $1 RETURNING *',
+  [the_room.id]
+); //no await
+// */
+
+const DeleteRoomQuery =  database.prepare(`
+  DELETE FROM rooms WHERE code = ?
+`);
+
+const deleteRoom = async function (code ) {
+  const room_record = await DeleteRoomQuery.run(code );
+  return room_record;
+}
+
 module.exports = {
     createRoom,
+    updateRoom,
+    deleteRoom,
     getRoomList,
     getRoomByCode
   };

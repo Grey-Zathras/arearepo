@@ -4,7 +4,9 @@ debug.log = console.log.bind(console); // don't forget to bind to console!
 const { log_debug_on, teams_list, isInt, getOneCookie } = require("./glbl_objcts");
 const { addUser, removeUser, getUser, getUsersInRoom,updateUser } = require("./users");
 const { addRoom, removeRoom, getRoom, updateRoom } = require("./rooms");
-const codenames_DB = require('../db');
+//const codenames_DB = require('../db');
+const roomModel = require("./../models/rooms_model.js");
+
 
 exports.roomData = function ({room, io}) {
     //debug("gamelogic roomData room:",room);
@@ -126,18 +128,28 @@ exports.checkUserTeamIsActive = function (the_room,user) {
       }  
 }
 exports.readStates = async function (the_room_id) {
-  var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE code = $1', [the_room_id]);
-  if (rows.length === 0) {
+  //var { rows } = await codenames_DB.query('SELECT states FROM rooms WHERE code = $1', [the_room_id]);
+  const room = await roomModel.getRoomByCode(the_room_id);
+  //if (rows.length === 0) {
+  if (typeof(room)==="undefined") {
       const errmsg= `Room ${the_room_id} not found`;
       throw (errmsg);
   }
-  if (!Array.isArray(rows[0].states)  ){
+  if (!Array.isArray(room.states)  ){
     const errmsg= `Room ${the_room_id} not found`; 
     throw (errmsg);
   }
-  return rows;
+  return room;
 }
 exports.writeStates = async function ({the_room_id,cards,states}) {
+  try {
+    const room = await roomModel.updateRoom({cards: cards, states: states}, the_room_id);
+    return room;
+  } catch (error) {
+    debug(' - writestates: ',error,the_room_id,cards,states);
+    throw (error);
+  }
+  /*
   try {
     await codenames_DB.query('BEGIN');
     if (cards) {
@@ -155,21 +167,21 @@ exports.writeStates = async function ({the_room_id,cards,states}) {
   } finally {
     //codenames_DB.release()
   }
-  return rows;
+  //  */
 }
 
 exports.getStatesRevertTheCard = async function ({the_room,card_id}) {
-  var rows = await exports.readStates(the_room.id);
-  if (rows[0].states[2-the_room.active_team][card_id] >2 ) {
+  var room = await exports.readStates(the_room.id);
+  if (room.states[2-the_room.active_team][card_id] >2 ) {
       const errmsg= `Card ${the_room.id} is already opened`;
       throw (errmsg);
   }
-  rows[0].states[2-the_room.active_team][card_id]+=3;
-  if (rows[0].states[2-the_room.active_team][card_id] ==4 ) { // >3  , 4 = spy, 5 = killer
-      rows[0].states[the_room.active_team-1][card_id]=rows[0].states[2-the_room.active_team][card_id];
+  room.states[2-the_room.active_team][card_id]+=3;
+  if (room.states[2-the_room.active_team][card_id] ==4 ) { // >3  , 4 = spy, 5 = killer
+    room.states[the_room.active_team-1][card_id]=room.states[2-the_room.active_team][card_id];
   }
-  exports.writeStates({the_room_id: the_room.id, states: rows[0].states}); //await not needed ?
-  return rows[0].states;      
+    await exports.writeStates({the_room_id: the_room.id, states: room.states}); //await needed for error handling ?
+  return room.states;      
 }
 
 exports.kickUserFromTheRoom = async function ({the_room,userleft,socket,io}) {
@@ -246,14 +258,16 @@ exports.delayedUserLeaveTheRoom =  function (the_room,user,socket) {
 }
 
 exports.getRoomStates = async function (room_id) {
-    var { rows } = await codenames_DB.query("SELECT states FROM rooms WHERE code = $1", [room_id]);
-    if (rows.length === 0) {
+    //var { rows } = await codenames_DB.query("SELECT states FROM rooms WHERE code = $1", [room_id]);
+    const room = await roomModel.getRoomByCode(room_id);
+    //if (rows.length === 0) {
+    if (typeof(room)==="undefined") {
       throw(`Room ${room_id} not found`);
     } 
-    if (!Array.isArray(rows[0].states)  ) {
+    if (!Array.isArray(room.states)  ) {
       throw (`Room ${room_id} - game data not found, pls generate the table`);
     }
-    return rows[0].states;
+    return room.states;
 }
 
 exports.getTeamStates = async function ({room_id,team_id,states_unsecured}) {
@@ -384,10 +398,13 @@ exports.destroyRoom = function ({io, the_room}){
   });      
 
   io.socketsLeave(the_room.room_name);
+  /*
   const { rows } =  codenames_DB.query(
     'DELETE FROM rooms WHERE code = $1 RETURNING *',
     [the_room.id]
   ); //no await
+  // */
+  const room = deleteRoom(the_room.id);
 }
 
 exports.joinRoom = async function ({socket}) { 

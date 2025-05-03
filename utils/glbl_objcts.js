@@ -40,12 +40,15 @@ function getOneCookie(rawCookie, cokkieName){
   const myCookieValue = parsedCookies[cokkieName]; // Replace with your actual cookie name
   return myCookieValue;
 }
-
+function isEmpty(val){
+  return (val === undefined || val == null || val.length <= 0) ? true : false;
+}
 module.exports = {
   teams_list,
   step_verbs,
   supported_languages,
   log_debug_on,
+  isEmpty,
   getRandomValue,
   isInt,
   getOneCookie,

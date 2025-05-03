@@ -182,7 +182,8 @@ const io_socket_connected = (socket) => {
       //debug("card_choice consent", consent);
       if (consent) {
         // update states in the database
-        var states = await gameLogic.getStatesRevertTheCard({the_room:the_room,card_id:data.card_id});
+          
+          var states = await gameLogic.getStatesRevertTheCard({the_room:the_room,card_id:data.card_id});
           
         // broadcast new states to all users
         const reveal_role= states[2-the_room.active_team][data.card_id];
