@@ -136,6 +136,7 @@ package-lock.json
 
 # databases folder
 databases/
+*.db
 
 # random files
 codenames03.html
