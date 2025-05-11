@@ -187,7 +187,7 @@ td.card_choice_no_concent {
     text-align: center;
 }
 .userControl{
-    display: ruby-text;
+    display: block;
 }
 #reconnectButton {
     /* margin-left: 0; display: block; margin-right: auto; */
