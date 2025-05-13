@@ -1,4 +1,12 @@
 // db.js
+const fs = require('fs');
+
+const path = './database';
+if (!fs.existsSync(path)) {
+    fs.mkdirSync(path);
+    console.log('Folder "database" created.');
+}
+
 const database = require('better-sqlite3')(`./database/rooms.db`);
 const initDatabase = `
 CREATE TABLE IF NOT EXISTS rooms (
@@ -16,6 +24,7 @@ CREATE TABLE IF NOT EXISTS rooms (
 CREATE UNIQUE INDEX IF NOT EXISTS idx_rooms_code  
 ON rooms(code);
 `;
+
 
 
 database.exec(initDatabase);
