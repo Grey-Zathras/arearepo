@@ -1,5 +1,9 @@
 // db.js
-const database = require('better-sqlite3')(`./database/rooms.db`);
+const fs = require('fs');
+const path = './database';
+const dbPath= (fs.existsSync(path) ? `./database/rooms.db`: ':memory:');
+
+const database = require('better-sqlite3')(dbPath);
 const initDatabase = `
 CREATE TABLE IF NOT EXISTS rooms (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
